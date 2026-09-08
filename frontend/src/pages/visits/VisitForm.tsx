@@ -60,17 +60,25 @@ export default function VisitForm() {
   const [completing, setCompleting] = useState(false);
 
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const draftCreationStarted = useRef(false);
 
   // Create the draft immediately so autosave always has somewhere to write to.
+  // Guarded against React StrictMode's double-invoke of effects in development,
+  // which would otherwise create two draft visits for a single "new visit" click.
   useEffect(() => {
     if (visitIdParam) return;
     if (!clientId) return;
+    if (draftCreationStarted.current) return;
+    draftCreationStarted.current = true;
     api
       .post(`/clients/${clientId}/visits`, {})
       .then((res) => {
         navigate(`/visits/${res.data.visit.id}/edit`, { replace: true });
       })
-      .catch((err) => setError(apiErrorMessage(err, "Could not start a new visit.")));
+      .catch((err) => {
+        draftCreationStarted.current = false;
+        setError(apiErrorMessage(err, "Could not start a new visit."));
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clientId, visitIdParam]);
 
