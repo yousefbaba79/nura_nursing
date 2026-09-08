@@ -26,6 +26,8 @@ services:
         value: production
       - key: CORS_ORIGIN
         value: https://nura-nursing-app.onrender.com
+      - key: NODE_VERSION
+        value: 22.14.0
 
   - type: web
     name: nura-nursing-app
@@ -36,6 +38,8 @@ services:
     envVars:
       - key: VITE_API_URL
         value: https://nura-nursing-api.onrender.com/api
+      - key: NODE_VERSION
+        value: 22.14.0
     routes:
       - type: rewrite
         source: /*
