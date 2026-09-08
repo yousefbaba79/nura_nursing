@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { api } from "../../api/client";
 import { Spinner, ErrorBanner } from "../../components/ui";
 import { formatDate } from "../../lib/format";
@@ -21,6 +22,7 @@ interface SummaryData {
 
 export default function VisitSummary() {
   const { visitId } = useParams<{ visitId: string }>();
+  const { t } = useTranslation();
   const [summary, setSummary] = useState<SummaryData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -44,56 +46,60 @@ export default function VisitSummary() {
         setSelectedRecs(s.recommendations.map((r) => r.id));
         setSelectedItems(s.actionItems.map((a) => a.id));
       })
-      .catch(() => setError("Could not load this visit's summary."))
+      .catch(() => setError(t("visits.summary.couldNotLoad")))
       .finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visitId]);
 
   const previewText = useMemo(() => {
     if (!summary) return "";
     const lines: string[] = [];
-    lines.push(`Visit Summary — ${summary.clientName}`);
-    if (summary.babyNames.length) lines.push(`Baby/Babies: ${summary.babyNames.join(", ")}`);
-    lines.push(`Visit date: ${formatDate(summary.visitDate)}`);
+    lines.push(t("visits.summary.text.heading", { clientName: summary.clientName }));
+    if (summary.babyNames.length) lines.push(t("visits.summary.text.babies", { names: summary.babyNames.join(", ") }));
+    lines.push(t("visits.summary.text.visitDate", { date: formatDate(summary.visitDate) }));
     lines.push("");
     if (includeQuestions && summary.clientQuestions) {
-      lines.push("Questions Discussed:");
+      lines.push(t("visits.summary.text.questionsDiscussed"));
       lines.push(summary.clientQuestions, "");
     }
     if (includeSolutions && summary.solutionsDiscussed) {
-      lines.push("Recommendations Discussed:");
+      lines.push(t("visits.summary.text.recommendationsDiscussed"));
       lines.push(summary.solutionsDiscussed, "");
     }
     const recs = summary.recommendations.filter((r) => selectedRecs.includes(r.id));
     if (recs.length) {
-      lines.push("Recommendations:");
+      lines.push(t("visits.summary.text.recommendations"));
       recs.forEach((r) => lines.push(`- ${r.title}${r.instructions ? `: ${r.instructions}` : ""}`));
       lines.push("");
     }
     const items = summary.actionItems.filter((a) => selectedItems.includes(a.id));
     if (items.length) {
-      lines.push("Action Items:");
-      items.forEach((a) => lines.push(`- ${a.title}${a.dueDate ? ` (due ${formatDate(a.dueDate)})` : ""}${a.instructions ? `: ${a.instructions}` : ""}`));
+      lines.push(t("visits.summary.text.actionItems"));
+      items.forEach((a) =>
+        lines.push(`- ${a.title}${a.dueDate ? ` (${t("visits.summary.text.actionItemDue", { date: formatDate(a.dueDate) })})` : ""}${a.instructions ? `: ${a.instructions}` : ""}`)
+      );
       lines.push("");
     }
     if (includeWarningSigns && summary.warningSignsDiscussed) {
-      lines.push("Warning Signs to Watch For:");
+      lines.push(t("visits.summary.text.warningSigns"));
       lines.push(summary.warningSignsDiscussed, "");
     }
     if (includeFollowUp && (summary.followUpPlan || summary.followUpDate)) {
-      lines.push("Follow-Up Plan:");
-      if (summary.followUpDate) lines.push(`Next follow-up: ${formatDate(summary.followUpDate)}`);
+      lines.push(t("visits.summary.text.followUpPlan"));
+      if (summary.followUpDate) lines.push(t("visits.summary.text.nextFollowUp", { date: formatDate(summary.followUpDate) }));
       if (summary.followUpPlan) lines.push(summary.followUpPlan);
       lines.push("");
     }
     if (summary.consultant) {
-      lines.push("Prepared by:");
+      lines.push(t("visits.summary.text.preparedBy"));
       lines.push(`${summary.consultant.fullName}${summary.consultant.professionalTitle ? `, ${summary.consultant.professionalTitle}` : ""}`);
       if (summary.consultant.clinicName) lines.push(summary.consultant.clinicName);
       if (summary.consultant.phone) lines.push(summary.consultant.phone);
       if (summary.consultant.email) lines.push(summary.consultant.email);
     }
     return lines.join("\n");
-  }, [summary, includeQuestions, includeSolutions, includeFollowUp, includeWarningSigns, selectedRecs, selectedItems]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [summary, includeQuestions, includeSolutions, includeFollowUp, includeWarningSigns, selectedRecs, selectedItems, t]);
 
   async function handleCopy() {
     await navigator.clipboard.writeText(previewText);
@@ -126,7 +132,7 @@ export default function VisitSummary() {
       link.remove();
       window.URL.revokeObjectURL(url);
     } catch {
-      setError("Could not generate the PDF summary.");
+      setError(t("visits.summary.couldNotGeneratePdf"));
     } finally {
       setDownloading(false);
     }
@@ -144,33 +150,31 @@ export default function VisitSummary() {
     <div className="space-y-6">
       <div>
         <Link to={`/visits/${visitId}`} className="text-sm font-medium text-brand-700 hover:underline">
-          ← Back to visit
+          {t("visits.summary.backToVisit")}
         </Link>
-        <h1 className="mt-1 text-xl font-bold text-gray-900">Client visit summary</h1>
-        <p className="text-sm text-gray-500">
-          Choose exactly what to share. Private professional notes and internal assessments are never included.
-        </p>
+        <h1 className="mt-1 text-xl font-bold text-gray-900">{t("visits.summary.title")}</h1>
+        <p className="text-sm text-gray-500">{t("visits.summary.subtitle")}</p>
       </div>
 
       <ErrorBanner message={error} />
 
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="card space-y-3">
-          <h2 className="text-sm font-semibold text-gray-900">What to include</h2>
+          <h2 className="text-sm font-semibold text-gray-900">{t("visits.summary.whatToInclude")}</h2>
           <label className="flex items-center gap-2 text-sm text-gray-700">
             <input type="checkbox" checked={includeQuestions} onChange={(e) => setIncludeQuestions(e.target.checked)} disabled={!summary.clientQuestions} />
-            Questions discussed {!summary.clientQuestions && <span className="text-gray-400">(none recorded)</span>}
+            {t("visits.summary.questionsDiscussed")} {!summary.clientQuestions && <span className="text-gray-400">{t("visits.summary.noneRecorded")}</span>}
           </label>
           <label className="flex items-center gap-2 text-sm text-gray-700">
             <input type="checkbox" checked={includeSolutions} onChange={(e) => setIncludeSolutions(e.target.checked)} disabled={!summary.solutionsDiscussed} />
-            Recommendations discussed (narrative) {!summary.solutionsDiscussed && <span className="text-gray-400">(none recorded)</span>}
+            {t("visits.summary.recommendationsNarrative")} {!summary.solutionsDiscussed && <span className="text-gray-400">{t("visits.summary.noneRecorded")}</span>}
           </label>
 
           {summary.recommendations.length > 0 && (
             <div>
-              <p className="mb-1 text-sm font-medium text-gray-700">Recommendations</p>
+              <p className="mb-1 text-sm font-medium text-gray-700">{t("visits.summary.recommendationsLabel")}</p>
               {summary.recommendations.map((r) => (
-                <label key={r.id} className="flex items-center gap-2 pl-2 text-sm text-gray-700">
+                <label key={r.id} className="flex items-center gap-2 ps-2 text-sm text-gray-700">
                   <input
                     type="checkbox"
                     checked={selectedRecs.includes(r.id)}
@@ -184,9 +188,9 @@ export default function VisitSummary() {
 
           {summary.actionItems.length > 0 && (
             <div>
-              <p className="mb-1 text-sm font-medium text-gray-700">Action items</p>
+              <p className="mb-1 text-sm font-medium text-gray-700">{t("visits.summary.actionItemsLabel")}</p>
               {summary.actionItems.map((a) => (
-                <label key={a.id} className="flex items-center gap-2 pl-2 text-sm text-gray-700">
+                <label key={a.id} className="flex items-center gap-2 ps-2 text-sm text-gray-700">
                   <input
                     type="checkbox"
                     checked={selectedItems.includes(a.id)}
@@ -200,7 +204,7 @@ export default function VisitSummary() {
 
           <label className="flex items-center gap-2 text-sm text-gray-700">
             <input type="checkbox" checked={includeWarningSigns} onChange={(e) => setIncludeWarningSigns(e.target.checked)} disabled={!summary.warningSignsDiscussed} />
-            Warning signs to watch for {!summary.warningSignsDiscussed && <span className="text-gray-400">(none recorded)</span>}
+            {t("visits.summary.warningSignsLabel")} {!summary.warningSignsDiscussed && <span className="text-gray-400">{t("visits.summary.noneRecorded")}</span>}
           </label>
           <label className="flex items-center gap-2 text-sm text-gray-700">
             <input
@@ -209,19 +213,19 @@ export default function VisitSummary() {
               onChange={(e) => setIncludeFollowUp(e.target.checked)}
               disabled={!summary.followUpPlan && !summary.followUpDate}
             />
-            Follow-up plan {!summary.followUpPlan && !summary.followUpDate && <span className="text-gray-400">(none recorded)</span>}
+            {t("visits.summary.followUpPlanLabel")} {!summary.followUpPlan && !summary.followUpDate && <span className="text-gray-400">{t("visits.summary.noneRecorded")}</span>}
           </label>
         </div>
 
         <div className="card flex flex-col">
-          <h2 className="mb-2 text-sm font-semibold text-gray-900">Preview</h2>
+          <h2 className="mb-2 text-sm font-semibold text-gray-900">{t("visits.summary.preview")}</h2>
           <pre className="max-h-[420px] flex-1 overflow-auto whitespace-pre-wrap rounded-md bg-gray-50 p-3 text-sm text-gray-800">{previewText}</pre>
           <div className="mt-3 flex flex-wrap gap-2">
             <button className="btn-secondary" onClick={handleCopy}>
-              {copied ? "Copied!" : "Copy to clipboard"}
+              {copied ? t("visits.summary.copied") : t("visits.summary.copyToClipboard")}
             </button>
             <button className="btn-primary" onClick={handleDownloadPdf} disabled={downloading}>
-              {downloading ? "Preparing PDF…" : "Download PDF"}
+              {downloading ? t("visits.summary.preparingPdf") : t("visits.summary.downloadPdf")}
             </button>
           </div>
         </div>

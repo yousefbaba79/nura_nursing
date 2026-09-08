@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { api } from "../api/client";
 import { Spinner, EmptyState, Badge } from "../components/ui";
 import { formatDate, formatDateTime, isOverdue } from "../lib/format";
@@ -9,6 +10,7 @@ import { useAuth } from "../context/AuthContext";
 export default function Dashboard() {
   const navigate = useNavigate();
   const { consultant } = useAuth();
+  const { t } = useTranslation();
   const { data, isLoading } = useQuery({
     queryKey: ["dashboard"],
     queryFn: async () => (await api.get("/dashboard")).data,
@@ -18,12 +20,14 @@ export default function Dashboard() {
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Welcome back{consultant ? `, ${consultant.fullName.split(" ")[0]}` : ""}</h1>
-          <p className="text-sm text-gray-500">Here's what needs your attention today.</p>
+          <h1 className="text-xl font-bold text-gray-900">
+            {t("dashboard.welcomeBack", { name: consultant ? consultant.fullName.split(" ")[0] : "" })}
+          </h1>
+          <p className="text-sm text-gray-500">{t("dashboard.subtitle")}</p>
         </div>
         <div className="flex gap-2">
           <button className="btn-primary" onClick={() => navigate("/clients?new=1")}>
-            + Add client
+            {t("dashboard.addClient")}
           </button>
         </div>
       </div>
@@ -35,16 +39,21 @@ export default function Dashboard() {
       ) : (
         <>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <StatCard label="Active clients" value={data.stats.activeClientCount} to="/clients" />
-            <StatCard label="Overdue follow-ups" value={data.stats.overdueFollowUpCount} to="/follow-ups?scope=overdue" alert={data.stats.overdueFollowUpCount > 0} />
-            <StatCard label="Overdue action items" value={data.stats.overdueActionItemCount} alert={data.stats.overdueActionItemCount > 0} />
-            <StatCard label="Draft visits" value={data.stats.incompleteDraftCount} alert={data.stats.incompleteDraftCount > 0} />
+            <StatCard label={t("dashboard.stats.activeClients")} value={data.stats.activeClientCount} to="/clients" />
+            <StatCard
+              label={t("dashboard.stats.overdueFollowUps")}
+              value={data.stats.overdueFollowUpCount}
+              to="/follow-ups?scope=overdue"
+              alert={data.stats.overdueFollowUpCount > 0}
+            />
+            <StatCard label={t("dashboard.stats.overdueActionItems")} value={data.stats.overdueActionItemCount} alert={data.stats.overdueActionItemCount > 0} />
+            <StatCard label={t("dashboard.stats.draftVisits")} value={data.stats.incompleteDraftCount} alert={data.stats.incompleteDraftCount > 0} />
           </div>
 
           <div className="grid gap-6 lg:grid-cols-2">
-            <Section title="Today & upcoming follow-ups" viewAllTo="/follow-ups">
+            <Section title={t("dashboard.sections.todayUpcomingFollowUps")} viewAllTo="/follow-ups">
               {[...data.todayFollowUps, ...data.upcomingFollowUps].length === 0 ? (
-                <EmptyState title="No upcoming follow-ups" />
+                <EmptyState title={t("dashboard.sections.noUpcomingFollowUps")} />
               ) : (
                 <ul className="divide-y divide-gray-100">
                   {[...data.todayFollowUps, ...data.upcomingFollowUps].slice(0, 6).map((f: any) => (
@@ -52,7 +61,7 @@ export default function Dashboard() {
                       <Link to={`/clients/${f.client.id}`} className="flex items-center justify-between py-2 text-sm hover:text-brand-700">
                         <span>
                           <span className="font-medium text-gray-900">{f.client.fullName}</span>{" "}
-                          <span className="text-gray-500">— {f.type.replace("_", " ").toLowerCase()}</span>
+                          <span className="text-gray-500">— {t(`enums.followUpType.${f.type}`)}</span>
                         </span>
                         <span className="text-gray-500">{formatDateTime(f.scheduledAt)}</span>
                       </Link>
@@ -62,9 +71,9 @@ export default function Dashboard() {
               )}
             </Section>
 
-            <Section title="Overdue follow-ups" viewAllTo="/follow-ups?scope=overdue">
+            <Section title={t("dashboard.sections.overdueFollowUps")} viewAllTo="/follow-ups?scope=overdue">
               {data.overdueFollowUps.length === 0 ? (
-                <EmptyState title="Nothing overdue" description="Great work staying on top of follow-ups." />
+                <EmptyState title={t("dashboard.sections.nothingOverdue")} description={t("dashboard.sections.nothingOverdueDescription")} />
               ) : (
                 <ul className="divide-y divide-gray-100">
                   {data.overdueFollowUps.slice(0, 6).map((f: any) => (
@@ -79,9 +88,9 @@ export default function Dashboard() {
               )}
             </Section>
 
-            <Section title="Incomplete action items">
+            <Section title={t("dashboard.sections.incompleteActionItems")}>
               {data.incompleteActionItems.length === 0 ? (
-                <EmptyState title="No open action items" />
+                <EmptyState title={t("dashboard.sections.noOpenActionItems")} />
               ) : (
                 <ul className="divide-y divide-gray-100">
                   {data.incompleteActionItems.slice(0, 8).map((a: any) => (
@@ -89,7 +98,7 @@ export default function Dashboard() {
                       <Link to={`/clients/${a.client.id}`} className="flex items-center justify-between py-2 text-sm hover:text-brand-700">
                         <span className="flex items-center gap-2">
                           <span className="font-medium text-gray-900">{a.title}</span>
-                          <Badge className={PRIORITY_COLORS[a.priority]}>{a.priority}</Badge>
+                          <Badge className={PRIORITY_COLORS[a.priority]}>{t(`enums.priority.${a.priority}`)}</Badge>
                         </span>
                         <span className={isOverdue(a.dueDate) ? "font-medium text-red-600" : "text-gray-500"}>{formatDate(a.dueDate)}</span>
                       </Link>
@@ -99,9 +108,9 @@ export default function Dashboard() {
               )}
             </Section>
 
-            <Section title="Recent visits">
+            <Section title={t("dashboard.sections.recentVisits")}>
               {data.recentVisits.length === 0 ? (
-                <EmptyState title="No visits recorded yet" />
+                <EmptyState title={t("dashboard.sections.noVisitsYet")} />
               ) : (
                 <ul className="divide-y divide-gray-100">
                   {data.recentVisits.map((v: any) => (
@@ -118,16 +127,23 @@ export default function Dashboard() {
           </div>
 
           <div className="grid gap-6 lg:grid-cols-2">
-            <Section title="Recently viewed clients">
+            <Section title={t("dashboard.sections.recentlyViewedClients")}>
               {data.recentlyViewedClients.length === 0 ? (
-                <EmptyState title="No clients viewed yet" />
+                <EmptyState title={t("dashboard.sections.noClientsViewedYet")} />
               ) : (
                 <ClientMiniList clients={data.recentlyViewedClients} />
               )}
             </Section>
-            <Section title="Recently added clients">
+            <Section title={t("dashboard.sections.recentlyAddedClients")}>
               {data.recentlyAddedClients.length === 0 ? (
-                <EmptyState title="No clients yet" action={<Link className="btn-primary" to="/clients?new=1">Add your first client</Link>} />
+                <EmptyState
+                  title={t("dashboard.sections.noClientsYet")}
+                  action={
+                    <Link className="btn-primary" to="/clients?new=1">
+                      {t("dashboard.sections.addFirstClient")}
+                    </Link>
+                  }
+                />
               ) : (
                 <ClientMiniList clients={data.recentlyAddedClients} />
               )}
@@ -165,13 +181,14 @@ function StatCard({ label, value, to, alert }: { label: string; value: number; t
 }
 
 function Section({ title, children, viewAllTo }: { title: string; children: React.ReactNode; viewAllTo?: string }) {
+  const { t } = useTranslation();
   return (
     <div className="card">
       <div className="mb-2 flex items-center justify-between">
         <h2 className="text-sm font-semibold text-gray-900">{title}</h2>
         {viewAllTo && (
           <Link to={viewAllTo} className="text-xs font-medium text-brand-700 hover:underline">
-            View all
+            {t("common.viewAll")}
           </Link>
         )}
       </div>

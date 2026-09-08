@@ -14,7 +14,7 @@ const profileInput = z.object({
   clinicName: z.string().optional().nullable(),
   clinicAddress: z.string().optional().nullable(),
   profileImageUrl: z.string().optional().nullable(),
-  defaultLanguage: z.string().optional(),
+  defaultLanguage: z.enum(["en", "he", "ar"]).optional(),
   timeZone: z.string().optional(),
   dateFormat: z.string().optional(),
   defaultVisitDurationMinutes: z.number().optional(),

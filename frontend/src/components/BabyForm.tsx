@@ -1,6 +1,7 @@
 import { type FormEvent, useState, cloneElement } from "react";
+import { useTranslation } from "react-i18next";
 import { api, apiErrorMessage } from "../api/client";
-import { FEEDING_METHODS, labelize } from "../api/enums";
+import { FEEDING_METHODS } from "../api/enums";
 import { ErrorBanner } from "./ui";
 import type { Baby } from "../api/types";
 
@@ -58,6 +59,7 @@ function toFormValues(baby?: Baby | null): FormValues {
 }
 
 export default function BabyForm({ clientId, baby, onSaved, onCancel }: Props) {
+  const { t } = useTranslation();
   const [values, setValues] = useState<FormValues>(() => toFormValues(baby));
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
@@ -69,7 +71,7 @@ export default function BabyForm({ clientId, baby, onSaved, onCancel }: Props) {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (!values.fullName.trim()) {
-      setError("Baby's name is required.");
+      setError(t("babies.form.errorNameRequired"));
       return;
     }
     setError("");
@@ -88,7 +90,7 @@ export default function BabyForm({ clientId, baby, onSaved, onCancel }: Props) {
       const res = baby ? await api.put(`/babies/${baby.id}`, payload) : await api.post(`/clients/${clientId}/babies`, payload);
       onSaved(res.data.baby);
     } catch (err) {
-      setError(apiErrorMessage(err, "Could not save baby record."));
+      setError(apiErrorMessage(err, t("babies.form.couldNotSave")));
     } finally {
       setSaving(false);
     }
@@ -98,90 +100,101 @@ export default function BabyForm({ clientId, baby, onSaved, onCancel }: Props) {
     <form onSubmit={handleSubmit} className="space-y-4">
       <ErrorBanner message={error} />
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <F label="Full name" required>
+        <F id="baby-full-name" label={t("babies.form.fullName")} required>
           <input className="input" value={values.fullName} onChange={(e) => update("fullName", e.target.value)} required />
         </F>
-        <F label="Date of birth">
+        <F id="baby-dob" label={t("babies.form.dateOfBirth")}>
           <input className="input" type="date" value={values.dateOfBirth} onChange={(e) => update("dateOfBirth", e.target.value)} />
         </F>
-        <F label="Sex">
+        <F id="baby-sex" label={t("babies.form.sex")}>
           <select className="input" value={values.sex} onChange={(e) => update("sex", e.target.value)}>
-            <option value="">Not specified</option>
-            <option value="FEMALE">Female</option>
-            <option value="MALE">Male</option>
-            <option value="OTHER">Other</option>
+            <option value="">{t("babies.form.sexNotSpecified")}</option>
+            <option value="FEMALE">{t("babies.form.sexFemale")}</option>
+            <option value="MALE">{t("babies.form.sexMale")}</option>
+            <option value="OTHER">{t("babies.form.sexOther")}</option>
           </select>
         </F>
-        <F label="Gestational age at birth">
-          <input className="input" value={values.gestationalAgeWeeks} onChange={(e) => update("gestationalAgeWeeks", e.target.value)} placeholder="e.g. 38 weeks" />
+        <F id="baby-gestational-age" label={t("babies.form.gestationalAge")}>
+          <input className="input" value={values.gestationalAgeWeeks} onChange={(e) => update("gestationalAgeWeeks", e.target.value)} placeholder={t("babies.form.gestationalAgePlaceholder")} />
         </F>
-        <F label="Type of delivery">
-          <input className="input" value={values.deliveryType} onChange={(e) => update("deliveryType", e.target.value)} placeholder="e.g. vaginal, C-section" />
+        <F id="baby-delivery-type" label={t("babies.form.deliveryType")}>
+          <input className="input" value={values.deliveryType} onChange={(e) => update("deliveryType", e.target.value)} placeholder={t("babies.form.deliveryTypePlaceholder")} />
         </F>
-        <F label="Feeding method">
+        <F id="baby-feeding-method" label={t("babies.form.feedingMethod")}>
           <select className="input" value={values.feedingMethod} onChange={(e) => update("feedingMethod", e.target.value)}>
-            <option value="">Not specified</option>
+            <option value="">{t("babies.form.feedingMethodNotSpecified")}</option>
             {FEEDING_METHODS.map((m) => (
               <option key={m} value={m}>
-                {labelize(m)}
+                {t(`enums.feedingMethod.${m}`)}
               </option>
             ))}
           </select>
         </F>
-        <F label="Birth weight (g)">
+        <F id="baby-birth-weight" label={t("babies.form.birthWeight")}>
           <input className="input" type="number" value={values.birthWeightGrams} onChange={(e) => update("birthWeightGrams", e.target.value)} />
         </F>
-        <F label="Current weight (g)">
+        <F id="baby-current-weight" label={t("babies.form.currentWeight")}>
           <input className="input" type="number" value={values.currentWeightGrams} onChange={(e) => update("currentWeightGrams", e.target.value)} />
         </F>
-        <F label="Length (cm)">
+        <F id="baby-length" label={t("babies.form.length")}>
           <input className="input" type="number" value={values.lengthCm} onChange={(e) => update("lengthCm", e.target.value)} />
         </F>
-        <F label="Head circumference (cm)">
+        <F id="baby-head-circumference" label={t("babies.form.headCircumference")}>
           <input className="input" type="number" value={values.headCircumferenceCm} onChange={(e) => update("headCircumferenceCm", e.target.value)} />
         </F>
-        <F label="Daily feeds count">
+        <F id="baby-daily-feeds" label={t("babies.form.dailyFeedsCount")}>
           <input className="input" type="number" value={values.dailyFeedsCount} onChange={(e) => update("dailyFeedsCount", e.target.value)} />
         </F>
-        <F label="Pediatrician name">
+        <F id="baby-pediatrician-name" label={t("babies.form.pediatricianName")}>
           <input className="input" value={values.pediatricianName} onChange={(e) => update("pediatricianName", e.target.value)} />
         </F>
-        <F label="Pediatrician phone">
+        <F id="baby-pediatrician-phone" label={t("babies.form.pediatricianPhone")}>
           <input className="input" value={values.pediatricianPhone} onChange={(e) => update("pediatricianPhone", e.target.value)} />
         </F>
-        <F label="Medical conditions" full>
+        <F id="baby-medical-conditions" label={t("babies.form.medicalConditions")} full>
           <textarea className="input" rows={2} value={values.medicalConditions} onChange={(e) => update("medicalConditions", e.target.value)} />
         </F>
-        <F label="Medications" full>
+        <F id="baby-medications" label={t("babies.form.medications")} full>
           <textarea className="input" rows={2} value={values.medications} onChange={(e) => update("medications", e.target.value)} />
         </F>
-        <F label="Allergies" full>
+        <F id="baby-allergies" label={t("babies.form.allergies")} full>
           <input className="input" value={values.allergies} onChange={(e) => update("allergies", e.target.value)} />
         </F>
-        <F label="Supplementation information" full>
+        <F id="baby-supplementation" label={t("babies.form.supplementationInfo")} full>
           <textarea className="input" rows={2} value={values.supplementationInfo} onChange={(e) => update("supplementationInfo", e.target.value)} />
         </F>
-        <F label="Relevant hospital information" full>
+        <F id="baby-hospital-info" label={t("babies.form.hospitalInfo")} full>
           <textarea className="input" rows={2} value={values.hospitalInfo} onChange={(e) => update("hospitalInfo", e.target.value)} />
         </F>
-        <F label="Notes" full>
+        <F id="baby-notes" label={t("babies.form.notes")} full>
           <textarea className="input" rows={2} value={values.notes} onChange={(e) => update("notes", e.target.value)} />
         </F>
       </div>
       <div className="flex justify-end gap-2 border-t border-gray-200 pt-3">
         <button type="button" className="btn-secondary" onClick={onCancel} disabled={saving}>
-          Cancel
+          {t("common.cancel")}
         </button>
         <button type="submit" className="btn-primary" disabled={saving}>
-          {saving ? "Saving…" : baby ? "Save changes" : "Add baby"}
+          {saving ? t("common.saving") : baby ? t("common.saveChanges") : t("babies.form.addBaby")}
         </button>
       </div>
     </form>
   );
 }
 
-function F({ label, children, required, full }: { label: string; children: React.ReactElement<{ id?: string }>; required?: boolean; full?: boolean }) {
-  const id = "field-" + label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+function F({
+  id,
+  label,
+  children,
+  required,
+  full,
+}: {
+  id: string;
+  label: string;
+  children: React.ReactElement<{ id?: string }>;
+  required?: boolean;
+  full?: boolean;
+}) {
   return (
     <div className={full ? "sm:col-span-2" : ""}>
       <label className="label" htmlFor={id}>

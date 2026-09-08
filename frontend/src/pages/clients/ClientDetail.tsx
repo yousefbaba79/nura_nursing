@@ -1,19 +1,14 @@
 import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { api, apiErrorMessage } from "../../api/client";
 import { Modal, ConfirmDialog, Spinner, EmptyState, Badge, ErrorBanner } from "../../components/ui";
 import ClientForm from "../../components/ClientForm";
 import BabyForm from "../../components/BabyForm";
 import ActionItemForm from "../../components/ActionItemForm";
 import FollowUpForm from "../../components/FollowUpForm";
-import {
-  CLIENT_STATUS_COLORS,
-  CLIENT_STATUS_LABELS,
-  FOLLOW_UP_STATUS_COLORS,
-  PRIORITY_COLORS,
-  labelize,
-} from "../../api/enums";
+import { CLIENT_STATUS_COLORS, FOLLOW_UP_STATUS_COLORS, PRIORITY_COLORS } from "../../api/enums";
 import { formatDate, formatDateTime, isOverdue } from "../../lib/format";
 import type { Client, Baby, ActionItem, FollowUp } from "../../api/types";
 
@@ -21,6 +16,7 @@ export default function ClientDetail() {
   const { clientId } = useParams<{ clientId: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   const [editOpen, setEditOpen] = useState(false);
   const [babyModal, setBabyModal] = useState<{ open: boolean; baby?: Baby | null }>({ open: false });
@@ -51,7 +47,7 @@ export default function ClientDetail() {
       setArchiveConfirm(false);
       invalidate();
     } catch (err) {
-      setError(apiErrorMessage(err, "Could not update client."));
+      setError(apiErrorMessage(err, t("clients.detail.couldNotUpdateClient")));
     }
   }
 
@@ -80,7 +76,7 @@ export default function ClientDetail() {
         <div>
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="text-xl font-bold text-gray-900">{client.fullName}</h1>
-            <Badge className={CLIENT_STATUS_COLORS[client.status]}>{CLIENT_STATUS_LABELS[client.status]}</Badge>
+            <Badge className={CLIENT_STATUS_COLORS[client.status]}>{t(`enums.clientStatus.${client.status}`)}</Badge>
           </div>
           <div className="mt-1 flex flex-wrap gap-3 text-sm text-gray-600">
             <a href={`tel:${client.phone}`} className="hover:text-brand-700">
@@ -95,22 +91,29 @@ export default function ClientDetail() {
         </div>
         <div className="flex flex-wrap gap-2">
           <button className="btn-secondary" onClick={() => setEditOpen(true)}>
-            Edit
+            {t("clients.detail.edit")}
           </button>
           <button className="btn-secondary" onClick={() => navigate(`/clients/${client.id}/visits/new`)}>
-            + New visit
+            {t("clients.detail.newVisit")}
           </button>
           <button className={client.status === "ARCHIVED" ? "btn-secondary" : "btn-secondary text-red-700"} onClick={() => setArchiveConfirm(true)}>
-            {client.status === "ARCHIVED" ? "Restore" : "Archive"}
+            {client.status === "ARCHIVED" ? t("clients.detail.restore") : t("clients.detail.archive")}
           </button>
         </div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
-          <Section title="Babies" action={<button className="text-sm font-medium text-brand-700 hover:underline" onClick={() => setBabyModal({ open: true })}>+ Add baby</button>}>
+          <Section
+            title={t("clients.detail.babies")}
+            action={
+              <button className="text-sm font-medium text-brand-700 hover:underline" onClick={() => setBabyModal({ open: true })}>
+                {t("clients.detail.addBaby")}
+              </button>
+            }
+          >
             {!client.babies || client.babies.length === 0 ? (
-              <EmptyState title="No babies added yet" />
+              <EmptyState title={t("clients.detail.noBabiesYet")} />
             ) : (
               <div className="grid gap-3 sm:grid-cols-2">
                 {client.babies.map((b) => (
@@ -118,24 +121,33 @@ export default function ClientDetail() {
                     <div className="flex items-center justify-between">
                       <p className="font-medium text-gray-900">{b.fullName}</p>
                       <button className="text-xs font-medium text-brand-700 hover:underline" onClick={() => setBabyModal({ open: true, baby: b })}>
-                        Edit
+                        {t("clients.detail.edit")}
                       </button>
                     </div>
                     <p className="text-xs text-gray-500">
-                      {b.dateOfBirth ? `DOB ${formatDate(b.dateOfBirth)}` : "DOB not set"}
-                      {b.feedingMethod ? ` · ${labelize(b.feedingMethod)}` : ""}
+                      {b.dateOfBirth ? t("clients.detail.dobPrefix", { date: formatDate(b.dateOfBirth) }) : t("clients.detail.dobUnset")}
+                      {b.feedingMethod ? ` · ${t(`enums.feedingMethod.${b.feedingMethod}`)}` : ""}
                     </p>
-                    {b.currentWeightGrams ? <p className="text-xs text-gray-500">Current weight: {b.currentWeightGrams}g</p> : null}
-                    {b.archivedAt && <p className="mt-1 text-xs text-gray-400">Archived</p>}
+                    {b.currentWeightGrams ? (
+                      <p className="text-xs text-gray-500">{t("clients.detail.currentWeight", { weight: b.currentWeightGrams })}</p>
+                    ) : null}
+                    {b.archivedAt && <p className="mt-1 text-xs text-gray-400">{t("clients.detail.archived")}</p>}
                   </div>
                 ))}
               </div>
             )}
           </Section>
 
-          <Section title="Visit history" action={<Link to={`/clients/${client.id}/visits/new`} className="text-sm font-medium text-brand-700 hover:underline">+ New visit</Link>}>
+          <Section
+            title={t("clients.detail.visitHistory")}
+            action={
+              <Link to={`/clients/${client.id}/visits/new`} className="text-sm font-medium text-brand-700 hover:underline">
+                {t("clients.detail.newVisitLink")}
+              </Link>
+            }
+          >
             {!client.visits || client.visits.length === 0 ? (
-              <EmptyState title="No visits recorded yet" description="Document the first consultation to start this client's history." />
+              <EmptyState title={t("clients.detail.noVisitsYet")} description={t("clients.detail.noVisitsYetDescription")} />
             ) : (
               <ul className="divide-y divide-gray-100">
                 {client.visits.map((v) => (
@@ -144,19 +156,21 @@ export default function ClientDetail() {
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <div>
                           <p className="font-medium text-gray-900">
-                            {formatDate(v.visitDate)} · {labelize(v.visitType)}
+                            {formatDate(v.visitDate)} · {t(`enums.visitType.${v.visitType}`)}
                           </p>
                           {v.problems && v.problems.length > 0 && (
-                            <p className="text-sm text-gray-500">Problems: {v.problems.map((p) => p.title).join(", ")}</p>
+                            <p className="text-sm text-gray-500">{t("clients.detail.problemsLabel", { list: v.problems.map((p) => p.title).join(", ") })}</p>
                           )}
                           {v.recommendations && v.recommendations.length > 0 && (
-                            <p className="text-sm text-gray-500">Recommendations: {v.recommendations.map((r) => r.title).join(", ")}</p>
+                            <p className="text-sm text-gray-500">
+                              {t("clients.detail.recommendationsLabel", { list: v.recommendations.map((r) => r.title).join(", ") })}
+                            </p>
                           )}
                         </div>
                         <div className="flex items-center gap-2 text-sm">
                           {v.actionItems && v.actionItems.filter((a) => a.status !== "COMPLETED" && a.status !== "CANCELLED").length > 0 && (
                             <Badge className="bg-amber-100 text-amber-800">
-                              {v.actionItems.filter((a) => a.status !== "COMPLETED" && a.status !== "CANCELLED").length} open
+                              {t("clients.detail.openBadge", { count: v.actionItems.filter((a) => a.status !== "COMPLETED" && a.status !== "CANCELLED").length })}
                             </Badge>
                           )}
                           <Badge
@@ -164,11 +178,11 @@ export default function ClientDetail() {
                               v.status === "COMPLETED" ? "bg-green-100 text-green-800" : v.status === "CANCELLED" ? "bg-gray-100 text-gray-500" : "bg-blue-100 text-blue-800"
                             }
                           >
-                            {labelize(v.status)}
+                            {t(`enums.visitStatus.${v.status}`)}
                           </Badge>
                         </div>
                       </div>
-                      {v.followUpDate && <p className="mt-1 text-xs text-gray-500">Follow-up: {formatDate(v.followUpDate)}</p>}
+                      {v.followUpDate && <p className="mt-1 text-xs text-gray-500">{t("clients.detail.followUpLabel", { date: formatDate(v.followUpDate) })}</p>}
                     </Link>
                   </li>
                 ))}
@@ -177,35 +191,48 @@ export default function ClientDetail() {
           </Section>
 
           {client.generalNotes && (
-            <Section title="General notes">
+            <Section title={t("clients.detail.generalNotes")}>
               <p className="whitespace-pre-wrap text-sm text-gray-700">{client.generalNotes}</p>
             </Section>
           )}
         </div>
 
         <div className="space-y-6">
-          <Section title="Consent">
+          <Section title={t("clients.detail.consent")}>
             <dl className="space-y-1 text-sm">
-              <Row label="Consent received" value={client.consentReceived ? "Yes" : "No"} />
-              <Row label="Consent date" value={formatDate(client.consentDate)} />
-              <Row label="Method" value={client.consentMethod || "—"} />
-              <Row label="Form version" value={client.consentFormVersion || "—"} />
+              <Row label={t("clients.detail.consentReceived")} value={client.consentReceived ? t("common.yes") : t("common.no")} />
+              <Row label={t("clients.detail.consentDate")} value={formatDate(client.consentDate)} />
+              <Row label={t("clients.detail.consentMethod")} value={client.consentMethod || "—"} />
+              <Row label={t("clients.detail.consentFormVersion")} value={client.consentFormVersion || "—"} />
             </dl>
           </Section>
 
-          <Section title="Open action items" action={<button className="text-sm font-medium text-brand-700 hover:underline" onClick={() => setActionModal({ open: true })}>+ Add</button>}>
+          <Section
+            title={t("clients.detail.openActionItems")}
+            action={
+              <button className="text-sm font-medium text-brand-700 hover:underline" onClick={() => setActionModal({ open: true })}>
+                {t("clients.detail.addAction")}
+              </button>
+            }
+          >
             {openActionItems.length === 0 ? (
-              <EmptyState title="No open action items" />
+              <EmptyState title={t("clients.detail.noOpenActionItems")} />
             ) : (
               <ul className="space-y-2">
                 {openActionItems.map((a) => (
                   <li key={a.id} className="flex items-start gap-2 rounded-md border border-gray-200 p-2">
-                    <input type="checkbox" className="mt-1" checked={a.status === "COMPLETED"} onChange={() => toggleActionItemStatus(a)} aria-label={`Mark ${a.title} complete`} />
-                    <button className="flex-1 text-left" onClick={() => setActionModal({ open: true, item: a })}>
+                    <input
+                      type="checkbox"
+                      className="mt-1"
+                      checked={a.status === "COMPLETED"}
+                      onChange={() => toggleActionItemStatus(a)}
+                      aria-label={t("clients.detail.markComplete", { title: a.title })}
+                    />
+                    <button className="flex-1 text-start" onClick={() => setActionModal({ open: true, item: a })}>
                       <p className="text-sm font-medium text-gray-900">{a.title}</p>
                       <p className="flex items-center gap-2 text-xs text-gray-500">
                         <span className={isOverdue(a.dueDate) ? "font-medium text-red-600" : ""}>{formatDate(a.dueDate)}</span>
-                        <Badge className={PRIORITY_COLORS[a.priority]}>{a.priority}</Badge>
+                        <Badge className={PRIORITY_COLORS[a.priority]}>{t(`enums.priority.${a.priority}`)}</Badge>
                       </p>
                     </button>
                   </li>
@@ -214,18 +241,25 @@ export default function ClientDetail() {
             )}
           </Section>
 
-          <Section title="Follow-ups" action={<button className="text-sm font-medium text-brand-700 hover:underline" onClick={() => setFollowUpModal({ open: true })}>+ Schedule</button>}>
+          <Section
+            title={t("clients.detail.followUps")}
+            action={
+              <button className="text-sm font-medium text-brand-700 hover:underline" onClick={() => setFollowUpModal({ open: true })}>
+                {t("clients.detail.schedule")}
+              </button>
+            }
+          >
             {upcomingFollowUps.length === 0 ? (
-              <EmptyState title="No follow-ups scheduled" />
+              <EmptyState title={t("clients.detail.noFollowUpsScheduled")} />
             ) : (
               <ul className="space-y-2">
                 {upcomingFollowUps.map((f) => (
                   <li key={f.id}>
-                    <button className="w-full rounded-md border border-gray-200 p-2 text-left hover:bg-gray-50" onClick={() => setFollowUpModal({ open: true, item: f })}>
-                      <p className="text-sm font-medium text-gray-900">{labelize(f.type)}</p>
+                    <button className="w-full rounded-md border border-gray-200 p-2 text-start hover:bg-gray-50" onClick={() => setFollowUpModal({ open: true, item: f })}>
+                      <p className="text-sm font-medium text-gray-900">{t(`enums.followUpType.${f.type}`)}</p>
                       <p className="flex items-center gap-2 text-xs text-gray-500">
                         {formatDateTime(f.scheduledAt)}
-                        <Badge className={FOLLOW_UP_STATUS_COLORS[f.status]}>{labelize(f.status)}</Badge>
+                        <Badge className={FOLLOW_UP_STATUS_COLORS[f.status]}>{t(`enums.followUpStatus.${f.status}`)}</Badge>
                       </p>
                     </button>
                   </li>
@@ -234,16 +268,16 @@ export default function ClientDetail() {
             )}
           </Section>
 
-          <Section title="Record details">
+          <Section title={t("clients.detail.recordDetails")}>
             <dl className="space-y-1 text-sm">
-              <Row label="Created" value={formatDate(client.createdAt)} />
-              <Row label="Last updated" value={formatDate(client.updatedAt)} />
+              <Row label={t("clients.detail.created")} value={formatDate(client.createdAt)} />
+              <Row label={t("clients.detail.lastUpdated")} value={formatDate(client.updatedAt)} />
             </dl>
           </Section>
         </div>
       </div>
 
-      <Modal open={editOpen} onClose={() => setEditOpen(false)} title="Edit client" wide>
+      <Modal open={editOpen} onClose={() => setEditOpen(false)} title={t("clients.detail.editModalTitle")} wide>
         <ClientForm
           client={client}
           onCancel={() => setEditOpen(false)}
@@ -254,7 +288,7 @@ export default function ClientDetail() {
         />
       </Modal>
 
-      <Modal open={babyModal.open} onClose={() => setBabyModal({ open: false })} title={babyModal.baby ? "Edit baby" : "Add baby"} wide>
+      <Modal open={babyModal.open} onClose={() => setBabyModal({ open: false })} title={babyModal.baby ? t("clients.detail.editBabyModalTitle") : t("clients.detail.addBabyModalTitle")} wide>
         <BabyForm
           clientId={client.id}
           baby={babyModal.baby}
@@ -266,7 +300,11 @@ export default function ClientDetail() {
         />
       </Modal>
 
-      <Modal open={actionModal.open} onClose={() => setActionModal({ open: false })} title={actionModal.item ? "Edit action item" : "Add action item"}>
+      <Modal
+        open={actionModal.open}
+        onClose={() => setActionModal({ open: false })}
+        title={actionModal.item ? t("clients.detail.editActionItemModalTitle") : t("clients.detail.addActionItemModalTitle")}
+      >
         <ActionItemForm
           clientId={client.id}
           babies={client.babies}
@@ -279,7 +317,11 @@ export default function ClientDetail() {
         />
       </Modal>
 
-      <Modal open={followUpModal.open} onClose={() => setFollowUpModal({ open: false })} title={followUpModal.item ? "Edit follow-up" : "Schedule follow-up"}>
+      <Modal
+        open={followUpModal.open}
+        onClose={() => setFollowUpModal({ open: false })}
+        title={followUpModal.item ? t("clients.detail.editFollowUpModalTitle") : t("clients.detail.scheduleFollowUpModalTitle")}
+      >
         <FollowUpForm
           clientId={client.id}
           babies={client.babies}
@@ -294,13 +336,9 @@ export default function ClientDetail() {
 
       <ConfirmDialog
         open={archiveConfirm}
-        title={client.status === "ARCHIVED" ? "Restore this client?" : "Archive this client?"}
-        description={
-          client.status === "ARCHIVED"
-            ? "This client will reappear in your active client list."
-            : "This client will be removed from your active list but all information is preserved and can be restored later."
-        }
-        confirmLabel={client.status === "ARCHIVED" ? "Restore" : "Archive"}
+        title={client.status === "ARCHIVED" ? t("clients.detail.archiveConfirmTitleRestore") : t("clients.detail.archiveConfirmTitleArchive")}
+        description={client.status === "ARCHIVED" ? t("clients.detail.archiveConfirmDescriptionRestore") : t("clients.detail.archiveConfirmDescriptionArchive")}
+        confirmLabel={client.status === "ARCHIVED" ? t("clients.detail.archiveConfirmLabelRestore") : t("clients.detail.archiveConfirmLabelArchive")}
         danger={client.status !== "ARCHIVED"}
         onConfirm={handleArchiveToggle}
         onCancel={() => setArchiveConfirm(false)}
@@ -325,7 +363,7 @@ function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between gap-2">
       <dt className="text-gray-500">{label}</dt>
-      <dd className="text-right text-gray-900">{value}</dd>
+      <dd className="text-end text-gray-900">{value}</dd>
     </div>
   );
 }

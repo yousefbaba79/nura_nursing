@@ -1,12 +1,15 @@
 import { type FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { api, apiErrorMessage, setToken } from "../api/client";
 import { useAuth } from "../context/AuthContext";
 import { ErrorBanner } from "../components/ui";
+import LanguageSwitcher from "../components/LanguageSwitcher";
 
 export default function Setup() {
   const navigate = useNavigate();
   const { refresh } = useAuth();
+  const { t, i18n } = useTranslation();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -18,12 +21,17 @@ export default function Setup() {
     setError("");
     setLoading(true);
     try {
-      const res = await api.post("/auth/setup", { fullName, email, password });
+      const res = await api.post("/auth/setup", {
+        fullName,
+        email,
+        password,
+        defaultLanguage: i18n.resolvedLanguage || i18n.language,
+      });
       setToken(res.data.token, true);
       await refresh();
       navigate("/", { replace: true });
     } catch (err) {
-      setError(apiErrorMessage(err, "Could not complete setup."));
+      setError(apiErrorMessage(err, t("auth.setupFailed")));
     } finally {
       setLoading(false);
     }
@@ -32,25 +40,28 @@ export default function Setup() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-sm">
-        <h1 className="mb-1 text-center text-2xl font-bold text-brand-700">Welcome to Nura Lactation</h1>
-        <p className="mb-6 text-center text-sm text-gray-500">Create your consultant account to get started.</p>
+        <div className="mb-4 flex justify-center">
+          <LanguageSwitcher />
+        </div>
+        <h1 className="mb-1 text-center text-2xl font-bold text-brand-700">{t("auth.setupTitle", { appName: t("appName") })}</h1>
+        <p className="mb-6 text-center text-sm text-gray-500">{t("auth.setupSubtitle")}</p>
         <form onSubmit={handleSubmit} className="card space-y-4">
           <ErrorBanner message={error} />
           <div>
             <label className="label" htmlFor="fullName">
-              Full name
+              {t("auth.fullName")}
             </label>
             <input id="fullName" required className="input" value={fullName} onChange={(e) => setFullName(e.target.value)} />
           </div>
           <div>
             <label className="label" htmlFor="email">
-              Email
+              {t("auth.email")}
             </label>
             <input id="email" type="email" required className="input" value={email} onChange={(e) => setEmail(e.target.value)} />
           </div>
           <div>
             <label className="label" htmlFor="password">
-              Password
+              {t("auth.password")}
             </label>
             <input
               id="password"
@@ -61,10 +72,10 @@ export default function Setup() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-            <p className="mt-1 text-xs text-gray-500">At least 8 characters.</p>
+            <p className="mt-1 text-xs text-gray-500">{t("auth.passwordHint")}</p>
           </div>
           <button type="submit" disabled={loading} className="btn-primary w-full">
-            {loading ? "Creating account…" : "Create account"}
+            {loading ? t("auth.creatingAccount") : t("auth.createAccount")}
           </button>
         </form>
       </div>

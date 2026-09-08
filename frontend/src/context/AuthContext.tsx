@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import type { ReactNode } from "react";
 import { api, clearToken, getToken, setToken } from "../api/client";
+import i18n, { SUPPORTED_LANGUAGES } from "../i18n";
 
 export interface Consultant {
   id: string;
@@ -29,6 +30,17 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
+async function syncLanguageFromConsultant(consultant: Consultant) {
+  const lang = consultant.defaultLanguage;
+  if (
+    lang &&
+    (SUPPORTED_LANGUAGES as readonly string[]).includes(lang) &&
+    lang !== (i18n.resolvedLanguage || i18n.language)
+  ) {
+    await i18n.changeLanguage(lang);
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [consultant, setConsultantState] = useState<Consultant | null>(null);
   const [loading, setLoading] = useState(true);
@@ -43,6 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const res = await api.get("/auth/me");
       setConsultantState(res.data.consultant);
+      await syncLanguageFromConsultant(res.data.consultant);
     } catch {
       clearToken();
       setConsultantState(null);
@@ -59,6 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const res = await api.post("/auth/login", { email, password, rememberMe });
     setToken(res.data.token, rememberMe);
     setConsultantState(res.data.consultant);
+    await syncLanguageFromConsultant(res.data.consultant);
   }, []);
 
   const logout = useCallback(async () => {

@@ -1,6 +1,7 @@
 import { type FormEvent, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { api, apiErrorMessage } from "../api/client";
-import { FOLLOW_UP_TYPES, FOLLOW_UP_STATUSES, labelize } from "../api/enums";
+import { FOLLOW_UP_TYPES, FOLLOW_UP_STATUSES } from "../api/enums";
 import { ErrorBanner } from "./ui";
 import type { FollowUp, Baby } from "../api/types";
 
@@ -21,6 +22,7 @@ function toLocalInput(value?: string | null) {
 }
 
 export default function FollowUpForm({ clientId, visitId, babies, followUp, onSaved, onCancel }: Props) {
+  const { t } = useTranslation();
   const [scheduledAt, setScheduledAt] = useState(toLocalInput(followUp?.scheduledAt));
   const [type, setType] = useState(followUp?.type || "CALL");
   const [reason, setReason] = useState(followUp?.reason || "");
@@ -33,7 +35,7 @@ export default function FollowUpForm({ clientId, visitId, babies, followUp, onSa
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (!scheduledAt) {
-      setError("Follow-up date and time are required.");
+      setError(t("followUpForm.errorDateRequired"));
       return;
     }
     setSaving(true);
@@ -52,7 +54,7 @@ export default function FollowUpForm({ clientId, visitId, babies, followUp, onSa
       const res = followUp ? await api.put(`/follow-ups/${followUp.id}`, payload) : await api.post("/follow-ups", payload);
       onSaved(res.data.followUp);
     } catch (err) {
-      setError(apiErrorMessage(err, "Could not save follow-up."));
+      setError(apiErrorMessage(err, t("followUpForm.couldNotSave")));
     } finally {
       setSaving(false);
     }
@@ -63,34 +65,34 @@ export default function FollowUpForm({ clientId, visitId, babies, followUp, onSa
       <ErrorBanner message={error} />
       <div className="grid grid-cols-2 gap-4">
         <div className="col-span-2 sm:col-span-1">
-          <label className="label" htmlFor="fu-scheduled">Date &amp; time</label>
+          <label className="label" htmlFor="fu-scheduled">{t("followUpForm.dateTime")}</label>
           <input id="fu-scheduled" className="input" type="datetime-local" value={scheduledAt} onChange={(e) => setScheduledAt(e.target.value)} required />
         </div>
         <div>
-          <label className="label" htmlFor="fu-type">Type</label>
+          <label className="label" htmlFor="fu-type">{t("followUpForm.type")}</label>
           <select id="fu-type" className="input" value={type} onChange={(e) => setType(e.target.value)}>
-            {FOLLOW_UP_TYPES.map((t) => (
-              <option key={t} value={t}>
-                {labelize(t)}
+            {FOLLOW_UP_TYPES.map((ft) => (
+              <option key={ft} value={ft}>
+                {t(`enums.followUpType.${ft}`)}
               </option>
             ))}
           </select>
         </div>
         <div>
-          <label className="label" htmlFor="fu-status">Status</label>
+          <label className="label" htmlFor="fu-status">{t("followUpForm.status")}</label>
           <select id="fu-status" className="input" value={status} onChange={(e) => setStatus(e.target.value)}>
             {FOLLOW_UP_STATUSES.map((s) => (
               <option key={s} value={s}>
-                {labelize(s)}
+                {t(`enums.followUpStatus.${s}`)}
               </option>
             ))}
           </select>
         </div>
         {babies && babies.length > 0 && (
           <div>
-            <label className="label" htmlFor="fu-baby">Related baby</label>
+            <label className="label" htmlFor="fu-baby">{t("followUpForm.relatedBaby")}</label>
             <select id="fu-baby" className="input" value={babyId} onChange={(e) => setBabyId(e.target.value)}>
-              <option value="">None</option>
+              <option value="">{t("common.none")}</option>
               {babies.map((b) => (
                 <option key={b.id} value={b.id}>
                   {b.fullName}
@@ -101,19 +103,19 @@ export default function FollowUpForm({ clientId, visitId, babies, followUp, onSa
         )}
       </div>
       <div>
-        <label className="label" htmlFor="fu-reason">Reason</label>
+        <label className="label" htmlFor="fu-reason">{t("followUpForm.reason")}</label>
         <input id="fu-reason" className="input" value={reason} onChange={(e) => setReason(e.target.value)} />
       </div>
       <div>
-        <label className="label" htmlFor="fu-notes">Notes</label>
+        <label className="label" htmlFor="fu-notes">{t("followUpForm.notes")}</label>
         <textarea id="fu-notes" className="input" rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} />
       </div>
       <div className="flex justify-end gap-2 border-t border-gray-200 pt-3">
         <button type="button" className="btn-secondary" onClick={onCancel} disabled={saving}>
-          Cancel
+          {t("common.cancel")}
         </button>
         <button type="submit" className="btn-primary" disabled={saving}>
-          {saving ? "Saving…" : followUp ? "Save changes" : "Schedule follow-up"}
+          {saving ? t("common.saving") : followUp ? t("common.saveChanges") : t("followUpForm.scheduleFollowUp")}
         </button>
       </div>
     </form>

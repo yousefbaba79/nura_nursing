@@ -38,6 +38,7 @@ router.post("/setup", async (req, res) => {
     fullName: z.string().min(1),
     email: z.string().email(),
     password: z.string().min(8),
+    defaultLanguage: z.enum(["en", "he", "ar"]).optional(),
   });
   const parsed = schema.safeParse(req.body);
   if (!parsed.success) {
@@ -53,6 +54,7 @@ router.post("/setup", async (req, res) => {
       fullName: parsed.data.fullName,
       email: parsed.data.email.toLowerCase(),
       passwordHash,
+      ...(parsed.data.defaultLanguage ? { defaultLanguage: parsed.data.defaultLanguage } : {}),
     },
   });
   await recordAudit({ consultantId: consultant.id, action: "ACCOUNT_SETUP", entityType: "Consultant", entityId: consultant.id });
