@@ -1,21 +1,24 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../context/AuthContext";
 import { useInactivityLogout } from "../hooks/useInactivityLogout";
 import GlobalSearch from "./GlobalSearch";
-
-const navItems = [
-  { to: "/", label: "Home", icon: HomeIcon, end: true },
-  { to: "/clients", label: "Clients", icon: ClientsIcon },
-  { to: "/follow-ups", label: "Follow-ups", icon: FollowUpIcon },
-  { to: "/settings", label: "Settings", icon: SettingsIcon },
-];
+import LanguageSwitcher from "./LanguageSwitcher";
 
 export default function Layout() {
   const { consultant, logout } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
   useInactivityLogout(consultant?.sessionTimeoutMinutes || 30);
+
+  const navItems = [
+    { to: "/", label: t("nav.home"), icon: HomeIcon, end: true },
+    { to: "/clients", label: t("nav.clients"), icon: ClientsIcon },
+    { to: "/follow-ups", label: t("nav.followUps"), icon: FollowUpIcon },
+    { to: "/settings", label: t("nav.settings"), icon: SettingsIcon },
+  ];
 
   async function handleLogout() {
     await logout();
@@ -28,7 +31,7 @@ export default function Layout() {
       <header className="hidden border-b border-gray-200 bg-white sm:block">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
           <div className="flex items-center gap-8">
-            <span className="text-lg font-bold text-brand-700">Nura Lactation</span>
+            <span className="text-lg font-bold text-brand-700">{t("appName")}</span>
             <nav className="flex gap-1">
               {navItems.map((item) => (
                 <NavLink
@@ -50,10 +53,11 @@ export default function Layout() {
             <div className="w-72">
               <GlobalSearch />
             </div>
+            <LanguageSwitcher />
             <div className="relative">
               <button
                 onClick={() => setMenuOpen((v) => !v)}
-                className="flex items-center gap-2 rounded-full border border-gray-200 py-1 pl-1 pr-3 text-sm hover:bg-gray-50"
+                className="flex items-center gap-2 rounded-full border border-gray-200 py-1 ps-1 pe-3 text-sm hover:bg-gray-50"
               >
                 <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-600 text-xs font-semibold text-white">
                   {consultant?.fullName?.slice(0, 1) || "?"}
@@ -61,18 +65,18 @@ export default function Layout() {
                 {consultant?.fullName}
               </button>
               {menuOpen && (
-                <div className="absolute right-0 z-20 mt-2 w-48 rounded-md border border-gray-200 bg-white py-1 shadow-lg">
+                <div className="absolute end-0 z-20 mt-2 w-48 rounded-md border border-gray-200 bg-white py-1 shadow-lg">
                   <button
                     onClick={() => {
                       setMenuOpen(false);
                       navigate("/settings");
                     }}
-                    className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
+                    className="block w-full px-4 py-2 text-start text-sm text-gray-700 hover:bg-gray-50"
                   >
-                    Settings
+                    {t("nav.settings")}
                   </button>
-                  <button onClick={handleLogout} className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50">
-                    Sign out
+                  <button onClick={handleLogout} className="block w-full px-4 py-2 text-start text-sm text-gray-700 hover:bg-gray-50">
+                    {t("nav.signOut")}
                   </button>
                 </div>
               )}
@@ -83,10 +87,13 @@ export default function Layout() {
 
       {/* Mobile top bar */}
       <header className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3 sm:hidden">
-        <span className="text-lg font-bold text-brand-700">Nura Lactation</span>
-        <button onClick={handleLogout} className="text-sm font-medium text-gray-600">
-          Sign out
-        </button>
+        <span className="text-lg font-bold text-brand-700">{t("appName")}</span>
+        <div className="flex items-center gap-2">
+          <LanguageSwitcher />
+          <button onClick={handleLogout} className="text-sm font-medium text-gray-600">
+            {t("nav.signOut")}
+          </button>
+        </div>
       </header>
       <div className="border-b border-gray-200 bg-white px-4 py-2 sm:hidden">
         <GlobalSearch />

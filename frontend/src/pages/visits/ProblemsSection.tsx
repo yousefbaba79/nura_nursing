@@ -1,7 +1,8 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { api, apiErrorMessage } from "../../api/client";
 import { Modal, ConfirmDialog, Badge, ErrorBanner } from "../../components/ui";
-import { SEVERITIES, PROBLEM_STATUSES, labelize } from "../../api/enums";
+import { SEVERITIES, PROBLEM_STATUSES } from "../../api/enums";
 import type { Problem, Baby } from "../../api/types";
 
 interface Props {
@@ -18,37 +19,38 @@ const severityColors: Record<string, string> = {
 };
 
 export default function ProblemsSection({ visitId, babies, problems, onChanged }: Props) {
+  const { t } = useTranslation();
   const [modal, setModal] = useState<{ open: boolean; problem?: Problem | null }>({ open: false });
   const [deleteTarget, setDeleteTarget] = useState<Problem | null>(null);
 
   return (
     <div className="card space-y-3">
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-gray-900">Identified problems</h2>
+        <h2 className="text-sm font-semibold text-gray-900">{t("problems.title")}</h2>
         <button type="button" className="text-sm font-medium text-brand-700 hover:underline" onClick={() => setModal({ open: true })}>
-          + Add problem
+          {t("problems.add")}
         </button>
       </div>
       {problems.length === 0 ? (
-        <p className="text-sm text-gray-500">No problems recorded for this visit.</p>
+        <p className="text-sm text-gray-500">{t("problems.noneRecorded")}</p>
       ) : (
         <ul className="space-y-2">
           {problems.map((p) => (
             <li key={p.id} className="flex items-start justify-between gap-2 rounded-md border border-gray-200 p-3">
               <div>
                 <p className="text-sm font-medium text-gray-900">
-                  {p.title} <Badge className={severityColors[p.severity]}>{labelize(p.severity)}</Badge>{" "}
-                  <Badge className="bg-gray-100 text-gray-700">{labelize(p.status)}</Badge>
+                  {p.title} <Badge className={severityColors[p.severity]}>{t(`enums.severity.${p.severity}`)}</Badge>{" "}
+                  <Badge className="bg-gray-100 text-gray-700">{t(`enums.problemStatus.${p.status}`)}</Badge>
                 </p>
                 {p.description && <p className="mt-0.5 text-sm text-gray-600">{p.description}</p>}
-                {p.babyId && <p className="mt-0.5 text-xs text-gray-500">Baby: {babies.find((b) => b.id === p.babyId)?.fullName}</p>}
+                {p.babyId && <p className="mt-0.5 text-xs text-gray-500">{t("problems.relatedBaby", { name: babies.find((b) => b.id === p.babyId)?.fullName })}</p>}
               </div>
               <div className="flex shrink-0 gap-2 text-xs">
                 <button type="button" className="font-medium text-brand-700 hover:underline" onClick={() => setModal({ open: true, problem: p })}>
-                  Edit
+                  {t("common.edit")}
                 </button>
                 <button type="button" className="font-medium text-red-600 hover:underline" onClick={() => setDeleteTarget(p)}>
-                  Delete
+                  {t("common.delete")}
                 </button>
               </div>
             </li>
@@ -56,7 +58,7 @@ export default function ProblemsSection({ visitId, babies, problems, onChanged }
         </ul>
       )}
 
-      <Modal open={modal.open} onClose={() => setModal({ open: false })} title={modal.problem ? "Edit problem" : "Add problem"}>
+      <Modal open={modal.open} onClose={() => setModal({ open: false })} title={modal.problem ? t("problems.editModalTitle") : t("problems.addModalTitle")}>
         <ProblemForm
           visitId={visitId}
           babies={babies}
@@ -71,9 +73,9 @@ export default function ProblemsSection({ visitId, babies, problems, onChanged }
 
       <ConfirmDialog
         open={!!deleteTarget}
-        title="Delete this problem?"
-        description="This will also remove its link to any related recommendations or action items."
-        confirmLabel="Delete"
+        title={t("problems.deleteConfirmTitle")}
+        description={t("problems.deleteConfirmDescription")}
+        confirmLabel={t("common.delete")}
         danger
         onConfirm={async () => {
           if (!deleteTarget) return;
@@ -100,6 +102,7 @@ function ProblemForm({
   onSaved: () => void;
   onCancel: () => void;
 }) {
+  const { t } = useTranslation();
   const [title, setTitle] = useState(problem?.title || "");
   const [description, setDescription] = useState(problem?.description || "");
   const [severity, setSeverity] = useState(problem?.severity || "MEDIUM");
@@ -112,7 +115,7 @@ function ProblemForm({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!title.trim()) {
-      setError("Problem title is required.");
+      setError(t("problems.form.errorTitleRequired"));
       return;
     }
     setSaving(true);
@@ -123,7 +126,7 @@ function ProblemForm({
       else await api.post(`/visits/${visitId}/problems`, payload);
       onSaved();
     } catch (err) {
-      setError(apiErrorMessage(err, "Could not save problem."));
+      setError(apiErrorMessage(err, t("problems.form.couldNotSave")));
     } finally {
       setSaving(false);
     }
@@ -133,39 +136,39 @@ function ProblemForm({
     <form onSubmit={handleSubmit} className="space-y-4">
       <ErrorBanner message={error} />
       <div>
-        <label className="label" htmlFor="prob-title">Problem title</label>
+        <label className="label" htmlFor="prob-title">{t("problems.form.title")}</label>
         <input id="prob-title" className="input" value={title} onChange={(e) => setTitle(e.target.value)} required />
       </div>
       <div>
-        <label className="label" htmlFor="prob-description">Detailed description</label>
+        <label className="label" htmlFor="prob-description">{t("problems.form.description")}</label>
         <textarea id="prob-description" className="input" rows={2} value={description} onChange={(e) => setDescription(e.target.value)} />
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="label" htmlFor="prob-severity">Severity</label>
+          <label className="label" htmlFor="prob-severity">{t("problems.form.severity")}</label>
           <select id="prob-severity" className="input" value={severity} onChange={(e) => setSeverity(e.target.value)}>
             {SEVERITIES.map((s) => (
               <option key={s} value={s}>
-                {labelize(s)}
+                {t(`enums.severity.${s}`)}
               </option>
             ))}
           </select>
         </div>
         <div>
-          <label className="label" htmlFor="prob-status">Status</label>
+          <label className="label" htmlFor="prob-status">{t("problems.form.status")}</label>
           <select id="prob-status" className="input" value={status} onChange={(e) => setStatus(e.target.value)}>
             {PROBLEM_STATUSES.map((s) => (
               <option key={s} value={s}>
-                {labelize(s)}
+                {t(`enums.problemStatus.${s}`)}
               </option>
             ))}
           </select>
         </div>
         {babies.length > 0 && (
           <div className="col-span-2">
-            <label className="label" htmlFor="prob-baby">Related baby</label>
+            <label className="label" htmlFor="prob-baby">{t("problems.form.relatedBaby")}</label>
             <select id="prob-baby" className="input" value={babyId} onChange={(e) => setBabyId(e.target.value)}>
-              <option value="">None</option>
+              <option value="">{t("common.none")}</option>
               {babies.map((b) => (
                 <option key={b.id} value={b.id}>
                   {b.fullName}
@@ -176,15 +179,15 @@ function ProblemForm({
         )}
       </div>
       <div>
-        <label className="label" htmlFor="prob-notes">Notes</label>
+        <label className="label" htmlFor="prob-notes">{t("problems.form.notes")}</label>
         <textarea id="prob-notes" className="input" rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} />
       </div>
       <div className="flex justify-end gap-2 border-t border-gray-200 pt-3">
         <button type="button" className="btn-secondary" onClick={onCancel} disabled={saving}>
-          Cancel
+          {t("common.cancel")}
         </button>
         <button type="submit" className="btn-primary" disabled={saving}>
-          {saving ? "Saving…" : problem ? "Save changes" : "Add problem"}
+          {saving ? t("common.saving") : problem ? t("common.saveChanges") : t("problems.form.addProblem")}
         </button>
       </div>
     </form>

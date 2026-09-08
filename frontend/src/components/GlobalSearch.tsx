@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { api } from "../api/client";
 
 interface ClientResult {
@@ -15,6 +16,7 @@ export default function GlobalSearch() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const boxRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!query.trim()) {
@@ -48,8 +50,8 @@ export default function GlobalSearch() {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         onFocus={() => results.length && setOpen(true)}
-        placeholder="Search clients, phone, baby name…"
-        aria-label="Search clients"
+        placeholder={t("nav.searchPlaceholder")}
+        aria-label={t("clients.searchAriaLabel")}
         className="w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
       />
       {open && results.length > 0 && (
@@ -62,7 +64,7 @@ export default function GlobalSearch() {
                 setQuery("");
                 navigate(`/clients/${c.id}`);
               }}
-              className="flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-gray-50"
+              className="flex w-full items-center justify-between px-3 py-2 text-start text-sm hover:bg-gray-50"
             >
               <span className="font-medium text-gray-900">{c.fullName}</span>
               <span className="text-gray-500">{c.phone}</span>

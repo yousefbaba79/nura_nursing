@@ -1,45 +1,55 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { api, apiErrorMessage } from "../../api/client";
 import { ErrorBanner, Spinner } from "../../components/ui";
-import { VISIT_TYPES, labelize } from "../../api/enums";
+import { VISIT_TYPES } from "../../api/enums";
+import { formatTime } from "../../lib/format";
 import type { Client, Visit } from "../../api/types";
 import ProblemsSection from "./ProblemsSection";
 import RecommendationsSection from "./RecommendationsSection";
 import ActionItemsSection from "./ActionItemsSection";
 
-const TEXT_FIELDS: { key: keyof Visit; label: string; group: string }[] = [
-  { key: "reasonForConsultation", label: "Reason for consultation", group: "Reason & goals" },
-  { key: "clientGoals", label: "Client's goals", group: "Reason & goals" },
-  { key: "clientQuestions", label: "Client's questions", group: "Reason & goals" },
-  { key: "currentFeedingRoutine", label: "Current feeding routine", group: "Reason & goals" },
-  { key: "problemsReported", label: "Problems reported by the client", group: "Reason & goals" },
+type GroupKey = "reasonGoals" | "assessment" | "plan" | "private";
 
-  { key: "consultantObservations", label: "Consultant's observations", group: "Assessment" },
-  { key: "feedingAssessment", label: "Feeding assessment", group: "Assessment" },
-  { key: "breastAssessment", label: "Breast assessment", group: "Assessment" },
-  { key: "babyAssessment", label: "Baby assessment", group: "Assessment" },
-  { key: "latchAssessment", label: "Latch assessment", group: "Assessment" },
-  { key: "milkTransferAssessment", label: "Milk transfer assessment", group: "Assessment" },
-  { key: "weightInformation", label: "Weight information", group: "Assessment" },
-  { key: "relevantMedicalInfo", label: "Relevant medical information", group: "Assessment" },
+const TEXT_FIELDS: { key: keyof Visit; labelKey: string; group: GroupKey }[] = [
+  { key: "reasonForConsultation", labelKey: "reasonForConsultation", group: "reasonGoals" },
+  { key: "clientGoals", labelKey: "clientGoals", group: "reasonGoals" },
+  { key: "clientQuestions", labelKey: "clientQuestions", group: "reasonGoals" },
+  { key: "currentFeedingRoutine", labelKey: "currentFeedingRoutine", group: "reasonGoals" },
+  { key: "problemsReported", labelKey: "problemsReported", group: "reasonGoals" },
 
-  { key: "solutionsDiscussed", label: "Solutions discussed", group: "Plan" },
-  { key: "clientActionPlan", label: "Client action plan", group: "Plan" },
-  { key: "warningSignsDiscussed", label: "Warning signs discussed", group: "Plan" },
-  { key: "referrals", label: "Referrals to other professionals", group: "Plan" },
-  { key: "followUpPlan", label: "Follow-up plan", group: "Plan" },
+  { key: "consultantObservations", labelKey: "consultantObservations", group: "assessment" },
+  { key: "feedingAssessment", labelKey: "feedingAssessment", group: "assessment" },
+  { key: "breastAssessment", labelKey: "breastAssessment", group: "assessment" },
+  { key: "babyAssessment", labelKey: "babyAssessment", group: "assessment" },
+  { key: "latchAssessment", labelKey: "latchAssessment", group: "assessment" },
+  { key: "milkTransferAssessment", labelKey: "milkTransferAssessment", group: "assessment" },
+  { key: "weightInformation", labelKey: "weightInformation", group: "assessment" },
+  { key: "relevantMedicalInfo", labelKey: "relevantMedicalInfo", group: "assessment" },
 
-  { key: "privateNotes", label: "Private professional notes (never shared with client)", group: "Private" },
+  { key: "solutionsDiscussed", labelKey: "solutionsDiscussed", group: "plan" },
+  { key: "clientActionPlan", labelKey: "clientActionPlan", group: "plan" },
+  { key: "warningSignsDiscussed", labelKey: "warningSignsDiscussed", group: "plan" },
+  { key: "referrals", labelKey: "referrals", group: "plan" },
+  { key: "followUpPlan", labelKey: "followUpPlan", group: "plan" },
+
+  { key: "privateNotes", labelKey: "privateNotes", group: "private" },
 ];
 
-const GROUPS = ["Reason & goals", "Assessment", "Plan", "Private"];
+const GROUPS: { key: GroupKey; titleKey: string }[] = [
+  { key: "reasonGoals", titleKey: "visits.form.groupReasonGoals" },
+  { key: "assessment", titleKey: "visits.form.groupAssessment" },
+  { key: "plan", titleKey: "visits.form.groupPlan" },
+  { key: "private", titleKey: "visits.form.groupPrivate" },
+];
 
 type FieldValues = Partial<Record<keyof Visit, string>>;
 
 export default function VisitForm() {
   const { clientId, visitId: visitIdParam } = useParams<{ clientId?: string; visitId?: string }>();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [visitId, setVisitId] = useState<string | null>(visitIdParam || null);
   const [visit, setVisit] = useState<Visit | null>(null);
@@ -77,38 +87,42 @@ export default function VisitForm() {
       })
       .catch((err) => {
         draftCreationStarted.current = false;
-        setError(apiErrorMessage(err, "Could not start a new visit."));
+        setError(apiErrorMessage(err, t("visits.form.couldNotStart")));
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clientId, visitIdParam]);
 
-  const loadVisit = useCallback(async (id: string) => {
-    setLoading(true);
-    try {
-      const res = await api.get(`/visits/${id}`);
-      const v: Visit = res.data.visit;
-      setVisit(v);
-      setVisitId(v.id);
-      setVisitDate(v.visitDate.slice(0, 10));
-      setStartTime(v.startTime || "");
-      setEndTime(v.endTime || "");
-      setVisitType(v.visitType);
-      setLocation(v.location || "");
-      setFollowUpDate(v.followUpDate ? v.followUpDate.slice(0, 10) : "");
-      setBabyIds(v.babies.map((b) => b.baby.id));
-      const textValues: FieldValues = {};
-      TEXT_FIELDS.forEach((f) => {
-        textValues[f.key] = (v as any)[f.key] || "";
-      });
-      setValues(textValues);
-      const clientRes = await api.get(`/clients/${v.clientId}`);
-      setClient(clientRes.data.client);
-    } catch (err) {
-      setError(apiErrorMessage(err, "Could not load this visit."));
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const loadVisit = useCallback(
+    async (id: string) => {
+      setLoading(true);
+      try {
+        const res = await api.get(`/visits/${id}`);
+        const v: Visit = res.data.visit;
+        setVisit(v);
+        setVisitId(v.id);
+        setVisitDate(v.visitDate.slice(0, 10));
+        setStartTime(v.startTime || "");
+        setEndTime(v.endTime || "");
+        setVisitType(v.visitType);
+        setLocation(v.location || "");
+        setFollowUpDate(v.followUpDate ? v.followUpDate.slice(0, 10) : "");
+        setBabyIds(v.babies.map((b) => b.baby.id));
+        const textValues: FieldValues = {};
+        TEXT_FIELDS.forEach((f) => {
+          textValues[f.key] = (v as any)[f.key] || "";
+        });
+        setValues(textValues);
+        const clientRes = await api.get(`/clients/${v.clientId}`);
+        setClient(clientRes.data.client);
+      } catch (err) {
+        setError(apiErrorMessage(err, t("visits.form.couldNotLoad")));
+      } finally {
+        setLoading(false);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
 
   useEffect(() => {
     if (visitIdParam) loadVisit(visitIdParam);
@@ -192,7 +206,7 @@ export default function VisitForm() {
       await saveNow();
       navigate(`/clients/${client?.id}`);
     } catch (err) {
-      setError(apiErrorMessage(err, "Could not save visit."));
+      setError(apiErrorMessage(err, t("visits.form.couldNotSave")));
     }
   }
 
@@ -203,7 +217,7 @@ export default function VisitForm() {
       const saved = await saveNow({ status: "COMPLETED" });
       navigate(`/visits/${saved!.id}`);
     } catch (err) {
-      setError(apiErrorMessage(err, "Could not complete visit."));
+      setError(apiErrorMessage(err, t("visits.form.couldNotComplete")));
     } finally {
       setCompleting(false);
     }
@@ -223,25 +237,31 @@ export default function VisitForm() {
 
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">{visit?.status === "DRAFT" ? "New / draft visit" : "Edit visit"}</h1>
-          {client && <p className="text-sm text-gray-500">Client: {client.fullName}</p>}
+          <h1 className="text-xl font-bold text-gray-900">{visit?.status === "DRAFT" ? t("visits.form.newDraftTitle") : t("visits.form.editTitle")}</h1>
+          {client && <p className="text-sm text-gray-500">{t("visits.form.client", { name: client.fullName })}</p>}
         </div>
         <p className="text-xs text-gray-500">
-          {dirty ? "Saving…" : savedAt ? `Draft saved ${new Date(savedAt).toLocaleTimeString()}` : visit?.lastDraftSavedAt ? `Draft saved ${new Date(visit.lastDraftSavedAt).toLocaleTimeString()}` : ""}
+          {dirty
+            ? t("visits.form.draftSaving")
+            : savedAt
+            ? t("visits.form.draftSavedAt", { time: formatTime(savedAt) })
+            : visit?.lastDraftSavedAt
+            ? t("visits.form.draftSavedAt", { time: formatTime(visit.lastDraftSavedAt) })
+            : ""}
         </p>
       </div>
 
       {!isEditableDraft && (
         <div className="rounded-md border border-blue-200 bg-blue-50 px-4 py-2 text-sm text-blue-800">
-          This visit is {visit?.status.toLowerCase()}. Changes below are saved when you click "Save changes".
+          {t("visits.form.notEditableNotice", { status: visit ? t(`enums.visitStatus.${visit.status}`).toLowerCase() : "" })}
         </div>
       )}
 
       <div className="card space-y-4">
-        <h2 className="text-sm font-semibold text-gray-900">General information</h2>
+        <h2 className="text-sm font-semibold text-gray-900">{t("visits.form.generalInformation")}</h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div>
-            <label className="label">Visit date</label>
+            <label className="label">{t("visits.form.visitDate")}</label>
             <input
               className="input"
               type="date"
@@ -253,7 +273,7 @@ export default function VisitForm() {
             />
           </div>
           <div>
-            <label className="label">Start time</label>
+            <label className="label">{t("visits.form.startTime")}</label>
             <input
               className="input"
               type="time"
@@ -265,7 +285,7 @@ export default function VisitForm() {
             />
           </div>
           <div>
-            <label className="label">End time</label>
+            <label className="label">{t("visits.form.endTime")}</label>
             <input
               className="input"
               type="time"
@@ -277,7 +297,7 @@ export default function VisitForm() {
             />
           </div>
           <div>
-            <label className="label">Visit type</label>
+            <label className="label">{t("visits.form.visitType")}</label>
             <select
               className="input"
               value={visitType}
@@ -286,15 +306,15 @@ export default function VisitForm() {
                 updateGeneral({ visitType: e.target.value });
               }}
             >
-              {VISIT_TYPES.map((t) => (
-                <option key={t} value={t}>
-                  {labelize(t)}
+              {VISIT_TYPES.map((vt) => (
+                <option key={vt} value={vt}>
+                  {t(`enums.visitType.${vt}`)}
                 </option>
               ))}
             </select>
           </div>
           <div>
-            <label className="label">Location / method</label>
+            <label className="label">{t("visits.form.location")}</label>
             <input
               className="input"
               value={location}
@@ -305,7 +325,7 @@ export default function VisitForm() {
             />
           </div>
           <div>
-            <label className="label">Follow-up date</label>
+            <label className="label">{t("visits.form.followUpDate")}</label>
             <input
               className="input"
               type="date"
@@ -319,7 +339,7 @@ export default function VisitForm() {
         </div>
         {client && client.babies && client.babies.length > 0 && (
           <div>
-            <label className="label">Babies involved in this visit</label>
+            <label className="label">{t("visits.form.babiesInvolved")}</label>
             <div className="flex flex-wrap gap-3">
               {client.babies.map((b) => (
                 <label key={b.id} className="flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm">
@@ -333,14 +353,14 @@ export default function VisitForm() {
       </div>
 
       {GROUPS.map((group) => (
-        <div key={group} className="card space-y-4">
-          <h2 className="text-sm font-semibold text-gray-900">{group}</h2>
-          {TEXT_FIELDS.filter((f) => f.group === group).map((f) => (
+        <div key={group.key} className="card space-y-4">
+          <h2 className="text-sm font-semibold text-gray-900">{t(group.titleKey)}</h2>
+          {TEXT_FIELDS.filter((f) => f.group === group.key).map((f) => (
             <div key={String(f.key)}>
-              <label className="label">{f.label}</label>
+              <label className="label">{t(`visits.form.field.${f.labelKey}`)}</label>
               <textarea
                 className="input"
-                rows={f.group === "Private" ? 4 : 3}
+                rows={f.group === "private" ? 4 : 3}
                 value={values[f.key] || ""}
                 onChange={(e) => updateText(f.key, e.target.value)}
               />
@@ -371,15 +391,15 @@ export default function VisitForm() {
 
       <div className="sticky bottom-0 -mx-4 flex flex-wrap justify-end gap-2 border-t border-gray-200 bg-white/95 px-4 py-3 backdrop-blur sm:mx-0 sm:rounded-md sm:border">
         <button className="btn-secondary" onClick={() => navigate(client ? `/clients/${client.id}` : "/clients")}>
-          Back to client
+          {t("visits.form.backToClient")}
         </button>
         {isEditableDraft && (
           <button className="btn-secondary" onClick={handleSaveDraft}>
-            Save as draft
+            {t("visits.form.saveAsDraft")}
           </button>
         )}
         <button className="btn-primary" onClick={handleComplete} disabled={completing}>
-          {completing ? "Saving…" : isEditableDraft ? "Complete visit" : "Save changes"}
+          {completing ? t("common.saving") : isEditableDraft ? t("visits.form.completeVisit") : t("common.saveChanges")}
         </button>
       </div>
     </div>

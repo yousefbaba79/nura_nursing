@@ -40,21 +40,6 @@ export type FollowUpType = (typeof FOLLOW_UP_TYPES)[number];
 export const FOLLOW_UP_STATUSES = ["SCHEDULED", "COMPLETED", "RESCHEDULED", "CANCELLED", "MISSED"] as const;
 export type FollowUpStatus = (typeof FOLLOW_UP_STATUSES)[number];
 
-export function labelize(value: string): string {
-  return value
-    .toLowerCase()
-    .split("_")
-    .map((w) => w[0]?.toUpperCase() + w.slice(1))
-    .join(" ");
-}
-
-export const CLIENT_STATUS_LABELS: Record<string, string> = {
-  ACTIVE: "Active",
-  FOLLOW_UP_REQUIRED: "Follow-up required",
-  TREATMENT_COMPLETED: "Treatment completed",
-  ARCHIVED: "Archived",
-};
-
 export const CLIENT_STATUS_COLORS: Record<string, string> = {
   ACTIVE: "bg-green-100 text-green-800",
   FOLLOW_UP_REQUIRED: "bg-amber-100 text-amber-800",

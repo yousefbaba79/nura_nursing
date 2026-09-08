@@ -1,51 +1,57 @@
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { api } from "../../api/client";
 import { Spinner, Badge, EmptyState } from "../../components/ui";
-import { labelize } from "../../api/enums";
 import { formatDate, formatDateTime } from "../../lib/format";
 import ProblemsSection from "./ProblemsSection";
 import RecommendationsSection from "./RecommendationsSection";
 import ActionItemsSection from "./ActionItemsSection";
 import type { Visit } from "../../api/types";
 
-const FIELD_GROUPS: { title: string; fields: { key: keyof Visit; label: string }[] }[] = [
+type GroupKey = "reasonGoals" | "assessment" | "plan" | "private";
+
+const FIELD_GROUPS: { key: GroupKey; titleKey: string; fields: { key: keyof Visit; labelKey: string }[] }[] = [
   {
-    title: "Reason & goals",
+    key: "reasonGoals",
+    titleKey: "visits.form.groupReasonGoals",
     fields: [
-      { key: "reasonForConsultation", label: "Reason for consultation" },
-      { key: "clientGoals", label: "Client's goals" },
-      { key: "clientQuestions", label: "Client's questions" },
-      { key: "currentFeedingRoutine", label: "Current feeding routine" },
-      { key: "problemsReported", label: "Problems reported by the client" },
+      { key: "reasonForConsultation", labelKey: "reasonForConsultation" },
+      { key: "clientGoals", labelKey: "clientGoals" },
+      { key: "clientQuestions", labelKey: "clientQuestions" },
+      { key: "currentFeedingRoutine", labelKey: "currentFeedingRoutine" },
+      { key: "problemsReported", labelKey: "problemsReported" },
     ],
   },
   {
-    title: "Assessment",
+    key: "assessment",
+    titleKey: "visits.form.groupAssessment",
     fields: [
-      { key: "consultantObservations", label: "Consultant's observations" },
-      { key: "feedingAssessment", label: "Feeding assessment" },
-      { key: "breastAssessment", label: "Breast assessment" },
-      { key: "babyAssessment", label: "Baby assessment" },
-      { key: "latchAssessment", label: "Latch assessment" },
-      { key: "milkTransferAssessment", label: "Milk transfer assessment" },
-      { key: "weightInformation", label: "Weight information" },
-      { key: "relevantMedicalInfo", label: "Relevant medical information" },
+      { key: "consultantObservations", labelKey: "consultantObservations" },
+      { key: "feedingAssessment", labelKey: "feedingAssessment" },
+      { key: "breastAssessment", labelKey: "breastAssessment" },
+      { key: "babyAssessment", labelKey: "babyAssessment" },
+      { key: "latchAssessment", labelKey: "latchAssessment" },
+      { key: "milkTransferAssessment", labelKey: "milkTransferAssessment" },
+      { key: "weightInformation", labelKey: "weightInformation" },
+      { key: "relevantMedicalInfo", labelKey: "relevantMedicalInfo" },
     ],
   },
   {
-    title: "Plan",
+    key: "plan",
+    titleKey: "visits.form.groupPlan",
     fields: [
-      { key: "solutionsDiscussed", label: "Solutions discussed" },
-      { key: "clientActionPlan", label: "Client action plan" },
-      { key: "warningSignsDiscussed", label: "Warning signs discussed" },
-      { key: "referrals", label: "Referrals to other professionals" },
-      { key: "followUpPlan", label: "Follow-up plan" },
+      { key: "solutionsDiscussed", labelKey: "solutionsDiscussed" },
+      { key: "clientActionPlan", labelKey: "clientActionPlan" },
+      { key: "warningSignsDiscussed", labelKey: "warningSignsDiscussed" },
+      { key: "referrals", labelKey: "referrals" },
+      { key: "followUpPlan", labelKey: "followUpPlan" },
     ],
   },
   {
-    title: "Private professional notes",
-    fields: [{ key: "privateNotes", label: "Private notes (never shared with client)" }],
+    key: "private",
+    titleKey: "visits.detail.privateNotesGroupTitle",
+    fields: [{ key: "privateNotes", labelKey: "privateNotes" }],
   },
 ];
 
@@ -53,6 +59,7 @@ export default function VisitDetail() {
   const { visitId } = useParams<{ visitId: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   const { data: visit, isLoading } = useQuery({
     queryKey: ["visit", visitId],
@@ -77,13 +84,13 @@ export default function VisitDetail() {
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-xl font-bold text-gray-900">{formatDate(visit.visitDate)} visit</h1>
+            <h1 className="text-xl font-bold text-gray-900">{t("visits.detail.title", { date: formatDate(visit.visitDate) })}</h1>
             <Badge
               className={
                 visit.status === "COMPLETED" ? "bg-green-100 text-green-800" : visit.status === "CANCELLED" ? "bg-gray-100 text-gray-500" : "bg-blue-100 text-blue-800"
               }
             >
-              {labelize(visit.status)}
+              {t(`enums.visitStatus.${visit.status}`)}
             </Badge>
           </div>
           <p className="text-sm text-gray-500">
@@ -93,43 +100,43 @@ export default function VisitDetail() {
               </Link>
             )}
             {" · "}
-            {labelize(visit.visitType)}
+            {t(`enums.visitType.${visit.visitType}`)}
             {visit.babies.length > 0 ? ` · ${visit.babies.map((b) => b.baby.fullName).join(", ")}` : ""}
           </p>
         </div>
         <div className="flex gap-2">
           <button className="btn-secondary" onClick={() => navigate(`/visits/${visit.id}/edit`)}>
-            Edit visit
+            {t("visits.detail.editVisit")}
           </button>
           {visit.status === "COMPLETED" && (
             <button className="btn-primary" onClick={() => navigate(`/visits/${visit.id}/summary`)}>
-              Generate summary
+              {t("visits.detail.generateSummary")}
             </button>
           )}
         </div>
       </div>
 
       <div className="card grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
-        <Info label="Start" value={visit.startTime || "—"} />
-        <Info label="End" value={visit.endTime || "—"} />
-        <Info label="Location" value={visit.location || "—"} />
-        <Info label="Follow-up date" value={formatDate(visit.followUpDate)} />
-        <Info label="Created" value={formatDateTime(visit.createdAt)} />
-        <Info label="Created by" value={visit.createdBy?.fullName || "—"} />
-        <Info label="Last updated" value={formatDateTime(visit.updatedAt)} />
-        <Info label="Updated by" value={visit.updatedBy?.fullName || "—"} />
+        <Info label={t("visits.detail.start")} value={visit.startTime || "—"} />
+        <Info label={t("visits.detail.end")} value={visit.endTime || "—"} />
+        <Info label={t("visits.detail.location")} value={visit.location || "—"} />
+        <Info label={t("visits.detail.followUpDate")} value={formatDate(visit.followUpDate)} />
+        <Info label={t("visits.detail.created")} value={formatDateTime(visit.createdAt)} />
+        <Info label={t("visits.detail.createdBy")} value={visit.createdBy?.fullName || "—"} />
+        <Info label={t("visits.detail.lastUpdated")} value={formatDateTime(visit.updatedAt)} />
+        <Info label={t("visits.detail.updatedBy")} value={visit.updatedBy?.fullName || "—"} />
       </div>
 
       {FIELD_GROUPS.map((group) => {
         const hasContent = group.fields.some((f) => (visit as any)[f.key]);
         if (!hasContent) return null;
         return (
-          <div key={group.title} className="card space-y-3">
-            <h2 className="text-sm font-semibold text-gray-900">{group.title}</h2>
+          <div key={group.key} className="card space-y-3">
+            <h2 className="text-sm font-semibold text-gray-900">{t(group.titleKey)}</h2>
             {group.fields.map((f) =>
               (visit as any)[f.key] ? (
                 <div key={String(f.key)}>
-                  <p className="text-xs font-medium uppercase tracking-wide text-gray-500">{f.label}</p>
+                  <p className="text-xs font-medium uppercase tracking-wide text-gray-500">{t(`visits.form.field.${f.labelKey}`)}</p>
                   <p className="whitespace-pre-wrap text-sm text-gray-800">{(visit as any)[f.key]}</p>
                 </div>
               ) : null
@@ -157,7 +164,7 @@ export default function VisitDetail() {
       )}
 
       {visit.problems.length === 0 && visit.recommendations.length === 0 && visit.actionItems.length === 0 && (
-        <EmptyState title="No clinical detail recorded yet" description="Add problems, recommendations, or action items from the sections above." />
+        <EmptyState title={t("visits.detail.noClinicalDetail")} description={t("visits.detail.noClinicalDetailDescription")} />
       )}
     </div>
   );
