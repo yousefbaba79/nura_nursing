@@ -87,6 +87,7 @@ export default function ClientDetail() {
                 ✉️ {client.email}
               </a>
             )}
+            {client.idNumber && <span>{t("clients.form.idNumber")}: {client.idNumber}</span>}
           </div>
         </div>
         <div className="flex flex-wrap gap-2">

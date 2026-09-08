@@ -171,6 +171,7 @@
       "basicInformation": "Basic information",
       "fullName": "Full name",
       "phoneNumber": "Phone number",
+      "idNumber": "ID number",
       "email": "Email",
       "dateOfBirth": "Date of birth",
       "clientNumber": "Client number",

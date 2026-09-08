@@ -44,9 +44,9 @@ router.get("/clients.csv", async (req: AuthedRequest, res) => {
     orderBy: { fullName: "asc" },
   });
 
-  const headers = ["Full Name", "Phone", "Email", "Status", "City", "Client Number", "Created At", "Last Updated"];
+  const headers = ["Full Name", "Phone", "Email", "Status", "City", "Client Number", "ID Number", "Created At", "Last Updated"];
   const rows = clients.map((c) =>
-    [c.fullName, c.phone, c.email ?? "", c.status, c.city ?? "", c.clientNumber ?? "", c.createdAt.toISOString(), c.updatedAt.toISOString()].map(
+    [c.fullName, c.phone, c.email ?? "", c.status, c.city ?? "", c.clientNumber ?? "", c.idNumber ?? "", c.createdAt.toISOString(), c.updatedAt.toISOString()].map(
       (v) => `"${String(v).replace(/"/g, '""')}"`
     ).join(",")
   );

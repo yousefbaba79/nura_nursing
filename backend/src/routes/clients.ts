@@ -13,6 +13,7 @@ const clientInput = z.object({
   phone: z.string().min(1, "Phone number is required."),
   email: z.string().email().optional().or(z.literal("")).nullable(),
   dateOfBirth: z.string().optional().nullable(),
+  idNumber: z.string().optional().nullable(),
   clientNumber: z.string().optional().nullable(),
   address: z.string().optional().nullable(),
   city: z.string().optional().nullable(),
@@ -61,6 +62,7 @@ router.get("/", async (req: AuthedRequest, res) => {
       { phone: { contains: term } },
       { email: { contains: term } },
       { clientNumber: { contains: term } },
+      { idNumber: { contains: term } },
       { babies: { some: { fullName: { contains: term } } } },
     ];
   }
@@ -121,13 +123,14 @@ router.get("/", async (req: AuthedRequest, res) => {
   res.json({ clients: result });
 });
 
-// GET /api/clients/check-duplicate?phone=&email=&clientNumber=
+// GET /api/clients/check-duplicate?phone=&email=&clientNumber=&idNumber=
 router.get("/check-duplicate", async (req: AuthedRequest, res) => {
-  const { phone, email, clientNumber, excludeId } = req.query as Record<string, string | undefined>;
+  const { phone, email, clientNumber, idNumber, excludeId } = req.query as Record<string, string | undefined>;
   const or: any[] = [];
   if (phone) or.push({ phone });
   if (email) or.push({ email });
   if (clientNumber) or.push({ clientNumber });
+  if (idNumber) or.push({ idNumber });
   if (or.length === 0) return res.json({ duplicates: [] });
 
   const duplicates = await prisma.client.findMany({
@@ -136,7 +139,7 @@ router.get("/check-duplicate", async (req: AuthedRequest, res) => {
       OR: or,
       ...(excludeId ? { id: { not: excludeId } } : {}),
     },
-    select: { id: true, fullName: true, phone: true, email: true, clientNumber: true, status: true },
+    select: { id: true, fullName: true, phone: true, email: true, clientNumber: true, idNumber: true, status: true },
   });
   res.json({ duplicates });
 });
@@ -182,6 +185,7 @@ router.post("/", async (req: AuthedRequest, res) => {
       phone: data.phone,
       email: data.email || null,
       dateOfBirth: toDate(data.dateOfBirth),
+      idNumber: data.idNumber || null,
       clientNumber: data.clientNumber || null,
       address: data.address || null,
       city: data.city || null,
@@ -239,6 +243,7 @@ router.put("/:id", async (req: AuthedRequest, res) => {
       ...(data.phone !== undefined ? { phone: data.phone } : {}),
       ...(data.email !== undefined ? { email: data.email || null } : {}),
       ...(data.dateOfBirth !== undefined ? { dateOfBirth: toDate(data.dateOfBirth) } : {}),
+      ...(data.idNumber !== undefined ? { idNumber: data.idNumber || null } : {}),
       ...(data.clientNumber !== undefined ? { clientNumber: data.clientNumber || null } : {}),
       ...(data.address !== undefined ? { address: data.address || null } : {}),
       ...(data.city !== undefined ? { city: data.city || null } : {}),
