@@ -1,0 +1,42 @@
+databases:
+  - name: nura-nursing-db
+    plan: free
+    databaseName: nura_nursing
+    user: nura_nursing
+
+services:
+  - type: web
+    name: nura-nursing-api
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    healthCheckPath: /api/health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: nura-nursing-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 8h
+      - key: NODE_ENV
+        value: production
+      - key: CORS_ORIGIN
+        value: https://nura-nursing-app.onrender.com
+
+  - type: web
+    name: nura-nursing-app
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://nura-nursing-api.onrender.com/api
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

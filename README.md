@@ -8,9 +8,7 @@ audit logging, and responsive mobile design).
 
 ## Stack
 
-- **Backend**: Node.js, Express, TypeScript, Prisma ORM, SQLite (swap the `DATABASE_URL` in
-  `backend/.env` for a Postgres/MySQL connection string in production — Prisma supports both
-  with a one-line `provider` change in `schema.prisma`), JWT auth, bcrypt, PDFKit.
+- **Backend**: Node.js, Express, TypeScript, Prisma ORM, PostgreSQL, JWT auth, bcrypt, PDFKit.
 - **Frontend**: React, TypeScript, Vite, Tailwind CSS, React Router, TanStack Query, Axios.
 
 ## Project layout
@@ -20,23 +18,41 @@ backend/    Express API (src/routes, src/middleware, prisma/schema.prisma)
 frontend/   React SPA (src/pages, src/components, src/api)
 ```
 
+## Deploying
+
+See [`DEPLOY.md`](./DEPLOY.md) for a one-click Render deployment (`render.yaml` provisions a
+Postgres database, the API, and the frontend automatically).
+
 ## Running locally
+
+### 0. Database
+
+The app runs against Postgres everywhere, including locally. The easiest way to get one running:
+
+```bash
+docker compose up -d        # from the repo root — starts Postgres on localhost:5432
+```
+
+(No Docker available? Point `DATABASE_URL` in `backend/.env` at any Postgres instance you
+already have instead.)
 
 ### 1. Backend
 
 ```bash
 cd backend
 npm install
-npx prisma migrate deploy   # creates backend/prisma/dev.db
+cp .env.example .env        # already points at the docker-compose Postgres from step 0
+npx prisma migrate deploy
 npm run dev                 # http://localhost:4000
 ```
 
-Environment variables live in `backend/.env` (already populated with dev defaults — replace
-`JWT_SECRET` before deploying anywhere real). Key ones:
+Environment variables live in `backend/.env` (see `backend/.env.example` for what each one
+does — replace `JWT_SECRET` before deploying anywhere real). Key ones:
 
-- `DATABASE_URL` — SQLite file path (default `file:./dev.db`)
+- `DATABASE_URL` — Postgres connection string
 - `JWT_SECRET`, `JWT_EXPIRES_IN`
 - `CORS_ORIGIN` — must match the frontend's origin
+- `NODE_ENV` — set to `production` in real deployments (see notes below)
 
 ### 2. Frontend
 
@@ -64,14 +80,18 @@ SEED_EMAIL=consultant@example.com SEED_PASSWORD='ChangeMe123!' npx tsx prisma/se
 
 ## Notable design choices
 
-- **SQLite for the MVP**: zero external services to stand up; the schema avoids native
-  enum columns (SQLite/Prisma limitation) in favor of validated string fields, so moving to
-  Postgres later is a `provider` + `DATABASE_URL` change, no schema rewrite.
+- **No native Postgres enums**: enumerated fields (client status, visit type, priority, etc.)
+  are plain, validated `String` columns rather than Postgres `enum` types, so adding a new
+  allowed value is an application-code change, not a migration.
 - **Password reset without an email provider**: `POST /api/auth/forgot-password` generates a
-  reset token and returns it directly in the (non-production) response instead of silently
-  failing, so the full reset flow can be exercised end-to-end. Wire up a real email provider
-  before shipping to real users — the endpoint returns a generic message either way to avoid
-  leaking which emails have accounts.
+  reset token and always logs it server-side; it's only echoed back in the API response
+  outside of `NODE_ENV=production`, so the full flow can be exercised end-to-end locally
+  without leaking reset tokens to anyone who can reach the endpoint in a real deployment. Wire
+  up a real email provider (Resend, Postmark, SendGrid, plain SMTP — the integration point is
+  right where that token is generated in `backend/src/routes/auth.ts`) before relying on
+  self-service password reset in production; until then, retrieve the token from the server
+  logs. The endpoint always returns the same generic message either way, to avoid leaking
+  which emails have accounts.
 - **Visit drafts**: creating a new visit immediately creates a `DRAFT` row server-side, so
   autosave (debounced `PATCH /visits/:id/draft`) always has something to write to and a
   consultant can navigate away and resume later without losing work.

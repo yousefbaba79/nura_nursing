@@ -138,10 +138,14 @@ router.post("/forgot-password", async (req, res) => {
   await prisma.passwordReset.create({ data: { token, consultantId: consultant.id, expiresAt } });
   await recordAudit({ consultantId: consultant.id, action: "PASSWORD_RESET_REQUESTED", entityType: "Consultant", entityId: consultant.id });
 
-  // No email provider is configured in this MVP; the reset link is returned
-  // directly (and logged) so the flow can be exercised end-to-end.
+  // No email provider is configured yet. The token is always logged server-side
+  // so a reset can be completed by checking the server logs; it is only ever
+  // included in the API response outside production, to exercise the flow
+  // end-to-end locally without leaking reset tokens to anyone who can reach
+  // this endpoint in a real deployment.
   console.log(`[password-reset] token for ${consultant.email}: ${token}`);
-  res.json({ ...genericResponse, devResetToken: token });
+  const devFields = process.env.NODE_ENV === "production" ? {} : { devResetToken: token };
+  res.json({ ...genericResponse, ...devFields });
 });
 
 router.post("/reset-password", async (req, res) => {

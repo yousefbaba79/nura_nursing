@@ -3,13 +3,14 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-// NOTE: SQLite has no native enum support in Prisma, so enumerated fields
-// below are plain Strings. Allowed values are validated in application code
-// (see backend/src/utils/enums.ts) and documented in comments here.
+// NOTE: Enumerated fields below are plain Strings rather than native Postgres
+// enums, so adding a new allowed value never requires a migration. Allowed
+// values are validated in application code (see backend/src/utils/enums.ts)
+// and documented in comments here.
 
 // ---------------------------------------------------------------------------
 // Consultant / account
