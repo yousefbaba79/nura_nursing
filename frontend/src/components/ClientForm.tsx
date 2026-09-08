@@ -10,6 +10,7 @@ export interface ClientFormValues {
   phone: string;
   email: string;
   dateOfBirth: string;
+  idNumber: string;
   clientNumber: string;
   address: string;
   city: string;
@@ -34,6 +35,7 @@ const emptyValues: ClientFormValues = {
   phone: "",
   email: "",
   dateOfBirth: "",
+  idNumber: "",
   clientNumber: "",
   address: "",
   city: "",
@@ -60,6 +62,7 @@ function toFormValues(client?: Client | null): ClientFormValues {
     phone: client.phone || "",
     email: client.email || "",
     dateOfBirth: client.dateOfBirth ? client.dateOfBirth.slice(0, 10) : "",
+    idNumber: client.idNumber || "",
     clientNumber: client.clientNumber || "",
     address: client.address || "",
     city: client.city || "",
@@ -117,10 +120,16 @@ export default function ClientForm({ client, onSaved, onCancel }: Props) {
   }
 
   async function checkDuplicates() {
-    if (!values.phone && !values.email && !values.clientNumber) return;
+    if (!values.phone && !values.email && !values.clientNumber && !values.idNumber) return;
     try {
       const res = await api.get("/clients/check-duplicate", {
-        params: { phone: values.phone || undefined, email: values.email || undefined, clientNumber: values.clientNumber || undefined, excludeId: client?.id },
+        params: {
+          phone: values.phone || undefined,
+          email: values.email || undefined,
+          clientNumber: values.clientNumber || undefined,
+          idNumber: values.idNumber || undefined,
+          excludeId: client?.id,
+        },
       });
       setDuplicates(res.data.duplicates);
       setDuplicatesChecked(true);
@@ -175,6 +184,9 @@ export default function ClientForm({ client, onSaved, onCancel }: Props) {
         </Field>
         <Field id="client-phone" label={t("clients.form.phoneNumber")} required error={errors.phone}>
           <input className="input" type="tel" value={values.phone} onChange={(e) => update("phone", e.target.value)} onBlur={checkDuplicates} required />
+        </Field>
+        <Field id="client-id-number" label={t("clients.form.idNumber")}>
+          <input className="input" value={values.idNumber} onChange={(e) => update("idNumber", e.target.value)} onBlur={checkDuplicates} />
         </Field>
         <Field id="client-email" label={t("clients.form.email")} error={errors.email}>
           <input className="input" type="email" value={values.email} onChange={(e) => update("email", e.target.value)} onBlur={checkDuplicates} />

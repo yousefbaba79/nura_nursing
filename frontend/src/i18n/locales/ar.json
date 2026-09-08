@@ -179,6 +179,7 @@
       "basicInformation": "المعلومات الأساسية",
       "fullName": "الاسم الكامل",
       "phoneNumber": "رقم الهاتف",
+      "idNumber": "رقم الهوية",
       "email": "البريد الإلكتروني",
       "dateOfBirth": "تاريخ الميلاد",
       "clientNumber": "رقم العميلة",
