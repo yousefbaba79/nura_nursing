@@ -1,0 +1,359 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// NOTE: SQLite has no native enum support in Prisma, so enumerated fields
+// below are plain Strings. Allowed values are validated in application code
+// (see backend/src/utils/enums.ts) and documented in comments here.
+
+// ---------------------------------------------------------------------------
+// Consultant / account
+// ---------------------------------------------------------------------------
+
+model Consultant {
+  id                String   @id @default(cuid())
+  email             String   @unique
+  passwordHash      String
+  fullName          String
+  professionalTitle String?
+  phone             String?
+  clinicName        String?
+  clinicAddress     String?
+  profileImageUrl   String?
+  defaultLanguage   String   @default("en")
+  timeZone          String   @default("UTC")
+  dateFormat        String   @default("MM/DD/YYYY")
+  defaultVisitDurationMinutes Int @default(60)
+  sessionTimeoutMinutes        Int @default(30)
+  failedLoginAttempts Int    @default(0)
+  lockedUntil       DateTime?
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  clients        Client[]
+  visitsCreated  Visit[]         @relation("VisitCreatedBy")
+  visitsUpdated  Visit[]         @relation("VisitUpdatedBy")
+  auditEntries   AuditEntry[]
+  passwordResets PasswordReset[]
+}
+
+model PasswordReset {
+  id           String     @id @default(cuid())
+  token        String     @unique
+  consultantId String
+  consultant   Consultant @relation(fields: [consultantId], references: [id], onDelete: Cascade)
+  expiresAt    DateTime
+  usedAt       DateTime?
+  createdAt    DateTime   @default(now())
+}
+
+// ---------------------------------------------------------------------------
+// Client
+// ---------------------------------------------------------------------------
+// status: ACTIVE | FOLLOW_UP_REQUIRED | TREATMENT_COMPLETED | ARCHIVED
+
+model Client {
+  id                 String       @id @default(cuid())
+  consultantId       String
+  consultant         Consultant   @relation(fields: [consultantId], references: [id])
+
+  fullName           String
+  phone              String
+  email              String?
+  dateOfBirth        DateTime?
+  clientNumber       String?
+  address            String?
+  city               String?
+  preferredLanguage  String?
+  preferredContactMethod String?
+  occupation         String?
+  emergencyContactName  String?
+  emergencyContactPhone String?
+  referralSource     String?
+  generalNotes       String?
+  tags               String?      // comma separated
+  status             String       @default("ACTIVE")
+
+  consentReceived    Boolean      @default(false)
+  consentDate        DateTime?
+  consentMethod      String?
+  consentFormVersion String?
+  consentNotes       String?
+
+  archivedAt         DateTime?
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+  lastViewedAt       DateTime?
+
+  babies       Baby[]
+  visits       Visit[]
+  actionItems  ActionItem[]
+  followUps    FollowUp[]
+
+  @@index([consultantId])
+  @@index([phone])
+  @@index([email])
+  @@index([status])
+}
+
+// ---------------------------------------------------------------------------
+// Baby
+// ---------------------------------------------------------------------------
+// feedingMethod: BREASTFEEDING | EXPRESSED_BREAST_MILK | FORMULA | MIXED_FEEDING | TUBE_FEEDING | OTHER
+
+model Baby {
+  id                  String        @id @default(cuid())
+  clientId            String
+  client              Client        @relation(fields: [clientId], references: [id])
+
+  fullName            String
+  dateOfBirth         DateTime?
+  sex                 String?
+  gestationalAgeWeeks String?
+  deliveryType        String?
+  birthWeightGrams    Float?
+  currentWeightGrams  Float?
+  lengthCm            Float?
+  headCircumferenceCm Float?
+  medicalConditions   String?
+  medications         String?
+  allergies           String?
+  feedingMethod       String?
+  dailyFeedsCount     Int?
+  supplementationInfo String?
+  hospitalInfo        String?
+  pediatricianName    String?
+  pediatricianPhone   String?
+  notes               String?
+
+  archivedAt          DateTime?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  visits       VisitBaby[]
+  weightLogs   WeightLog[]
+  problems     Problem[]
+  recommendations Recommendation[]
+  actionItems  ActionItem[]
+  followUps    FollowUp[]
+
+  @@index([clientId])
+}
+
+model WeightLog {
+  id          String   @id @default(cuid())
+  babyId      String
+  baby        Baby     @relation(fields: [babyId], references: [id])
+  visitId     String?
+  visit       Visit?   @relation(fields: [visitId], references: [id])
+  date        DateTime @default(now())
+  weightGrams Float
+  createdAt   DateTime @default(now())
+
+  @@index([babyId])
+}
+
+// ---------------------------------------------------------------------------
+// Visit
+// ---------------------------------------------------------------------------
+// visitType: INITIAL_CONSULTATION | FOLLOW_UP_CONSULTATION | PHONE_CONSULTATION |
+//            VIDEO_CONSULTATION | HOME_VISIT | CLINIC_VISIT | MESSAGE_CONSULTATION | OTHER
+// status: DRAFT | COMPLETED | CANCELLED
+
+model Visit {
+  id              String      @id @default(cuid())
+  clientId        String
+  client          Client      @relation(fields: [clientId], references: [id])
+
+  createdById     String
+  createdBy       Consultant  @relation("VisitCreatedBy", fields: [createdById], references: [id])
+  updatedById     String?
+  updatedBy       Consultant? @relation("VisitUpdatedBy", fields: [updatedById], references: [id])
+
+  visitDate       DateTime    @default(now())
+  startTime       String?
+  endTime         String?
+  visitType       String      @default("INITIAL_CONSULTATION")
+  location        String?
+  status          String      @default("DRAFT")
+  followUpDate    DateTime?
+
+  reasonForConsultation String?
+  clientGoals           String?
+  clientQuestions        String?
+  currentFeedingRoutine  String?
+  problemsReported       String?
+  consultantObservations String?
+  feedingAssessment      String?
+  breastAssessment       String?
+  babyAssessment         String?
+  latchAssessment        String?
+  milkTransferAssessment String?
+  weightInformation      String?
+  relevantMedicalInfo    String?
+  solutionsDiscussed     String?
+  clientActionPlan       String?
+  warningSignsDiscussed  String?
+  referrals              String?
+  followUpPlan           String?
+  privateNotes           String?
+
+  lastDraftSavedAt DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  babies          VisitBaby[]
+  problems        Problem[]
+  recommendations Recommendation[]
+  actionItems     ActionItem[]
+  followUps       FollowUp[]
+  weightLogs      WeightLog[]
+
+  @@index([clientId])
+  @@index([status])
+}
+
+model VisitBaby {
+  id      String @id @default(cuid())
+  visitId String
+  visit   Visit  @relation(fields: [visitId], references: [id])
+  babyId  String
+  baby    Baby   @relation(fields: [babyId], references: [id])
+
+  @@unique([visitId, babyId])
+}
+
+// ---------------------------------------------------------------------------
+// Problems / Recommendations / Action items
+// ---------------------------------------------------------------------------
+// severity / priority: LOW | MEDIUM | HIGH
+// problem status: NEW | IN_PROGRESS | IMPROVED | RESOLVED
+
+model Problem {
+  id          String        @id @default(cuid())
+  visitId     String
+  visit       Visit         @relation(fields: [visitId], references: [id])
+  babyId      String?
+  baby        Baby?         @relation(fields: [babyId], references: [id])
+
+  title       String
+  description String?
+  severity    String        @default("MEDIUM")
+  status      String        @default("NEW")
+  notes       String?
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  recommendations Recommendation[]
+  actionItems     ActionItem[]
+
+  @@index([visitId])
+}
+
+model Recommendation {
+  id           String   @id @default(cuid())
+  visitId      String
+  visit        Visit    @relation(fields: [visitId], references: [id])
+  problemId    String?
+  problem      Problem? @relation(fields: [problemId], references: [id])
+  babyId       String?
+  baby         Baby?    @relation(fields: [babyId], references: [id])
+
+  title             String
+  instructions      String?
+  priority          String   @default("MEDIUM")
+  includeInSummary  Boolean  @default(true)
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  actionItems  ActionItem[]
+
+  @@index([visitId])
+}
+
+// action item status: TODO | IN_PROGRESS | COMPLETED | CANCELLED
+
+model ActionItem {
+  id               String            @id @default(cuid())
+  clientId         String
+  client           Client            @relation(fields: [clientId], references: [id])
+  visitId          String?
+  visit            Visit?            @relation(fields: [visitId], references: [id])
+  problemId        String?
+  problem          Problem?          @relation(fields: [problemId], references: [id])
+  recommendationId String?
+  recommendation   Recommendation?   @relation(fields: [recommendationId], references: [id])
+  babyId           String?
+  baby             Baby?             @relation(fields: [babyId], references: [id])
+
+  title         String
+  instructions  String?
+  dueDate       DateTime?
+  priority      String            @default("MEDIUM")
+  status        String            @default("TODO")
+  completedAt   DateTime?
+  notes         String?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([clientId])
+  @@index([status])
+  @@index([dueDate])
+}
+
+// ---------------------------------------------------------------------------
+// Follow-ups
+// ---------------------------------------------------------------------------
+// type: CALL | MESSAGE | VIDEO_MEETING | CLINIC_VISIT | HOME_VISIT | OTHER
+// status: SCHEDULED | COMPLETED | RESCHEDULED | CANCELLED | MISSED
+
+model FollowUp {
+  id          String         @id @default(cuid())
+  clientId    String
+  client      Client         @relation(fields: [clientId], references: [id])
+  babyId      String?
+  baby        Baby?          @relation(fields: [babyId], references: [id])
+  visitId     String?
+  visit       Visit?         @relation(fields: [visitId], references: [id])
+
+  scheduledAt DateTime
+  type        String         @default("CALL")
+  reason      String?
+  notes       String?
+  status      String         @default("SCHEDULED")
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([clientId])
+  @@index([status])
+  @@index([scheduledAt])
+}
+
+// ---------------------------------------------------------------------------
+// Audit log
+// ---------------------------------------------------------------------------
+
+model AuditEntry {
+  id           String     @id @default(cuid())
+  consultantId String?
+  consultant   Consultant? @relation(fields: [consultantId], references: [id])
+  action       String
+  entityType   String
+  entityId     String?
+  details      String?
+  ipAddress    String?
+  createdAt    DateTime   @default(now())
+
+  @@index([consultantId])
+  @@index([entityType, entityId])
+}
