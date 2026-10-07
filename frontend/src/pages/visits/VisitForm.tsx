@@ -18,10 +18,6 @@ const TEXT_FIELDS: { key: keyof Visit; labelKey: string; group: GroupKey }[] = [
   { key: "consultantObservations", labelKey: "consultantObservations", group: "assessment" },
 
   { key: "solutionsDiscussed", labelKey: "solutionsDiscussed", group: "plan" },
-  { key: "clientActionPlan", labelKey: "clientActionPlan", group: "plan" },
-  { key: "warningSignsDiscussed", labelKey: "warningSignsDiscussed", group: "plan" },
-  { key: "referrals", labelKey: "referrals", group: "plan" },
-  { key: "followUpPlan", labelKey: "followUpPlan", group: "plan" },
 
   { key: "privateNotes", labelKey: "privateNotes", group: "private" },
 ];

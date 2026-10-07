@@ -25,13 +25,7 @@ const FIELD_GROUPS: { key: GroupKey; titleKey: string; fields: { key: keyof Visi
   {
     key: "plan",
     titleKey: "visits.form.groupPlan",
-    fields: [
-      { key: "solutionsDiscussed", labelKey: "solutionsDiscussed" },
-      { key: "clientActionPlan", labelKey: "clientActionPlan" },
-      { key: "warningSignsDiscussed", labelKey: "warningSignsDiscussed" },
-      { key: "referrals", labelKey: "referrals" },
-      { key: "followUpPlan", labelKey: "followUpPlan" },
-    ],
+    fields: [{ key: "solutionsDiscussed", labelKey: "solutionsDiscussed" }],
   },
   {
     key: "private",
