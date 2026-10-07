@@ -175,6 +175,10 @@ export default function FollowUps() {
             clientId={modal.item.clientId}
             followUp={modal.item}
             onCancel={() => setModal({ open: false })}
+            onDeleted={() => {
+              setModal({ open: false });
+              invalidate();
+            }}
             onSaved={() => {
               setModal({ open: false });
               invalidate();

@@ -258,6 +258,10 @@ export default function ClientDetail() {
           babies={client.babies}
           followUp={followUpModal.item}
           onCancel={() => setFollowUpModal({ open: false })}
+          onDeleted={() => {
+            setFollowUpModal({ open: false });
+            invalidate();
+          }}
           onSaved={() => {
             setFollowUpModal({ open: false });
             invalidate();

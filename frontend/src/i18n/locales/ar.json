@@ -273,7 +273,10 @@
     "notes": "ملاحظات",
     "errorDateRequired": "يجب إدخال تاريخ ووقت للمتابعة.",
     "couldNotSave": "تعذّر حفظ المتابعة.",
-    "scheduleFollowUp": "جدولة متابعة"
+    "couldNotDelete": "تعذّر حذف المتابعة.",
+    "scheduleFollowUp": "جدولة متابعة",
+    "deleteConfirmTitle": "حذف هذه المتابعة؟",
+    "deleteConfirmDescription": "لا يمكن التراجع عن هذا الإجراء."
   },
   "visits": {
     "form": {

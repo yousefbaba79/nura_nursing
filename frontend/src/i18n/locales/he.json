@@ -269,7 +269,10 @@
     "notes": "הערות",
     "errorDateRequired": "יש להזין תאריך ושעה למעקב.",
     "couldNotSave": "לא ניתן היה לשמור את המעקב.",
-    "scheduleFollowUp": "קביעת מעקב"
+    "couldNotDelete": "לא ניתן היה למחוק את המעקב.",
+    "scheduleFollowUp": "קביעת מעקב",
+    "deleteConfirmTitle": "למחוק את המעקב הזה?",
+    "deleteConfirmDescription": "לא ניתן לבטל פעולה זו."
   },
   "visits": {
     "form": {

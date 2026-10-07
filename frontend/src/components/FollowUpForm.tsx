@@ -2,7 +2,7 @@ import { type FormEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api, apiErrorMessage } from "../api/client";
 import { FOLLOW_UP_TYPES, FOLLOW_UP_STATUSES } from "../api/enums";
-import { ErrorBanner } from "./ui";
+import { ConfirmDialog, ErrorBanner } from "./ui";
 import type { FollowUp, Baby } from "../api/types";
 
 interface Props {
@@ -12,6 +12,7 @@ interface Props {
   followUp?: FollowUp | null;
   onSaved: (followUp: FollowUp) => void;
   onCancel: () => void;
+  onDeleted?: () => void;
 }
 
 function toLocalInput(value?: string | null) {
@@ -21,7 +22,7 @@ function toLocalInput(value?: string | null) {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
-export default function FollowUpForm({ clientId, visitId, babies, followUp, onSaved, onCancel }: Props) {
+export default function FollowUpForm({ clientId, visitId, babies, followUp, onSaved, onCancel, onDeleted }: Props) {
   const { t } = useTranslation();
   const [scheduledAt, setScheduledAt] = useState(toLocalInput(followUp?.scheduledAt));
   const [type, setType] = useState(followUp?.type || "CLINIC_VISIT");
@@ -31,6 +32,23 @@ export default function FollowUpForm({ clientId, visitId, babies, followUp, onSa
   const [babyId, setBabyId] = useState(followUp?.babyId || "");
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  async function handleDelete() {
+    if (!followUp) return;
+    setDeleting(true);
+    try {
+      await api.delete(`/follow-ups/${followUp.id}`);
+      setDeleteConfirm(false);
+      onDeleted?.();
+    } catch (err) {
+      setError(apiErrorMessage(err, t("followUpForm.couldNotDelete")));
+      setDeleteConfirm(false);
+    } finally {
+      setDeleting(false);
+    }
+  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -110,14 +128,34 @@ export default function FollowUpForm({ clientId, visitId, babies, followUp, onSa
         <label className="label" htmlFor="fu-notes">{t("followUpForm.notes")}</label>
         <textarea id="fu-notes" className="input" rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} />
       </div>
-      <div className="flex justify-end gap-2 border-t border-gray-200 pt-3">
-        <button type="button" className="btn-secondary" onClick={onCancel} disabled={saving}>
-          {t("common.cancel")}
-        </button>
-        <button type="submit" className="btn-primary" disabled={saving}>
-          {saving ? t("common.saving") : followUp ? t("common.saveChanges") : t("followUpForm.scheduleFollowUp")}
-        </button>
+      <div className="flex items-center justify-between gap-2 border-t border-gray-200 pt-3">
+        {followUp ? (
+          <button type="button" className="text-sm font-medium text-red-600 hover:underline" onClick={() => setDeleteConfirm(true)} disabled={saving}>
+            {t("common.delete")}
+          </button>
+        ) : (
+          <span />
+        )}
+        <div className="flex gap-2">
+          <button type="button" className="btn-secondary" onClick={onCancel} disabled={saving}>
+            {t("common.cancel")}
+          </button>
+          <button type="submit" className="btn-primary" disabled={saving}>
+            {saving ? t("common.saving") : followUp ? t("common.saveChanges") : t("followUpForm.scheduleFollowUp")}
+          </button>
+        </div>
       </div>
+
+      <ConfirmDialog
+        open={deleteConfirm}
+        title={t("followUpForm.deleteConfirmTitle")}
+        description={t("followUpForm.deleteConfirmDescription")}
+        confirmLabel={t("common.delete")}
+        danger
+        loading={deleting}
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteConfirm(false)}
+      />
     </form>
   );
 }
