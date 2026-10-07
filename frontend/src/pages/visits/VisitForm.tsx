@@ -14,10 +14,6 @@ type GroupKey = "reasonGoals" | "assessment" | "plan" | "private";
 
 const TEXT_FIELDS: { key: keyof Visit; labelKey: string; group: GroupKey }[] = [
   { key: "reasonForConsultation", labelKey: "reasonForConsultation", group: "reasonGoals" },
-  { key: "clientGoals", labelKey: "clientGoals", group: "reasonGoals" },
-  { key: "clientQuestions", labelKey: "clientQuestions", group: "reasonGoals" },
-  { key: "currentFeedingRoutine", labelKey: "currentFeedingRoutine", group: "reasonGoals" },
-  { key: "problemsReported", labelKey: "problemsReported", group: "reasonGoals" },
 
   { key: "consultantObservations", labelKey: "consultantObservations", group: "assessment" },
   { key: "feedingAssessment", labelKey: "feedingAssessment", group: "assessment" },

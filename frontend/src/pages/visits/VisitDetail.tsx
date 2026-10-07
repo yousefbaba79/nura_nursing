@@ -15,13 +15,7 @@ const FIELD_GROUPS: { key: GroupKey; titleKey: string; fields: { key: keyof Visi
   {
     key: "reasonGoals",
     titleKey: "visits.form.groupReasonGoals",
-    fields: [
-      { key: "reasonForConsultation", labelKey: "reasonForConsultation" },
-      { key: "clientGoals", labelKey: "clientGoals" },
-      { key: "clientQuestions", labelKey: "clientQuestions" },
-      { key: "currentFeedingRoutine", labelKey: "currentFeedingRoutine" },
-      { key: "problemsReported", labelKey: "problemsReported" },
-    ],
+    fields: [{ key: "reasonForConsultation", labelKey: "reasonForConsultation" }],
   },
   {
     key: "assessment",
