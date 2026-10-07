@@ -602,7 +602,7 @@
     "followUpType": {
       "CALL": "اتصال هاتفي",
       "MESSAGE": "رسالة",
-      "VIDEO_MEETING": "اجتماع فيديو",
+      "VIDEO_MEETING": "زوم",
       "CLINIC_VISIT": "زيارة عيادة",
       "HOME_VISIT": "زيارة منزلية",
       "OTHER": "أخرى"

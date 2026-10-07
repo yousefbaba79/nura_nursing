@@ -34,7 +34,7 @@ export const PROBLEM_STATUSES = ["NEW", "IN_PROGRESS", "IMPROVED", "RESOLVED"] a
 export const ACTION_ITEM_STATUSES = ["TODO", "IN_PROGRESS", "COMPLETED", "CANCELLED"] as const;
 export type ActionItemStatus = (typeof ACTION_ITEM_STATUSES)[number];
 
-export const FOLLOW_UP_TYPES = ["CALL", "MESSAGE", "VIDEO_MEETING", "CLINIC_VISIT", "HOME_VISIT", "OTHER"] as const;
+export const FOLLOW_UP_TYPES = ["CLINIC_VISIT", "VIDEO_MEETING"] as const;
 export type FollowUpType = (typeof FOLLOW_UP_TYPES)[number];
 
 export const FOLLOW_UP_STATUSES = ["SCHEDULED", "COMPLETED", "RESCHEDULED", "CANCELLED", "MISSED"] as const;
