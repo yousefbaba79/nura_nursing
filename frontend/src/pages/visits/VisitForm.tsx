@@ -14,25 +14,10 @@ type GroupKey = "reasonGoals" | "assessment" | "plan" | "private";
 
 const TEXT_FIELDS: { key: keyof Visit; labelKey: string; group: GroupKey }[] = [
   { key: "reasonForConsultation", labelKey: "reasonForConsultation", group: "reasonGoals" },
-  { key: "clientGoals", labelKey: "clientGoals", group: "reasonGoals" },
-  { key: "clientQuestions", labelKey: "clientQuestions", group: "reasonGoals" },
-  { key: "currentFeedingRoutine", labelKey: "currentFeedingRoutine", group: "reasonGoals" },
-  { key: "problemsReported", labelKey: "problemsReported", group: "reasonGoals" },
 
   { key: "consultantObservations", labelKey: "consultantObservations", group: "assessment" },
-  { key: "feedingAssessment", labelKey: "feedingAssessment", group: "assessment" },
-  { key: "breastAssessment", labelKey: "breastAssessment", group: "assessment" },
-  { key: "babyAssessment", labelKey: "babyAssessment", group: "assessment" },
-  { key: "latchAssessment", labelKey: "latchAssessment", group: "assessment" },
-  { key: "milkTransferAssessment", labelKey: "milkTransferAssessment", group: "assessment" },
-  { key: "weightInformation", labelKey: "weightInformation", group: "assessment" },
-  { key: "relevantMedicalInfo", labelKey: "relevantMedicalInfo", group: "assessment" },
 
   { key: "solutionsDiscussed", labelKey: "solutionsDiscussed", group: "plan" },
-  { key: "clientActionPlan", labelKey: "clientActionPlan", group: "plan" },
-  { key: "warningSignsDiscussed", labelKey: "warningSignsDiscussed", group: "plan" },
-  { key: "referrals", labelKey: "referrals", group: "plan" },
-  { key: "followUpPlan", labelKey: "followUpPlan", group: "plan" },
 
   { key: "privateNotes", labelKey: "privateNotes", group: "private" },
 ];

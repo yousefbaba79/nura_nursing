@@ -433,7 +433,17 @@
     "noneHere": "אין מעקבים כאן",
     "call": "התקשרות",
     "editModalTitle": "עריכת מעקב",
-    "markDone": "סימון כהושלם"
+    "markDone": "סימון כהושלם",
+    "periods": {
+      "all": "כל הזמנים",
+      "thisMonth": "החודש",
+      "lastMonth": "החודש שעבר",
+      "thisYear": "השנה",
+      "lastYear": "השנה שעברה",
+      "custom": "תקופה מסוימת"
+    },
+    "periodFrom": "מתאריך",
+    "periodTo": "עד תאריך"
   },
   "settings": {
     "title": "הגדרות",

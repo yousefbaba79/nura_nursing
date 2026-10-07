@@ -437,7 +437,17 @@
     "noneHere": "لا توجد متابعات هنا",
     "call": "اتصال",
     "editModalTitle": "تعديل المتابعة",
-    "markDone": "وضع علامة إنجاز"
+    "markDone": "وضع علامة إنجاز",
+    "periods": {
+      "all": "كل الأوقات",
+      "thisMonth": "هذا الشهر",
+      "lastMonth": "الشهر الماضي",
+      "thisYear": "هذه السنة",
+      "lastYear": "السنة الماضية",
+      "custom": "فترة محددة"
+    },
+    "periodFrom": "من تاريخ",
+    "periodTo": "إلى تاريخ"
   },
   "settings": {
     "title": "الإعدادات",

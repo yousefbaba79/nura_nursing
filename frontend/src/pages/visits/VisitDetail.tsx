@@ -15,38 +15,17 @@ const FIELD_GROUPS: { key: GroupKey; titleKey: string; fields: { key: keyof Visi
   {
     key: "reasonGoals",
     titleKey: "visits.form.groupReasonGoals",
-    fields: [
-      { key: "reasonForConsultation", labelKey: "reasonForConsultation" },
-      { key: "clientGoals", labelKey: "clientGoals" },
-      { key: "clientQuestions", labelKey: "clientQuestions" },
-      { key: "currentFeedingRoutine", labelKey: "currentFeedingRoutine" },
-      { key: "problemsReported", labelKey: "problemsReported" },
-    ],
+    fields: [{ key: "reasonForConsultation", labelKey: "reasonForConsultation" }],
   },
   {
     key: "assessment",
     titleKey: "visits.form.groupAssessment",
-    fields: [
-      { key: "consultantObservations", labelKey: "consultantObservations" },
-      { key: "feedingAssessment", labelKey: "feedingAssessment" },
-      { key: "breastAssessment", labelKey: "breastAssessment" },
-      { key: "babyAssessment", labelKey: "babyAssessment" },
-      { key: "latchAssessment", labelKey: "latchAssessment" },
-      { key: "milkTransferAssessment", labelKey: "milkTransferAssessment" },
-      { key: "weightInformation", labelKey: "weightInformation" },
-      { key: "relevantMedicalInfo", labelKey: "relevantMedicalInfo" },
-    ],
+    fields: [{ key: "consultantObservations", labelKey: "consultantObservations" }],
   },
   {
     key: "plan",
     titleKey: "visits.form.groupPlan",
-    fields: [
-      { key: "solutionsDiscussed", labelKey: "solutionsDiscussed" },
-      { key: "clientActionPlan", labelKey: "clientActionPlan" },
-      { key: "warningSignsDiscussed", labelKey: "warningSignsDiscussed" },
-      { key: "referrals", labelKey: "referrals" },
-      { key: "followUpPlan", labelKey: "followUpPlan" },
-    ],
+    fields: [{ key: "solutionsDiscussed", labelKey: "solutionsDiscussed" }],
   },
   {
     key: "private",
