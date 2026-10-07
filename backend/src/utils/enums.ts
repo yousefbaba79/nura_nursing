@@ -39,14 +39,7 @@ export const ACTION_ITEM_STATUSES = [
   "CANCELLED",
 ] as const;
 
-export const FOLLOW_UP_TYPES = [
-  "CALL",
-  "MESSAGE",
-  "VIDEO_MEETING",
-  "CLINIC_VISIT",
-  "HOME_VISIT",
-  "OTHER",
-] as const;
+export const FOLLOW_UP_TYPES = ["CLINIC_VISIT", "VIDEO_MEETING"] as const;
 
 export const FOLLOW_UP_STATUSES = [
   "SCHEDULED",

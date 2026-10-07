@@ -328,7 +328,7 @@ model FollowUp {
   visit       Visit?         @relation(fields: [visitId], references: [id])
 
   scheduledAt DateTime
-  type        String         @default("CALL")
+  type        String         @default("CLINIC_VISIT")
   reason      String?
   notes       String?
   status      String         @default("SCHEDULED")

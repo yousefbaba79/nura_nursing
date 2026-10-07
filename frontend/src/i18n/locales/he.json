@@ -598,7 +598,7 @@
     "followUpType": {
       "CALL": "שיחת טלפון",
       "MESSAGE": "הודעה",
-      "VIDEO_MEETING": "פגישת וידאו",
+      "VIDEO_MEETING": "זום",
       "CLINIC_VISIT": "ביקור מרפאה",
       "HOME_VISIT": "ביקור בית",
       "OTHER": "אחר"

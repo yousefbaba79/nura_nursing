@@ -92,7 +92,7 @@ router.post("/", async (req: AuthedRequest, res) => {
       babyId: d.babyId || null,
       visitId: d.visitId || null,
       scheduledAt: new Date(d.scheduledAt),
-      type: d.type || "CALL",
+      type: d.type || "CLINIC_VISIT",
       reason: d.reason || null,
       notes: d.notes || null,
       status: d.status || "SCHEDULED",

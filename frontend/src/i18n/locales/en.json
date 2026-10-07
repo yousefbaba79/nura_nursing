@@ -594,7 +594,7 @@
     "followUpType": {
       "CALL": "Call",
       "MESSAGE": "Message",
-      "VIDEO_MEETING": "Video Meeting",
+      "VIDEO_MEETING": "Zoom",
       "CLINIC_VISIT": "Clinic Visit",
       "HOME_VISIT": "Home Visit",
       "OTHER": "Other"

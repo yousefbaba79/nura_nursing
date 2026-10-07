@@ -24,7 +24,7 @@ function toLocalInput(value?: string | null) {
 export default function FollowUpForm({ clientId, visitId, babies, followUp, onSaved, onCancel }: Props) {
   const { t } = useTranslation();
   const [scheduledAt, setScheduledAt] = useState(toLocalInput(followUp?.scheduledAt));
-  const [type, setType] = useState(followUp?.type || "CALL");
+  const [type, setType] = useState(followUp?.type || "CLINIC_VISIT");
   const [reason, setReason] = useState(followUp?.reason || "");
   const [notes, setNotes] = useState(followUp?.notes || "");
   const [status, setStatus] = useState(followUp?.status || "SCHEDULED");
