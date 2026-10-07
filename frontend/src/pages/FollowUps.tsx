@@ -16,17 +16,49 @@ const SCOPES = [
   { key: "completed", labelKey: "followUps.scopes.completed" },
 ];
 
+const PERIODS = [
+  { key: "all", labelKey: "followUps.periods.all" },
+  { key: "this_month", labelKey: "followUps.periods.thisMonth" },
+  { key: "last_month", labelKey: "followUps.periods.lastMonth" },
+  { key: "this_year", labelKey: "followUps.periods.thisYear" },
+  { key: "last_year", labelKey: "followUps.periods.lastYear" },
+  { key: "custom", labelKey: "followUps.periods.custom" },
+];
+
 export default function FollowUps() {
   const [params, setParams] = useSearchParams();
   const scope = params.get("scope") || "today";
+  const period = params.get("period") || "all";
+  const from = params.get("from") || "";
+  const to = params.get("to") || "";
   const queryClient = useQueryClient();
   const { t } = useTranslation();
   const [modal, setModal] = useState<{ open: boolean; item?: FollowUp | null }>({ open: false });
 
   const { data, isLoading } = useQuery({
-    queryKey: ["follow-ups", scope],
-    queryFn: async () => (await api.get("/follow-ups", { params: { scope } })).data.followUps as FollowUp[],
+    queryKey: ["follow-ups", scope, period, from, to],
+    queryFn: async () =>
+      (
+        await api.get("/follow-ups", {
+          params:
+            scope === "completed" && period !== "all"
+              ? { scope, period, ...(period === "custom" ? { from: from || undefined, to: to || undefined } : {}) }
+              : { scope },
+        })
+      ).data.followUps as FollowUp[],
   });
+
+  function setScope(key: string) {
+    setParams({ scope: key });
+  }
+
+  function setPeriod(key: string) {
+    setParams({ scope, period: key });
+  }
+
+  function setCustomRange(nextFrom: string, nextTo: string) {
+    setParams({ scope, period: "custom", from: nextFrom, to: nextTo });
+  }
 
   function invalidate() {
     queryClient.invalidateQueries({ queryKey: ["follow-ups"] });
@@ -46,7 +78,7 @@ export default function FollowUps() {
         {SCOPES.map((s) => (
           <button
             key={s.key}
-            onClick={() => setParams({ scope: s.key })}
+            onClick={() => setScope(s.key)}
             className={`shrink-0 rounded-full px-4 py-1.5 text-sm font-medium ${
               scope === s.key ? "bg-brand-600 text-white" : "bg-white text-gray-600 ring-1 ring-gray-200"
             }`}
@@ -55,6 +87,46 @@ export default function FollowUps() {
           </button>
         ))}
       </div>
+
+      {scope === "completed" && (
+        <div className="space-y-2">
+          <div className="flex gap-2 overflow-x-auto">
+            {PERIODS.map((p) => (
+              <button
+                key={p.key}
+                onClick={() => setPeriod(p.key)}
+                className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${
+                  period === p.key ? "bg-brand-100 text-brand-800 ring-1 ring-brand-300" : "bg-white text-gray-500 ring-1 ring-gray-200"
+                }`}
+              >
+                {t(p.labelKey)}
+              </button>
+            ))}
+          </div>
+          {period === "custom" && (
+            <div className="flex flex-wrap items-end gap-3">
+              <div>
+                <label className="label" htmlFor="follow-up-period-from">
+                  {t("followUps.periodFrom")}
+                </label>
+                <input
+                  id="follow-up-period-from"
+                  type="date"
+                  className="input"
+                  value={from}
+                  onChange={(e) => setCustomRange(e.target.value, to)}
+                />
+              </div>
+              <div>
+                <label className="label" htmlFor="follow-up-period-to">
+                  {t("followUps.periodTo")}
+                </label>
+                <input id="follow-up-period-to" type="date" className="input" value={to} onChange={(e) => setCustomRange(from, e.target.value)} />
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {isLoading ? (
         <div className="flex justify-center py-16">

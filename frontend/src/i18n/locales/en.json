@@ -429,7 +429,17 @@
     "noneHere": "No follow-ups here",
     "call": "Call",
     "editModalTitle": "Edit follow-up",
-    "markDone": "Mark done"
+    "markDone": "Mark done",
+    "periods": {
+      "all": "All time",
+      "thisMonth": "This month",
+      "lastMonth": "Last month",
+      "thisYear": "This year",
+      "lastYear": "Last year",
+      "custom": "Specific period"
+    },
+    "periodFrom": "From",
+    "periodTo": "To"
   },
   "settings": {
     "title": "Settings",
