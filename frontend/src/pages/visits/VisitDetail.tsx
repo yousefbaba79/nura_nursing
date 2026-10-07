@@ -9,27 +9,13 @@ import RecommendationsSection from "./RecommendationsSection";
 import ActionItemsSection from "./ActionItemsSection";
 import type { Visit } from "../../api/types";
 
-type GroupKey = "reasonGoals" | "assessment" | "plan" | "private";
+type GroupKey = "reasonGoals" | "plan" | "private";
 
 const FIELD_GROUPS: { key: GroupKey; titleKey: string; fields: { key: keyof Visit; labelKey: string }[] }[] = [
   {
     key: "reasonGoals",
     titleKey: "visits.form.groupReasonGoals",
     fields: [{ key: "reasonForConsultation", labelKey: "reasonForConsultation" }],
-  },
-  {
-    key: "assessment",
-    titleKey: "visits.form.groupAssessment",
-    fields: [
-      { key: "consultantObservations", labelKey: "consultantObservations" },
-      { key: "feedingAssessment", labelKey: "feedingAssessment" },
-      { key: "breastAssessment", labelKey: "breastAssessment" },
-      { key: "babyAssessment", labelKey: "babyAssessment" },
-      { key: "latchAssessment", labelKey: "latchAssessment" },
-      { key: "milkTransferAssessment", labelKey: "milkTransferAssessment" },
-      { key: "weightInformation", labelKey: "weightInformation" },
-      { key: "relevantMedicalInfo", labelKey: "relevantMedicalInfo" },
-    ],
   },
   {
     key: "plan",

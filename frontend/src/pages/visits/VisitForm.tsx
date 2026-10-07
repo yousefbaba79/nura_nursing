@@ -10,19 +10,10 @@ import ProblemsSection from "./ProblemsSection";
 import RecommendationsSection from "./RecommendationsSection";
 import ActionItemsSection from "./ActionItemsSection";
 
-type GroupKey = "reasonGoals" | "assessment" | "plan" | "private";
+type GroupKey = "reasonGoals" | "plan" | "private";
 
 const TEXT_FIELDS: { key: keyof Visit; labelKey: string; group: GroupKey }[] = [
   { key: "reasonForConsultation", labelKey: "reasonForConsultation", group: "reasonGoals" },
-
-  { key: "consultantObservations", labelKey: "consultantObservations", group: "assessment" },
-  { key: "feedingAssessment", labelKey: "feedingAssessment", group: "assessment" },
-  { key: "breastAssessment", labelKey: "breastAssessment", group: "assessment" },
-  { key: "babyAssessment", labelKey: "babyAssessment", group: "assessment" },
-  { key: "latchAssessment", labelKey: "latchAssessment", group: "assessment" },
-  { key: "milkTransferAssessment", labelKey: "milkTransferAssessment", group: "assessment" },
-  { key: "weightInformation", labelKey: "weightInformation", group: "assessment" },
-  { key: "relevantMedicalInfo", labelKey: "relevantMedicalInfo", group: "assessment" },
 
   { key: "solutionsDiscussed", labelKey: "solutionsDiscussed", group: "plan" },
   { key: "clientActionPlan", labelKey: "clientActionPlan", group: "plan" },
@@ -35,7 +26,6 @@ const TEXT_FIELDS: { key: keyof Visit; labelKey: string; group: GroupKey }[] = [
 
 const GROUPS: { key: GroupKey; titleKey: string }[] = [
   { key: "reasonGoals", titleKey: "visits.form.groupReasonGoals" },
-  { key: "assessment", titleKey: "visits.form.groupAssessment" },
   { key: "plan", titleKey: "visits.form.groupPlan" },
   { key: "private", titleKey: "visits.form.groupPrivate" },
 ];
