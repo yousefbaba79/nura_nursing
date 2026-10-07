@@ -13,7 +13,6 @@ export interface ClientFormValues {
   clientNumber: string;
   address: string;
   city: string;
-  emergencyContactName: string;
   generalNotes: string;
   tags: string;
 }
@@ -27,7 +26,6 @@ const emptyValues: ClientFormValues = {
   clientNumber: "",
   address: "",
   city: "",
-  emergencyContactName: "",
   generalNotes: "",
   tags: "",
 };
@@ -43,7 +41,6 @@ function toFormValues(client?: Client | null): ClientFormValues {
     clientNumber: client.clientNumber || "",
     address: client.address || "",
     city: client.city || "",
-    emergencyContactName: client.emergencyContactName || "",
     generalNotes: client.generalNotes || "",
     tags: client.tags || "",
   };
@@ -168,9 +165,6 @@ export default function ClientForm({ client, onSaved, onCancel }: Props) {
         </Field>
         <Field id="client-city" label={t("clients.form.city")}>
           <input className="input" value={values.city} onChange={(e) => update("city", e.target.value)} />
-        </Field>
-        <Field id="client-emergency-name" label={t("clients.form.emergencyContactName")}>
-          <input className="input" value={values.emergencyContactName} onChange={(e) => update("emergencyContactName", e.target.value)} />
         </Field>
         <Field id="client-tags" label={t("clients.form.tags")} full>
           <input className="input" value={values.tags} onChange={(e) => update("tags", e.target.value)} placeholder={t("clients.form.tagsPlaceholder")} />
