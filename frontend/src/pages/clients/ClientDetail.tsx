@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { api, apiErrorMessage } from "../../api/client";
@@ -14,7 +14,6 @@ import type { Client, Baby, ActionItem, FollowUp } from "../../api/types";
 
 export default function ClientDetail() {
   const { clientId } = useParams<{ clientId: string }>();
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { t } = useTranslation();
 
@@ -94,8 +93,8 @@ export default function ClientDetail() {
           <button className="btn-secondary" onClick={() => setEditOpen(true)}>
             {t("clients.detail.edit")}
           </button>
-          <button className="btn-secondary" onClick={() => navigate(`/clients/${client.id}/visits/new`)}>
-            {t("clients.detail.newVisit")}
+          <button className="btn-secondary" onClick={() => setFollowUpModal({ open: true })}>
+            {t("clients.detail.schedule")}
           </button>
           <button className={client.status === "ARCHIVED" ? "btn-secondary" : "btn-secondary text-red-700"} onClick={() => setArchiveConfirm(true)}>
             {client.status === "ARCHIVED" ? t("clients.detail.restore") : t("clients.detail.archive")}
@@ -142,9 +141,9 @@ export default function ClientDetail() {
           <Section
             title={t("clients.detail.visitHistory")}
             action={
-              <Link to={`/clients/${client.id}/visits/new`} className="text-sm font-medium text-brand-700 hover:underline">
-                {t("clients.detail.newVisitLink")}
-              </Link>
+              <button className="text-sm font-medium text-brand-700 hover:underline" onClick={() => setFollowUpModal({ open: true })}>
+                {t("clients.detail.schedule")}
+              </button>
             }
           >
             {!client.visits || client.visits.length === 0 ? (
