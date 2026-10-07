@@ -1,7 +1,6 @@
 import { type FormEvent, useEffect, useState, cloneElement } from "react";
 import { useTranslation } from "react-i18next";
 import { api, apiErrorMessage } from "../api/client";
-import { CLIENT_STATUSES } from "../api/enums";
 import { ErrorBanner } from "./ui";
 import type { Client } from "../api/types";
 
@@ -14,15 +13,11 @@ export interface ClientFormValues {
   clientNumber: string;
   address: string;
   city: string;
-  preferredLanguage: string;
   preferredContactMethod: string;
   occupation: string;
   emergencyContactName: string;
-  emergencyContactPhone: string;
-  referralSource: string;
   generalNotes: string;
   tags: string;
-  status: string;
   consentReceived: boolean;
   consentDate: string;
   consentMethod: string;
@@ -39,15 +34,11 @@ const emptyValues: ClientFormValues = {
   clientNumber: "",
   address: "",
   city: "",
-  preferredLanguage: "",
   preferredContactMethod: "",
   occupation: "",
   emergencyContactName: "",
-  emergencyContactPhone: "",
-  referralSource: "",
   generalNotes: "",
   tags: "",
-  status: "ACTIVE",
   consentReceived: false,
   consentDate: "",
   consentMethod: "",
@@ -66,15 +57,11 @@ function toFormValues(client?: Client | null): ClientFormValues {
     clientNumber: client.clientNumber || "",
     address: client.address || "",
     city: client.city || "",
-    preferredLanguage: client.preferredLanguage || "",
     preferredContactMethod: client.preferredContactMethod || "",
     occupation: client.occupation || "",
     emergencyContactName: client.emergencyContactName || "",
-    emergencyContactPhone: client.emergencyContactPhone || "",
-    referralSource: client.referralSource || "",
     generalNotes: client.generalNotes || "",
     tags: client.tags || "",
-    status: client.status || "ACTIVE",
     consentReceived: client.consentReceived || false,
     consentDate: client.consentDate ? client.consentDate.slice(0, 10) : "",
     consentMethod: client.consentMethod || "",
@@ -197,23 +184,11 @@ export default function ClientForm({ client, onSaved, onCancel }: Props) {
         <Field id="client-number" label={t("clients.form.clientNumber")}>
           <input className="input" value={values.clientNumber} onChange={(e) => update("clientNumber", e.target.value)} onBlur={checkDuplicates} />
         </Field>
-        <Field id="client-status" label={t("clients.form.status")}>
-          <select className="input" value={values.status} onChange={(e) => update("status", e.target.value)}>
-            {CLIENT_STATUSES.map((s) => (
-              <option key={s} value={s}>
-                {t(`enums.clientStatus.${s}`)}
-              </option>
-            ))}
-          </select>
-        </Field>
         <Field id="client-address" label={t("clients.form.address")} full>
           <input className="input" value={values.address} onChange={(e) => update("address", e.target.value)} />
         </Field>
         <Field id="client-city" label={t("clients.form.city")}>
           <input className="input" value={values.city} onChange={(e) => update("city", e.target.value)} />
-        </Field>
-        <Field id="client-preferred-language" label={t("clients.form.preferredLanguage")}>
-          <input className="input" value={values.preferredLanguage} onChange={(e) => update("preferredLanguage", e.target.value)} />
         </Field>
         <Field id="client-contact-method" label={t("clients.form.preferredContactMethod")}>
           <select className="input" value={values.preferredContactMethod} onChange={(e) => update("preferredContactMethod", e.target.value)}>
@@ -227,14 +202,8 @@ export default function ClientForm({ client, onSaved, onCancel }: Props) {
         <Field id="client-occupation" label={t("clients.form.occupation")}>
           <input className="input" value={values.occupation} onChange={(e) => update("occupation", e.target.value)} />
         </Field>
-        <Field id="client-referral-source" label={t("clients.form.referralSource")}>
-          <input className="input" value={values.referralSource} onChange={(e) => update("referralSource", e.target.value)} />
-        </Field>
         <Field id="client-emergency-name" label={t("clients.form.emergencyContactName")}>
           <input className="input" value={values.emergencyContactName} onChange={(e) => update("emergencyContactName", e.target.value)} />
-        </Field>
-        <Field id="client-emergency-phone" label={t("clients.form.emergencyContactPhone")}>
-          <input className="input" value={values.emergencyContactPhone} onChange={(e) => update("emergencyContactPhone", e.target.value)} />
         </Field>
         <Field id="client-tags" label={t("clients.form.tags")} full>
           <input className="input" value={values.tags} onChange={(e) => update("tags", e.target.value)} placeholder={t("clients.form.tagsPlaceholder")} />
