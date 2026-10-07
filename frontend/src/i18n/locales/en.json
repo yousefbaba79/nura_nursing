@@ -265,7 +265,10 @@
     "notes": "Notes",
     "errorDateRequired": "Follow-up date and time are required.",
     "couldNotSave": "Could not save follow-up.",
-    "scheduleFollowUp": "Schedule follow-up"
+    "couldNotDelete": "Could not delete follow-up.",
+    "scheduleFollowUp": "Schedule follow-up",
+    "deleteConfirmTitle": "Delete this follow-up?",
+    "deleteConfirmDescription": "This cannot be undone."
   },
   "visits": {
     "form": {
