@@ -13,8 +13,6 @@ export interface ClientFormValues {
   clientNumber: string;
   address: string;
   city: string;
-  preferredContactMethod: string;
-  occupation: string;
   emergencyContactName: string;
   generalNotes: string;
   tags: string;
@@ -29,8 +27,6 @@ const emptyValues: ClientFormValues = {
   clientNumber: "",
   address: "",
   city: "",
-  preferredContactMethod: "",
-  occupation: "",
   emergencyContactName: "",
   generalNotes: "",
   tags: "",
@@ -47,8 +43,6 @@ function toFormValues(client?: Client | null): ClientFormValues {
     clientNumber: client.clientNumber || "",
     address: client.address || "",
     city: client.city || "",
-    preferredContactMethod: client.preferredContactMethod || "",
-    occupation: client.occupation || "",
     emergencyContactName: client.emergencyContactName || "",
     generalNotes: client.generalNotes || "",
     tags: client.tags || "",
@@ -174,18 +168,6 @@ export default function ClientForm({ client, onSaved, onCancel }: Props) {
         </Field>
         <Field id="client-city" label={t("clients.form.city")}>
           <input className="input" value={values.city} onChange={(e) => update("city", e.target.value)} />
-        </Field>
-        <Field id="client-contact-method" label={t("clients.form.preferredContactMethod")}>
-          <select className="input" value={values.preferredContactMethod} onChange={(e) => update("preferredContactMethod", e.target.value)}>
-            <option value="">{t("clients.form.contactMethodNotSpecified")}</option>
-            <option value="PHONE">{t("clients.form.contactMethodPhone")}</option>
-            <option value="EMAIL">{t("clients.form.contactMethodEmail")}</option>
-            <option value="MESSAGE">{t("clients.form.contactMethodMessage")}</option>
-            <option value="WHATSAPP">{t("clients.form.contactMethodWhatsapp")}</option>
-          </select>
-        </Field>
-        <Field id="client-occupation" label={t("clients.form.occupation")}>
-          <input className="input" value={values.occupation} onChange={(e) => update("occupation", e.target.value)} />
         </Field>
         <Field id="client-emergency-name" label={t("clients.form.emergencyContactName")}>
           <input className="input" value={values.emergencyContactName} onChange={(e) => update("emergencyContactName", e.target.value)} />
