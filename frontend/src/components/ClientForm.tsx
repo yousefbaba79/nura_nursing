@@ -18,11 +18,6 @@ export interface ClientFormValues {
   emergencyContactName: string;
   generalNotes: string;
   tags: string;
-  consentReceived: boolean;
-  consentDate: string;
-  consentMethod: string;
-  consentFormVersion: string;
-  consentNotes: string;
 }
 
 const emptyValues: ClientFormValues = {
@@ -39,11 +34,6 @@ const emptyValues: ClientFormValues = {
   emergencyContactName: "",
   generalNotes: "",
   tags: "",
-  consentReceived: false,
-  consentDate: "",
-  consentMethod: "",
-  consentFormVersion: "",
-  consentNotes: "",
 };
 
 function toFormValues(client?: Client | null): ClientFormValues {
@@ -62,11 +52,6 @@ function toFormValues(client?: Client | null): ClientFormValues {
     emergencyContactName: client.emergencyContactName || "",
     generalNotes: client.generalNotes || "",
     tags: client.tags || "",
-    consentReceived: client.consentReceived || false,
-    consentDate: client.consentDate ? client.consentDate.slice(0, 10) : "",
-    consentMethod: client.consentMethod || "",
-    consentFormVersion: client.consentFormVersion || "",
-    consentNotes: client.consentNotes || "",
   };
 }
 
@@ -136,7 +121,7 @@ export default function ClientForm({ client, onSaved, onCancel }: Props) {
 
     setSaving(true);
     try {
-      const payload = { ...values, email: values.email || null, dateOfBirth: values.dateOfBirth || null, consentDate: values.consentDate || null };
+      const payload = { ...values, email: values.email || null, dateOfBirth: values.dateOfBirth || null };
       const res = client ? await api.put(`/clients/${client.id}`, payload) : await api.post("/clients", payload);
       onSaved(res.data.client);
     } catch (err) {
@@ -210,28 +195,6 @@ export default function ClientForm({ client, onSaved, onCancel }: Props) {
         </Field>
         <Field id="client-notes" label={t("clients.form.generalNotes")} full>
           <textarea className="input" rows={3} value={values.generalNotes} onChange={(e) => update("generalNotes", e.target.value)} />
-        </Field>
-      </fieldset>
-
-      <fieldset className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <legend className="col-span-full mb-1 text-sm font-semibold text-gray-900">{t("clients.form.consentSection")}</legend>
-        <Field id="client-consent-received" label={t("clients.form.consentReceived")}>
-          <label className="flex items-center gap-2 text-sm text-gray-700">
-            <input type="checkbox" checked={values.consentReceived} onChange={(e) => update("consentReceived", e.target.checked)} />
-            {t("clients.form.consentReceivedCheckbox")}
-          </label>
-        </Field>
-        <Field id="client-consent-date" label={t("clients.form.consentDate")}>
-          <input className="input" type="date" value={values.consentDate} onChange={(e) => update("consentDate", e.target.value)} />
-        </Field>
-        <Field id="client-consent-method" label={t("clients.form.consentMethod")}>
-          <input className="input" value={values.consentMethod} onChange={(e) => update("consentMethod", e.target.value)} placeholder={t("clients.form.consentMethodPlaceholder")} />
-        </Field>
-        <Field id="client-consent-version" label={t("clients.form.consentFormVersion")}>
-          <input className="input" value={values.consentFormVersion} onChange={(e) => update("consentFormVersion", e.target.value)} />
-        </Field>
-        <Field id="client-consent-notes" label={t("clients.form.consentNotes")} full>
-          <textarea className="input" rows={2} value={values.consentNotes} onChange={(e) => update("consentNotes", e.target.value)} />
         </Field>
       </fieldset>
 

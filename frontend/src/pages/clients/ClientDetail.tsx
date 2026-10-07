@@ -199,15 +199,6 @@ export default function ClientDetail() {
         </div>
 
         <div className="space-y-6">
-          <Section title={t("clients.detail.consent")}>
-            <dl className="space-y-1 text-sm">
-              <Row label={t("clients.detail.consentReceived")} value={client.consentReceived ? t("common.yes") : t("common.no")} />
-              <Row label={t("clients.detail.consentDate")} value={formatDate(client.consentDate)} />
-              <Row label={t("clients.detail.consentMethod")} value={client.consentMethod || "—"} />
-              <Row label={t("clients.detail.consentFormVersion")} value={client.consentFormVersion || "—"} />
-            </dl>
-          </Section>
-
           <Section
             title={t("clients.detail.openActionItems")}
             action={
