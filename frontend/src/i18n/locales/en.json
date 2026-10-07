@@ -439,7 +439,8 @@
       "custom": "Specific period"
     },
     "periodFrom": "From",
-    "periodTo": "To"
+    "periodTo": "To",
+    "periodFilterAriaLabel": "Filter completed follow-ups by period"
   },
   "settings": {
     "title": "Settings",
