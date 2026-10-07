@@ -6,11 +6,10 @@ import { api, apiErrorMessage } from "../../api/client";
 import { Modal, ConfirmDialog, Spinner, EmptyState, Badge, ErrorBanner } from "../../components/ui";
 import ClientForm from "../../components/ClientForm";
 import BabyForm from "../../components/BabyForm";
-import ActionItemForm from "../../components/ActionItemForm";
 import FollowUpForm from "../../components/FollowUpForm";
-import { CLIENT_STATUS_COLORS, FOLLOW_UP_STATUS_COLORS, PRIORITY_COLORS } from "../../api/enums";
-import { formatDate, formatDateTime, isOverdue } from "../../lib/format";
-import type { Client, Baby, ActionItem, FollowUp } from "../../api/types";
+import { CLIENT_STATUS_COLORS, FOLLOW_UP_STATUS_COLORS } from "../../api/enums";
+import { formatDate, formatDateTime } from "../../lib/format";
+import type { Client, Baby, FollowUp } from "../../api/types";
 
 export default function ClientDetail() {
   const { clientId } = useParams<{ clientId: string }>();
@@ -19,7 +18,6 @@ export default function ClientDetail() {
 
   const [editOpen, setEditOpen] = useState(false);
   const [babyModal, setBabyModal] = useState<{ open: boolean; baby?: Baby | null }>({ open: false });
-  const [actionModal, setActionModal] = useState<{ open: boolean; item?: ActionItem | null }>({ open: false });
   const [followUpModal, setFollowUpModal] = useState<{ open: boolean; item?: FollowUp | null }>({ open: false });
   const [archiveConfirm, setArchiveConfirm] = useState(false);
   const [error, setError] = useState("");
@@ -50,12 +48,6 @@ export default function ClientDetail() {
     }
   }
 
-  async function toggleActionItemStatus(item: ActionItem) {
-    const nextStatus = item.status === "COMPLETED" ? "TODO" : "COMPLETED";
-    await api.put(`/action-items/${item.id}`, { status: nextStatus });
-    invalidate();
-  }
-
   if (isLoading || !client) {
     return (
       <div className="flex justify-center py-16">
@@ -64,7 +56,6 @@ export default function ClientDetail() {
     );
   }
 
-  const openActionItems = (client.actionItems || []).filter((a) => a.status !== "COMPLETED" && a.status !== "CANCELLED");
   const upcomingFollowUps = (client.followUps || []).filter((f) => f.status === "SCHEDULED");
 
   return (
@@ -199,40 +190,6 @@ export default function ClientDetail() {
 
         <div className="space-y-6">
           <Section
-            title={t("clients.detail.openActionItems")}
-            action={
-              <button className="text-sm font-medium text-brand-700 hover:underline" onClick={() => setActionModal({ open: true })}>
-                {t("clients.detail.addAction")}
-              </button>
-            }
-          >
-            {openActionItems.length === 0 ? (
-              <EmptyState title={t("clients.detail.noOpenActionItems")} />
-            ) : (
-              <ul className="space-y-2">
-                {openActionItems.map((a) => (
-                  <li key={a.id} className="flex items-start gap-2 rounded-md border border-gray-200 p-2">
-                    <input
-                      type="checkbox"
-                      className="mt-1"
-                      checked={a.status === "COMPLETED"}
-                      onChange={() => toggleActionItemStatus(a)}
-                      aria-label={t("clients.detail.markComplete", { title: a.title })}
-                    />
-                    <button className="flex-1 text-start" onClick={() => setActionModal({ open: true, item: a })}>
-                      <p className="text-sm font-medium text-gray-900">{a.title}</p>
-                      <p className="flex items-center gap-2 text-xs text-gray-500">
-                        <span className={isOverdue(a.dueDate) ? "font-medium text-red-600" : ""}>{formatDate(a.dueDate)}</span>
-                        <Badge className={PRIORITY_COLORS[a.priority]}>{t(`enums.priority.${a.priority}`)}</Badge>
-                      </p>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </Section>
-
-          <Section
             title={t("clients.detail.followUps")}
             action={
               <button className="text-sm font-medium text-brand-700 hover:underline" onClick={() => setFollowUpModal({ open: true })}>
@@ -286,23 +243,6 @@ export default function ClientDetail() {
           onCancel={() => setBabyModal({ open: false })}
           onSaved={() => {
             setBabyModal({ open: false });
-            invalidate();
-          }}
-        />
-      </Modal>
-
-      <Modal
-        open={actionModal.open}
-        onClose={() => setActionModal({ open: false })}
-        title={actionModal.item ? t("clients.detail.editActionItemModalTitle") : t("clients.detail.addActionItemModalTitle")}
-      >
-        <ActionItemForm
-          clientId={client.id}
-          babies={client.babies}
-          actionItem={actionModal.item}
-          onCancel={() => setActionModal({ open: false })}
-          onSaved={() => {
-            setActionModal({ open: false });
             invalidate();
           }}
         />
