@@ -9,13 +9,18 @@ import RecommendationsSection from "./RecommendationsSection";
 import ActionItemsSection from "./ActionItemsSection";
 import type { Visit } from "../../api/types";
 
-type GroupKey = "reasonGoals" | "plan" | "private";
+type GroupKey = "reasonGoals" | "assessment" | "plan" | "private";
 
 const FIELD_GROUPS: { key: GroupKey; titleKey: string; fields: { key: keyof Visit; labelKey: string }[] }[] = [
   {
     key: "reasonGoals",
     titleKey: "visits.form.groupReasonGoals",
     fields: [{ key: "reasonForConsultation", labelKey: "reasonForConsultation" }],
+  },
+  {
+    key: "assessment",
+    titleKey: "visits.form.groupAssessment",
+    fields: [{ key: "consultantObservations", labelKey: "consultantObservations" }],
   },
   {
     key: "plan",

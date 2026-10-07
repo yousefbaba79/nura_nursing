@@ -10,10 +10,12 @@ import ProblemsSection from "./ProblemsSection";
 import RecommendationsSection from "./RecommendationsSection";
 import ActionItemsSection from "./ActionItemsSection";
 
-type GroupKey = "reasonGoals" | "plan" | "private";
+type GroupKey = "reasonGoals" | "assessment" | "plan" | "private";
 
 const TEXT_FIELDS: { key: keyof Visit; labelKey: string; group: GroupKey }[] = [
   { key: "reasonForConsultation", labelKey: "reasonForConsultation", group: "reasonGoals" },
+
+  { key: "consultantObservations", labelKey: "consultantObservations", group: "assessment" },
 
   { key: "solutionsDiscussed", labelKey: "solutionsDiscussed", group: "plan" },
   { key: "clientActionPlan", labelKey: "clientActionPlan", group: "plan" },
@@ -26,6 +28,7 @@ const TEXT_FIELDS: { key: keyof Visit; labelKey: string; group: GroupKey }[] = [
 
 const GROUPS: { key: GroupKey; titleKey: string }[] = [
   { key: "reasonGoals", titleKey: "visits.form.groupReasonGoals" },
+  { key: "assessment", titleKey: "visits.form.groupAssessment" },
   { key: "plan", titleKey: "visits.form.groupPlan" },
   { key: "private", titleKey: "visits.form.groupPrivate" },
 ];
