@@ -443,7 +443,8 @@
       "custom": "תקופה מסוימת"
     },
     "periodFrom": "מתאריך",
-    "periodTo": "עד תאריך"
+    "periodTo": "עד תאריך",
+    "periodFilterAriaLabel": "סינון מעקבים שהושלמו לפי תקופה"
   },
   "settings": {
     "title": "הגדרות",

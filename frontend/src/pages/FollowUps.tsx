@@ -90,19 +90,18 @@ export default function FollowUps() {
 
       {scope === "completed" && (
         <div className="space-y-2">
-          <div className="flex gap-2 overflow-x-auto">
+          <select
+            className="input max-w-[220px]"
+            value={period}
+            onChange={(e) => setPeriod(e.target.value)}
+            aria-label={t("followUps.periodFilterAriaLabel")}
+          >
             {PERIODS.map((p) => (
-              <button
-                key={p.key}
-                onClick={() => setPeriod(p.key)}
-                className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${
-                  period === p.key ? "bg-brand-100 text-brand-800 ring-1 ring-brand-300" : "bg-white text-gray-500 ring-1 ring-gray-200"
-                }`}
-              >
+              <option key={p.key} value={p.key}>
                 {t(p.labelKey)}
-              </button>
+              </option>
             ))}
-          </div>
+          </select>
           {period === "custom" && (
             <div className="flex flex-wrap items-end gap-3">
               <div>

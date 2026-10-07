@@ -447,7 +447,8 @@
       "custom": "فترة محددة"
     },
     "periodFrom": "من تاريخ",
-    "periodTo": "إلى تاريخ"
+    "periodTo": "إلى تاريخ",
+    "periodFilterAriaLabel": "تصفية المتابعات المكتملة حسب الفترة"
   },
   "settings": {
     "title": "الإعدادات",
