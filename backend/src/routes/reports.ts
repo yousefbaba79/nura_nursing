@@ -1,14 +1,15 @@
-import { Router } from "express";
-import { prisma } from "../lib/prisma";
+import { Hono } from "hono";
+import type { AppEnv } from "../types";
 import { recordAudit } from "../lib/audit";
-import { authenticate, AuthedRequest } from "../middleware/auth";
+import { authenticate } from "../middleware/auth";
 
-const router = Router();
-router.use(authenticate);
+const app = new Hono<AppEnv>();
+app.use(authenticate);
 
-router.get("/", async (req: AuthedRequest, res) => {
-  const consultantId = req.consultantId!;
-  const { from, to } = req.query as Record<string, string | undefined>;
+app.get("/", async (c) => {
+  const prisma = c.get("prisma");
+  const consultantId = c.get("consultantId")!;
+  const { from, to } = c.req.query();
   const dateFilter: any = {};
   if (from) dateFilter.gte = new Date(from);
   if (to) dateFilter.lte = new Date(to);
@@ -27,7 +28,7 @@ router.get("/", async (req: AuthedRequest, res) => {
     }),
   ]);
 
-  res.json({
+  return c.json({
     activeClientCount,
     visitsInRange,
     clientsNeedingFollowUp,
@@ -38,25 +39,27 @@ router.get("/", async (req: AuthedRequest, res) => {
 });
 
 // GET /api/reports/clients.csv - basic CSV export of client data
-router.get("/clients.csv", async (req: AuthedRequest, res) => {
+app.get("/clients.csv", async (c) => {
+  const prisma = c.get("prisma");
+  const consultantId = c.get("consultantId")!;
   const clients = await prisma.client.findMany({
-    where: { consultantId: req.consultantId },
+    where: { consultantId },
     orderBy: { fullName: "asc" },
   });
 
   const headers = ["Full Name", "Phone", "Email", "Status", "City", "Client Number", "ID Number", "Created At", "Last Updated"];
-  const rows = clients.map((c) =>
-    [c.fullName, c.phone, c.email ?? "", c.status, c.city ?? "", c.clientNumber ?? "", c.idNumber ?? "", c.createdAt.toISOString(), c.updatedAt.toISOString()].map(
+  const rows = clients.map((cl) =>
+    [cl.fullName, cl.phone, cl.email ?? "", cl.status, cl.city ?? "", cl.clientNumber ?? "", cl.idNumber ?? "", cl.createdAt.toISOString(), cl.updatedAt.toISOString()].map(
       (v) => `"${String(v).replace(/"/g, '""')}"`
     ).join(",")
   );
   const csv = [headers.join(","), ...rows].join("\n");
 
-  await recordAudit({ consultantId: req.consultantId!, action: "DATA_EXPORTED", entityType: "Client", details: "format=csv,scope=all" });
+  await recordAudit(prisma, { consultantId, action: "DATA_EXPORTED", entityType: "Client", details: "format=csv,scope=all" });
 
-  res.setHeader("Content-Type", "text/csv");
-  res.setHeader("Content-Disposition", `attachment; filename="clients-export.csv"`);
-  res.send(csv);
+  c.header("Content-Type", "text/csv");
+  c.header("Content-Disposition", `attachment; filename="clients-export.csv"`);
+  return c.body(csv);
 });
 
-export default router;
+export default app;

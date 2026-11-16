@@ -1,4 +1,4 @@
-import { prisma } from "./prisma";
+import type { Prisma } from "./prisma";
 
 interface AuditParams {
   consultantId: string | null;
@@ -9,7 +9,7 @@ interface AuditParams {
   ipAddress?: string | null;
 }
 
-export async function recordAudit(params: AuditParams) {
+export async function recordAudit(prisma: Prisma, params: AuditParams) {
   try {
     await prisma.auditEntry.create({
       data: {

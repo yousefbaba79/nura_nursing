@@ -9,3 +9,5 @@ build/
 backend/prisma/dev.db
 backend/prisma/dev.db-journal
 frontend/dist/
+.wrangler/
+.dev.vars

@@ -1,12 +1,13 @@
-import { Router } from "express";
-import { prisma } from "../lib/prisma";
-import { authenticate, AuthedRequest } from "../middleware/auth";
+import { Hono } from "hono";
+import type { AppEnv } from "../types";
+import { authenticate } from "../middleware/auth";
 
-const router = Router();
-router.use(authenticate);
+const app = new Hono<AppEnv>();
+app.use(authenticate);
 
-router.get("/", async (req: AuthedRequest, res) => {
-  const consultantId = req.consultantId!;
+app.get("/", async (c) => {
+  const prisma = c.get("prisma");
+  const consultantId = c.get("consultantId")!;
   const now = new Date();
   const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const endOfToday = new Date(startOfToday.getTime() + 24 * 60 * 60 * 1000);
@@ -71,7 +72,7 @@ router.get("/", async (req: AuthedRequest, res) => {
     prisma.visit.count({ where: { client: { consultantId }, status: "DRAFT" } }),
   ]);
 
-  res.json({
+  return c.json({
     stats: {
       activeClientCount,
       overdueFollowUpCount: overdueFollowUps.length,
@@ -88,4 +89,4 @@ router.get("/", async (req: AuthedRequest, res) => {
   });
 });
 
-export default router;
+export default app;

@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE "FollowUp" ALTER COLUMN "type" SET DEFAULT 'CLINIC_VISIT';

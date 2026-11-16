@@ -1,12 +1,13 @@
-import { Router } from "express";
+import { Hono } from "hono";
 import { z } from "zod";
-import { prisma } from "../lib/prisma";
+import type { AppEnv } from "../types";
+import type { Prisma } from "../lib/prisma";
 import { recordAudit } from "../lib/audit";
-import { authenticate, AuthedRequest } from "../middleware/auth";
+import { authenticate } from "../middleware/auth";
 import { FEEDING_METHODS } from "../utils/enums";
 
-const router = Router();
-router.use(authenticate);
+const app = new Hono<AppEnv>();
+app.use(authenticate);
 
 const babyInput = z.object({
   fullName: z.string().min(1, "Baby's name is required."),
@@ -36,25 +37,31 @@ function toDate(v?: string | null) {
   return isNaN(d.getTime()) ? null : d;
 }
 
-async function assertClientOwnership(clientId: string, consultantId: string) {
+async function assertClientOwnership(prisma: Prisma, clientId: string, consultantId: string) {
   return prisma.client.findFirst({ where: { id: clientId, consultantId } });
 }
 
 // GET /api/clients/:clientId/babies
-router.get("/clients/:clientId/babies", async (req: AuthedRequest, res) => {
-  const client = await assertClientOwnership(req.params.clientId, req.consultantId!);
-  if (!client) return res.status(404).json({ error: "Client not found." });
+app.get("/clients/:clientId/babies", async (c) => {
+  const prisma = c.get("prisma");
+  const consultantId = c.get("consultantId")!;
+  const clientId = c.req.param("clientId");
+  const client = await assertClientOwnership(prisma, clientId, consultantId);
+  if (!client) return c.json({ error: "Client not found." }, 404);
   const babies = await prisma.baby.findMany({ where: { clientId: client.id }, orderBy: { createdAt: "asc" } });
-  res.json({ babies });
+  return c.json({ babies });
 });
 
 // POST /api/clients/:clientId/babies
-router.post("/clients/:clientId/babies", async (req: AuthedRequest, res) => {
-  const client = await assertClientOwnership(req.params.clientId, req.consultantId!);
-  if (!client) return res.status(404).json({ error: "Client not found." });
+app.post("/clients/:clientId/babies", async (c) => {
+  const prisma = c.get("prisma");
+  const consultantId = c.get("consultantId")!;
+  const clientId = c.req.param("clientId");
+  const client = await assertClientOwnership(prisma, clientId, consultantId);
+  if (!client) return c.json({ error: "Client not found." }, 404);
 
-  const parsed = babyInput.safeParse(req.body);
-  if (!parsed.success) return res.status(400).json({ error: "Please check the highlighted fields.", details: parsed.error.flatten() });
+  const parsed = babyInput.safeParse(await c.req.json());
+  if (!parsed.success) return c.json({ error: "Please check the highlighted fields.", details: parsed.error.flatten() }, 400);
   const d = parsed.data;
 
   const baby = await prisma.baby.create({
@@ -86,30 +93,36 @@ router.post("/clients/:clientId/babies", async (req: AuthedRequest, res) => {
     await prisma.weightLog.create({ data: { babyId: baby.id, weightGrams: baby.currentWeightGrams, date: baby.dateOfBirth || new Date() } });
   }
 
-  await recordAudit({ consultantId: req.consultantId!, action: "BABY_CREATED", entityType: "Baby", entityId: baby.id, details: `clientId=${client.id}` });
-  res.status(201).json({ baby });
+  await recordAudit(prisma, { consultantId, action: "BABY_CREATED", entityType: "Baby", entityId: baby.id, details: `clientId=${client.id}` });
+  return c.json({ baby }, 201);
 });
 
 // GET /api/babies/:id
-router.get("/babies/:id", async (req: AuthedRequest, res) => {
+app.get("/babies/:id", async (c) => {
+  const prisma = c.get("prisma");
+  const consultantId = c.get("consultantId")!;
+  const id = c.req.param("id");
   const baby = await prisma.baby.findFirst({
-    where: { id: req.params.id, client: { consultantId: req.consultantId } },
+    where: { id, client: { consultantId } },
     include: {
       weightLogs: { orderBy: { date: "asc" } },
       visits: { include: { visit: { select: { id: true, visitDate: true, visitType: true, status: true } } } },
     },
   });
-  if (!baby) return res.status(404).json({ error: "Baby not found." });
-  res.json({ baby });
+  if (!baby) return c.json({ error: "Baby not found." }, 404);
+  return c.json({ baby });
 });
 
 // PUT /api/babies/:id
-router.put("/babies/:id", async (req: AuthedRequest, res) => {
-  const existing = await prisma.baby.findFirst({ where: { id: req.params.id, client: { consultantId: req.consultantId } } });
-  if (!existing) return res.status(404).json({ error: "Baby not found." });
+app.put("/babies/:id", async (c) => {
+  const prisma = c.get("prisma");
+  const consultantId = c.get("consultantId")!;
+  const id = c.req.param("id");
+  const existing = await prisma.baby.findFirst({ where: { id, client: { consultantId } } });
+  if (!existing) return c.json({ error: "Baby not found." }, 404);
 
-  const parsed = babyInput.partial().safeParse(req.body);
-  if (!parsed.success) return res.status(400).json({ error: "Please check the highlighted fields.", details: parsed.error.flatten() });
+  const parsed = babyInput.partial().safeParse(await c.req.json());
+  if (!parsed.success) return c.json({ error: "Please check the highlighted fields.", details: parsed.error.flatten() }, 400);
   const d = parsed.data;
 
   const baby = await prisma.baby.update({
@@ -141,26 +154,32 @@ router.put("/babies/:id", async (req: AuthedRequest, res) => {
     await prisma.weightLog.create({ data: { babyId: baby.id, weightGrams: d.currentWeightGrams } });
   }
 
-  await recordAudit({ consultantId: req.consultantId!, action: "BABY_UPDATED", entityType: "Baby", entityId: baby.id });
-  res.json({ baby });
+  await recordAudit(prisma, { consultantId, action: "BABY_UPDATED", entityType: "Baby", entityId: baby.id });
+  return c.json({ baby });
 });
 
 // POST /api/babies/:id/archive
-router.post("/babies/:id/archive", async (req: AuthedRequest, res) => {
-  const existing = await prisma.baby.findFirst({ where: { id: req.params.id, client: { consultantId: req.consultantId } } });
-  if (!existing) return res.status(404).json({ error: "Baby not found." });
+app.post("/babies/:id/archive", async (c) => {
+  const prisma = c.get("prisma");
+  const consultantId = c.get("consultantId")!;
+  const id = c.req.param("id");
+  const existing = await prisma.baby.findFirst({ where: { id, client: { consultantId } } });
+  if (!existing) return c.json({ error: "Baby not found." }, 404);
   const baby = await prisma.baby.update({ where: { id: existing.id }, data: { archivedAt: new Date() } });
-  await recordAudit({ consultantId: req.consultantId!, action: "BABY_ARCHIVED", entityType: "Baby", entityId: baby.id });
-  res.json({ baby });
+  await recordAudit(prisma, { consultantId, action: "BABY_ARCHIVED", entityType: "Baby", entityId: baby.id });
+  return c.json({ baby });
 });
 
 // POST /api/babies/:id/restore
-router.post("/babies/:id/restore", async (req: AuthedRequest, res) => {
-  const existing = await prisma.baby.findFirst({ where: { id: req.params.id, client: { consultantId: req.consultantId } } });
-  if (!existing) return res.status(404).json({ error: "Baby not found." });
+app.post("/babies/:id/restore", async (c) => {
+  const prisma = c.get("prisma");
+  const consultantId = c.get("consultantId")!;
+  const id = c.req.param("id");
+  const existing = await prisma.baby.findFirst({ where: { id, client: { consultantId } } });
+  if (!existing) return c.json({ error: "Baby not found." }, 404);
   const baby = await prisma.baby.update({ where: { id: existing.id }, data: { archivedAt: null } });
-  await recordAudit({ consultantId: req.consultantId!, action: "BABY_RESTORED", entityType: "Baby", entityId: baby.id });
-  res.json({ baby });
+  await recordAudit(prisma, { consultantId, action: "BABY_RESTORED", entityType: "Baby", entityId: baby.id });
+  return c.json({ baby });
 });
 
-export default router;
+export default app;

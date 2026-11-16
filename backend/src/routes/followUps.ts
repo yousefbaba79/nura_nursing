@@ -1,12 +1,12 @@
-import { Router } from "express";
+import { Hono } from "hono";
 import { z } from "zod";
-import { prisma } from "../lib/prisma";
+import type { AppEnv } from "../types";
 import { recordAudit } from "../lib/audit";
-import { authenticate, AuthedRequest } from "../middleware/auth";
+import { authenticate } from "../middleware/auth";
 import { FOLLOW_UP_TYPES, FOLLOW_UP_STATUSES } from "../utils/enums";
 
-const router = Router();
-router.use(authenticate);
+const app = new Hono<AppEnv>();
+app.use(authenticate);
 
 const followUpInput = z.object({
   clientId: z.string().min(1),
@@ -47,9 +47,11 @@ function periodRange(period: string | undefined, from: string | undefined, to: s
 }
 
 // GET /api/follow-ups?scope=today|upcoming|overdue|completed&clientId=&period=&from=&to=
-router.get("/", async (req: AuthedRequest, res) => {
-  const { scope, clientId, period, from, to } = req.query as Record<string, string | undefined>;
-  const where: any = { client: { consultantId: req.consultantId } };
+app.get("/", async (c) => {
+  const prisma = c.get("prisma");
+  const consultantId = c.get("consultantId")!;
+  const { scope, clientId, period, from, to } = c.req.query();
+  const where: any = { client: { consultantId } };
   if (clientId) where.clientId = clientId;
 
   const now = new Date();
@@ -76,15 +78,17 @@ router.get("/", async (req: AuthedRequest, res) => {
     orderBy: { scheduledAt: "asc" },
     include: { client: { select: { id: true, fullName: true, phone: true } }, baby: { select: { id: true, fullName: true } } },
   });
-  res.json({ followUps });
+  return c.json({ followUps });
 });
 
-router.post("/", async (req: AuthedRequest, res) => {
-  const parsed = followUpInput.safeParse(req.body);
-  if (!parsed.success) return res.status(400).json({ error: "Please check the highlighted fields.", details: parsed.error.flatten() });
+app.post("/", async (c) => {
+  const prisma = c.get("prisma");
+  const consultantId = c.get("consultantId")!;
+  const parsed = followUpInput.safeParse(await c.req.json());
+  if (!parsed.success) return c.json({ error: "Please check the highlighted fields.", details: parsed.error.flatten() }, 400);
   const d = parsed.data;
-  const client = await prisma.client.findFirst({ where: { id: d.clientId, consultantId: req.consultantId } });
-  if (!client) return res.status(404).json({ error: "Client not found." });
+  const client = await prisma.client.findFirst({ where: { id: d.clientId, consultantId } });
+  if (!client) return c.json({ error: "Client not found." }, 404);
 
   const followUp = await prisma.followUp.create({
     data: {
@@ -98,15 +102,17 @@ router.post("/", async (req: AuthedRequest, res) => {
       status: d.status || "SCHEDULED",
     },
   });
-  await recordAudit({ consultantId: req.consultantId!, action: "FOLLOW_UP_CREATED", entityType: "FollowUp", entityId: followUp.id });
-  res.status(201).json({ followUp });
+  await recordAudit(prisma, { consultantId, action: "FOLLOW_UP_CREATED", entityType: "FollowUp", entityId: followUp.id });
+  return c.json({ followUp }, 201);
 });
 
-router.put("/:id", async (req: AuthedRequest, res) => {
-  const existing = await prisma.followUp.findFirst({ where: { id: req.params.id, client: { consultantId: req.consultantId } } });
-  if (!existing) return res.status(404).json({ error: "Follow-up not found." });
-  const parsed = followUpInput.partial().safeParse(req.body);
-  if (!parsed.success) return res.status(400).json({ error: "Please check the highlighted fields." });
+app.put("/:id", async (c) => {
+  const prisma = c.get("prisma");
+  const consultantId = c.get("consultantId")!;
+  const existing = await prisma.followUp.findFirst({ where: { id: c.req.param("id"), client: { consultantId } } });
+  if (!existing) return c.json({ error: "Follow-up not found." }, 404);
+  const parsed = followUpInput.partial().safeParse(await c.req.json());
+  if (!parsed.success) return c.json({ error: "Please check the highlighted fields." }, 400);
   const d = parsed.data;
 
   const followUp = await prisma.followUp.update({
@@ -121,15 +127,17 @@ router.put("/:id", async (req: AuthedRequest, res) => {
       ...(d.status !== undefined ? { status: d.status } : {}),
     },
   });
-  await recordAudit({ consultantId: req.consultantId!, action: "FOLLOW_UP_UPDATED", entityType: "FollowUp", entityId: followUp.id });
-  res.json({ followUp });
+  await recordAudit(prisma, { consultantId, action: "FOLLOW_UP_UPDATED", entityType: "FollowUp", entityId: followUp.id });
+  return c.json({ followUp });
 });
 
-router.delete("/:id", async (req: AuthedRequest, res) => {
-  const existing = await prisma.followUp.findFirst({ where: { id: req.params.id, client: { consultantId: req.consultantId } } });
-  if (!existing) return res.status(404).json({ error: "Follow-up not found." });
+app.delete("/:id", async (c) => {
+  const prisma = c.get("prisma");
+  const consultantId = c.get("consultantId")!;
+  const existing = await prisma.followUp.findFirst({ where: { id: c.req.param("id"), client: { consultantId } } });
+  if (!existing) return c.json({ error: "Follow-up not found." }, 404);
   await prisma.followUp.delete({ where: { id: existing.id } });
-  res.json({ ok: true });
+  return c.json({ ok: true });
 });
 
-export default router;
+export default app;

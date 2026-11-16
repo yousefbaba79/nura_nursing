@@ -1,6 +1,7 @@
 import axios from "axios";
+import i18n from "../i18n";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000/api";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8787/api";
 
 export const api = axios.create({ baseURL: API_URL });
 
@@ -42,7 +43,14 @@ api.interceptors.response.use(
 
 export function apiErrorMessage(err: unknown, fallback = "Something went wrong. Please try again."): string {
   if (axios.isAxiosError(err)) {
-    return err.response?.data?.error || fallback;
+    // No response at all (network/DNS/CORS failure, timeout, or the backend is down)
+    // is a connectivity problem, not whatever the caller's fallback describes (e.g.
+    // "Invalid email or password") — showing that fallback here would misreport an
+    // outage as a credentials or validation error.
+    if (!err.response) {
+      return i18n.t("common.connectionError");
+    }
+    return err.response.data?.error || fallback;
   }
   return fallback;
 }

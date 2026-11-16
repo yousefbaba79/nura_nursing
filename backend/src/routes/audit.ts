@@ -1,14 +1,16 @@
-import { Router } from "express";
-import { prisma } from "../lib/prisma";
-import { authenticate, AuthedRequest } from "../middleware/auth";
+import { Hono } from "hono";
+import type { AppEnv } from "../types";
+import { authenticate } from "../middleware/auth";
 
-const router = Router();
-router.use(authenticate);
+const app = new Hono<AppEnv>();
+app.use(authenticate);
 
 // GET /api/audit-log?entityType=&entityId=&limit=
-router.get("/", async (req: AuthedRequest, res) => {
-  const { entityType, entityId, limit } = req.query as Record<string, string | undefined>;
-  const where: any = { consultantId: req.consultantId };
+app.get("/", async (c) => {
+  const prisma = c.get("prisma");
+  const consultantId = c.get("consultantId")!;
+  const { entityType, entityId, limit } = c.req.query();
+  const where: any = { consultantId };
   if (entityType) where.entityType = entityType;
   if (entityId) where.entityId = entityId;
 
@@ -17,7 +19,7 @@ router.get("/", async (req: AuthedRequest, res) => {
     orderBy: { createdAt: "desc" },
     take: limit ? Math.min(parseInt(limit, 10) || 100, 500) : 100,
   });
-  res.json({ entries });
+  return c.json({ entries });
 });
 
-export default router;
+export default app;

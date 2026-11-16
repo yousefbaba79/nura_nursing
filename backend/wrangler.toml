@@ -1,0 +1,18 @@
+name = "nura-nursing-api"
+main = "src/worker.ts"
+compatibility_date = "2024-11-01"
+compatibility_flags = ["nodejs_compat"]
+
+[observability]
+enabled = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "nura-nursing-db"
+database_id = "d067a91b-257a-4741-b359-0addd977e6d1"
+migrations_dir = "migrations"
+
+[vars]
+CORS_ORIGIN = "http://localhost:5173"
+JWT_EXPIRES_IN = "8h"
+ENVIRONMENT = "development"
