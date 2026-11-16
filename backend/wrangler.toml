@@ -13,6 +13,6 @@ database_id = "d067a91b-257a-4741-b359-0addd977e6d1"
 migrations_dir = "migrations"
 
 [vars]
-CORS_ORIGIN = "http://localhost:5173"
+CORS_ORIGIN = "https://nura-nursing-app.pages.dev"
 JWT_EXPIRES_IN = "8h"
-ENVIRONMENT = "development"
+ENVIRONMENT = "production"
