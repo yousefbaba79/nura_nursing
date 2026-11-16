@@ -20,6 +20,7 @@
     "search": "Search",
     "viewAll": "View all",
     "somethingWentWrong": "Something went wrong. Please try again.",
+    "connectionError": "Can't reach the server. Check your internet connection and try again.",
     "required": "Required",
     "today": "Today",
     "tomorrow": "Tomorrow",

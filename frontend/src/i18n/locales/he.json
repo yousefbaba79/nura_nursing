@@ -20,6 +20,7 @@
     "search": "חיפוש",
     "viewAll": "הצג הכול",
     "somethingWentWrong": "משהו השתבש. נא לנסות שוב.",
+    "connectionError": "לא ניתן להתחבר לשרת. בדקו את החיבור לאינטרנט וניסו שוב.",
     "required": "שדה חובה",
     "today": "היום",
     "tomorrow": "מחר",
