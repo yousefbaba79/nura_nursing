@@ -9,7 +9,7 @@ enabled = true
 [[d1_databases]]
 binding = "DB"
 database_name = "nura-nursing-db"
-database_id = "00000000-0000-0000-0000-000000000000"
+database_id = "d067a91b-257a-4741-b359-0addd977e6d1"
 migrations_dir = "migrations"
 
 [vars]
