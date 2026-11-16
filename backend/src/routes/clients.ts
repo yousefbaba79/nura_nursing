@@ -1,12 +1,12 @@
-import { Router } from "express";
+import { Hono } from "hono";
 import { z } from "zod";
-import { prisma } from "../lib/prisma";
+import type { AppEnv } from "../types";
 import { recordAudit } from "../lib/audit";
-import { authenticate, AuthedRequest } from "../middleware/auth";
+import { authenticate } from "../middleware/auth";
 import { CLIENT_STATUSES } from "../utils/enums";
 
-const router = Router();
-router.use(authenticate);
+const app = new Hono<AppEnv>();
+app.use(authenticate);
 
 const clientInput = z.object({
   fullName: z.string().min(1, "Full name is required."),
@@ -40,10 +40,12 @@ function toDate(v?: string | null) {
 }
 
 // GET /api/clients - list with search/filter/sort
-router.get("/", async (req: AuthedRequest, res) => {
-  const { q, status, tag, sort, includeArchived } = req.query as Record<string, string | undefined>;
+app.get("/", async (c) => {
+  const prisma = c.get("prisma");
+  const consultantId = c.get("consultantId")!;
+  const { q, status, tag, sort, includeArchived } = c.req.query();
 
-  const where: any = { consultantId: req.consultantId };
+  const where: any = { consultantId };
 
   if (!includeArchived || includeArchived !== "true") {
     where.status = { not: "ARCHIVED" };
@@ -96,11 +98,11 @@ router.get("/", async (req: AuthedRequest, res) => {
     },
   });
 
-  let result = clients.map((c) => ({
-    ...c,
-    lastVisitDate: c.visits[0]?.visitDate ?? null,
-    nextFollowUpDate: c.followUps[0]?.scheduledAt ?? null,
-    openActionItemCount: c._count.actionItems,
+  let result = clients.map((cl) => ({
+    ...cl,
+    lastVisitDate: cl.visits[0]?.visitDate ?? null,
+    nextFollowUpDate: cl.followUps[0]?.scheduledAt ?? null,
+    openActionItemCount: cl._count.actionItems,
     visits: undefined,
     followUps: undefined,
     _count: undefined,
@@ -120,34 +122,39 @@ router.get("/", async (req: AuthedRequest, res) => {
     });
   }
 
-  res.json({ clients: result });
+  return c.json({ clients: result });
 });
 
 // GET /api/clients/check-duplicate?phone=&email=&clientNumber=&idNumber=
-router.get("/check-duplicate", async (req: AuthedRequest, res) => {
-  const { phone, email, clientNumber, idNumber, excludeId } = req.query as Record<string, string | undefined>;
+app.get("/check-duplicate", async (c) => {
+  const prisma = c.get("prisma");
+  const consultantId = c.get("consultantId")!;
+  const { phone, email, clientNumber, idNumber, excludeId } = c.req.query();
   const or: any[] = [];
   if (phone) or.push({ phone });
   if (email) or.push({ email });
   if (clientNumber) or.push({ clientNumber });
   if (idNumber) or.push({ idNumber });
-  if (or.length === 0) return res.json({ duplicates: [] });
+  if (or.length === 0) return c.json({ duplicates: [] });
 
   const duplicates = await prisma.client.findMany({
     where: {
-      consultantId: req.consultantId,
+      consultantId,
       OR: or,
       ...(excludeId ? { id: { not: excludeId } } : {}),
     },
     select: { id: true, fullName: true, phone: true, email: true, clientNumber: true, idNumber: true, status: true },
   });
-  res.json({ duplicates });
+  return c.json({ duplicates });
 });
 
 // GET /api/clients/:id
-router.get("/:id", async (req: AuthedRequest, res) => {
+app.get("/:id", async (c) => {
+  const prisma = c.get("prisma");
+  const consultantId = c.get("consultantId")!;
+  const id = c.req.param("id");
   const client = await prisma.client.findFirst({
-    where: { id: req.params.id, consultantId: req.consultantId },
+    where: { id, consultantId },
     include: {
       babies: { orderBy: { createdAt: "asc" } },
       visits: {
@@ -163,24 +170,26 @@ router.get("/:id", async (req: AuthedRequest, res) => {
       followUps: { orderBy: { scheduledAt: "asc" } },
     },
   });
-  if (!client) return res.status(404).json({ error: "Client not found." });
+  if (!client) return c.json({ error: "Client not found." }, 404);
 
   await prisma.client.update({ where: { id: client.id }, data: { lastViewedAt: new Date() } });
 
-  res.json({ client });
+  return c.json({ client });
 });
 
 // POST /api/clients
-router.post("/", async (req: AuthedRequest, res) => {
-  const parsed = clientInput.safeParse(req.body);
+app.post("/", async (c) => {
+  const prisma = c.get("prisma");
+  const consultantId = c.get("consultantId")!;
+  const parsed = clientInput.safeParse(await c.req.json());
   if (!parsed.success) {
-    return res.status(400).json({ error: "Please check the highlighted fields.", details: parsed.error.flatten() });
+    return c.json({ error: "Please check the highlighted fields.", details: parsed.error.flatten() }, 400);
   }
   const data = parsed.data;
 
   const client = await prisma.client.create({
     data: {
-      consultantId: req.consultantId!,
+      consultantId,
       fullName: data.fullName,
       phone: data.phone,
       email: data.email || null,
@@ -206,25 +215,28 @@ router.post("/", async (req: AuthedRequest, res) => {
     },
   });
 
-  await recordAudit({
-    consultantId: req.consultantId!,
+  await recordAudit(prisma, {
+    consultantId,
     action: "CLIENT_CREATED",
     entityType: "Client",
     entityId: client.id,
     details: `fullName=${client.fullName}`,
   });
 
-  res.status(201).json({ client });
+  return c.json({ client }, 201);
 });
 
 // PUT /api/clients/:id
-router.put("/:id", async (req: AuthedRequest, res) => {
-  const existing = await prisma.client.findFirst({ where: { id: req.params.id, consultantId: req.consultantId } });
-  if (!existing) return res.status(404).json({ error: "Client not found." });
+app.put("/:id", async (c) => {
+  const prisma = c.get("prisma");
+  const consultantId = c.get("consultantId")!;
+  const id = c.req.param("id");
+  const existing = await prisma.client.findFirst({ where: { id, consultantId } });
+  if (!existing) return c.json({ error: "Client not found." }, 404);
 
-  const parsed = clientInput.partial().safeParse(req.body);
+  const parsed = clientInput.partial().safeParse(await c.req.json());
   if (!parsed.success) {
-    return res.status(400).json({ error: "Please check the highlighted fields.", details: parsed.error.flatten() });
+    return c.json({ error: "Please check the highlighted fields.", details: parsed.error.flatten() }, 400);
   }
   const data = parsed.data;
 
@@ -264,55 +276,64 @@ router.put("/:id", async (req: AuthedRequest, res) => {
     },
   });
 
-  await recordAudit({
-    consultantId: req.consultantId!,
+  await recordAudit(prisma, {
+    consultantId,
     action: "CLIENT_UPDATED",
     entityType: "Client",
     entityId: client.id,
     details: changedFields.length ? `changed=${changedFields.join(",")}` : undefined,
   });
 
-  res.json({ client });
+  return c.json({ client });
 });
 
 // POST /api/clients/:id/archive
-router.post("/:id/archive", async (req: AuthedRequest, res) => {
-  const existing = await prisma.client.findFirst({ where: { id: req.params.id, consultantId: req.consultantId } });
-  if (!existing) return res.status(404).json({ error: "Client not found." });
+app.post("/:id/archive", async (c) => {
+  const prisma = c.get("prisma");
+  const consultantId = c.get("consultantId")!;
+  const id = c.req.param("id");
+  const existing = await prisma.client.findFirst({ where: { id, consultantId } });
+  if (!existing) return c.json({ error: "Client not found." }, 404);
 
   const client = await prisma.client.update({
     where: { id: existing.id },
     data: { status: "ARCHIVED", archivedAt: new Date() },
   });
-  await recordAudit({ consultantId: req.consultantId!, action: "CLIENT_ARCHIVED", entityType: "Client", entityId: client.id });
-  res.json({ client });
+  await recordAudit(prisma, { consultantId, action: "CLIENT_ARCHIVED", entityType: "Client", entityId: client.id });
+  return c.json({ client });
 });
 
 // POST /api/clients/:id/restore
-router.post("/:id/restore", async (req: AuthedRequest, res) => {
-  const existing = await prisma.client.findFirst({ where: { id: req.params.id, consultantId: req.consultantId } });
-  if (!existing) return res.status(404).json({ error: "Client not found." });
+app.post("/:id/restore", async (c) => {
+  const prisma = c.get("prisma");
+  const consultantId = c.get("consultantId")!;
+  const id = c.req.param("id");
+  const existing = await prisma.client.findFirst({ where: { id, consultantId } });
+  if (!existing) return c.json({ error: "Client not found." }, 404);
 
   const client = await prisma.client.update({
     where: { id: existing.id },
     data: { status: "ACTIVE", archivedAt: null },
   });
-  await recordAudit({ consultantId: req.consultantId!, action: "CLIENT_RESTORED", entityType: "Client", entityId: client.id });
-  res.json({ client });
+  await recordAudit(prisma, { consultantId, action: "CLIENT_RESTORED", entityType: "Client", entityId: client.id });
+  return c.json({ client });
 });
 
 // DELETE /api/clients/:id - permanent delete, requires explicit confirm flag
-router.delete("/:id", async (req: AuthedRequest, res) => {
-  const existing = await prisma.client.findFirst({ where: { id: req.params.id, consultantId: req.consultantId } });
-  if (!existing) return res.status(404).json({ error: "Client not found." });
-  if (req.query.confirm !== "PERMANENTLY_DELETE") {
-    return res.status(400).json({ error: "Permanent deletion requires explicit confirmation." });
+app.delete("/:id", async (c) => {
+  const prisma = c.get("prisma");
+  const consultantId = c.get("consultantId")!;
+  const id = c.req.param("id");
+  const existing = await prisma.client.findFirst({ where: { id, consultantId } });
+  if (!existing) return c.json({ error: "Client not found." }, 404);
+  if (c.req.query("confirm") !== "PERMANENTLY_DELETE") {
+    return c.json({ error: "Permanent deletion requires explicit confirmation." }, 400);
   }
   if (existing.status !== "ARCHIVED") {
-    return res.status(400).json({ error: "Only archived clients can be permanently deleted." });
+    return c.json({ error: "Only archived clients can be permanently deleted." }, 400);
   }
 
-  await recordAudit({ consultantId: req.consultantId!, action: "CLIENT_DELETED", entityType: "Client", entityId: existing.id, details: `fullName=${existing.fullName}` });
+  await recordAudit(prisma, { consultantId, action: "CLIENT_DELETED", entityType: "Client", entityId: existing.id, details: `fullName=${existing.fullName}` });
 
   const babyIds = (await prisma.baby.findMany({ where: { clientId: existing.id }, select: { id: true } })).map((b) => b.id);
   const visitIds = (await prisma.visit.findMany({ where: { clientId: existing.id }, select: { id: true } })).map((v) => v.id);
@@ -329,7 +350,7 @@ router.delete("/:id", async (req: AuthedRequest, res) => {
     prisma.client.delete({ where: { id: existing.id } }),
   ]);
 
-  res.json({ ok: true });
+  return c.json({ ok: true });
 });
 
-export default router;
+export default app;

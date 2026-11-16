@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { jsPDF } from "jspdf";
 import { api } from "../../api/client";
 import { Spinner, ErrorBanner } from "../../components/ui";
 import { formatDate } from "../../lib/format";
@@ -108,29 +109,53 @@ export default function VisitSummary() {
   }
 
   async function handleDownloadPdf() {
-    if (!visitId) return;
+    if (!visitId || !summary) return;
     setDownloading(true);
     try {
-      const res = await api.post(
-        `/visits/${visitId}/summary/pdf`,
-        {
-          clientQuestions: includeQuestions,
-          solutionsDiscussed: includeSolutions,
-          followUpPlan: includeFollowUp,
-          warningSignsDiscussed: includeWarningSigns,
-          recommendationIds: selectedRecs,
-          actionItemIds: selectedItems,
-        },
-        { responseType: "blob" }
-      );
-      const url = window.URL.createObjectURL(new Blob([res.data], { type: "application/pdf" }));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", `visit-summary-${visitId}.pdf`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
+      const doc = new jsPDF({ unit: "pt", format: "a4" });
+      const margin = 50;
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const maxWidth = pageWidth - margin * 2;
+      const lineHeight = 16;
+      let y = margin;
+
+      function ensureRoom() {
+        if (y > pageHeight - margin) {
+          doc.addPage();
+          y = margin;
+        }
+      }
+
+      function writeLine(line: string, size: number, bold = false) {
+        doc.setFont("helvetica", bold ? "bold" : "normal");
+        doc.setFontSize(size);
+        if (!line) {
+          y += lineHeight;
+          return;
+        }
+        const wrapped = doc.splitTextToSize(line, maxWidth) as string[];
+        for (const piece of wrapped) {
+          ensureRoom();
+          doc.text(piece, margin, y);
+          y += lineHeight;
+        }
+      }
+
+      const [headingLine, ...restLines] = previewText.split("\n");
+
+      doc.setFontSize(18);
+      doc.setFont("helvetica", "bold");
+      doc.text(headingLine, pageWidth / 2, y, { align: "center" });
+      y += lineHeight + 8;
+
+      for (const line of restLines) {
+        ensureRoom();
+        writeLine(line, 11);
+      }
+
+      doc.save(`visit-summary-${visitId}.pdf`);
+      await api.post(`/visits/${visitId}/summary/exported`).catch(() => undefined);
     } catch {
       setError(t("visits.summary.couldNotGeneratePdf"));
     } finally {

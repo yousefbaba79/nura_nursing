@@ -1,23 +1,18 @@
-import { NextFunction, Request, Response } from "express";
+import type { Context, Next } from "hono";
 import jwt from "jsonwebtoken";
+import type { AppEnv } from "../types";
 
-const JWT_SECRET = process.env.JWT_SECRET as string;
-
-export interface AuthedRequest extends Request {
-  consultantId?: string;
-}
-
-export function authenticate(req: AuthedRequest, res: Response, next: NextFunction) {
-  const header = req.headers.authorization;
+export async function authenticate(c: Context<AppEnv>, next: Next) {
+  const header = c.req.header("Authorization");
   if (!header || !header.startsWith("Bearer ")) {
-    return res.status(401).json({ error: "Authentication required." });
+    return c.json({ error: "Authentication required." }, 401);
   }
   const token = header.slice("Bearer ".length);
   try {
-    const payload = jwt.verify(token, JWT_SECRET) as { sub: string };
-    req.consultantId = payload.sub;
-    next();
+    const payload = jwt.verify(token, c.env.JWT_SECRET) as { sub: string };
+    c.set("consultantId", payload.sub);
+    await next();
   } catch {
-    return res.status(401).json({ error: "Invalid or expired session. Please sign in again." });
+    return c.json({ error: "Invalid or expired session. Please sign in again." }, 401);
   }
 }

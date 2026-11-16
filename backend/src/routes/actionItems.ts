@@ -1,12 +1,12 @@
-import { Router } from "express";
+import { Hono } from "hono";
 import { z } from "zod";
-import { prisma } from "../lib/prisma";
+import type { AppEnv } from "../types";
 import { recordAudit } from "../lib/audit";
-import { authenticate, AuthedRequest } from "../middleware/auth";
+import { authenticate } from "../middleware/auth";
 import { PRIORITIES, ACTION_ITEM_STATUSES } from "../utils/enums";
 
-const router = Router();
-router.use(authenticate);
+const app = new Hono<AppEnv>();
+app.use(authenticate);
 
 const actionItemInput = z.object({
   clientId: z.string().min(1),
@@ -29,9 +29,11 @@ function toDate(v?: string | null) {
 }
 
 // GET /api/action-items?status=&overdue=true&clientId=
-router.get("/", async (req: AuthedRequest, res) => {
-  const { status, overdue, clientId } = req.query as Record<string, string | undefined>;
-  const where: any = { client: { consultantId: req.consultantId } };
+app.get("/", async (c) => {
+  const prisma = c.get("prisma");
+  const consultantId = c.get("consultantId")!;
+  const { status, overdue, clientId } = c.req.query();
+  const where: any = { client: { consultantId } };
   if (clientId) where.clientId = clientId;
   if (status) where.status = status;
   if (overdue === "true") {
@@ -43,15 +45,17 @@ router.get("/", async (req: AuthedRequest, res) => {
     orderBy: { dueDate: "asc" },
     include: { client: { select: { id: true, fullName: true } }, baby: { select: { id: true, fullName: true } } },
   });
-  res.json({ actionItems });
+  return c.json({ actionItems });
 });
 
-router.post("/", async (req: AuthedRequest, res) => {
-  const parsed = actionItemInput.safeParse(req.body);
-  if (!parsed.success) return res.status(400).json({ error: "Please check the highlighted fields.", details: parsed.error.flatten() });
+app.post("/", async (c) => {
+  const prisma = c.get("prisma");
+  const consultantId = c.get("consultantId")!;
+  const parsed = actionItemInput.safeParse(await c.req.json());
+  if (!parsed.success) return c.json({ error: "Please check the highlighted fields.", details: parsed.error.flatten() }, 400);
   const d = parsed.data;
-  const client = await prisma.client.findFirst({ where: { id: d.clientId, consultantId: req.consultantId } });
-  if (!client) return res.status(404).json({ error: "Client not found." });
+  const client = await prisma.client.findFirst({ where: { id: d.clientId, consultantId } });
+  if (!client) return c.json({ error: "Client not found." }, 404);
 
   const actionItem = await prisma.actionItem.create({
     data: {
@@ -68,15 +72,17 @@ router.post("/", async (req: AuthedRequest, res) => {
       notes: d.notes || null,
     },
   });
-  await recordAudit({ consultantId: req.consultantId!, action: "ACTION_ITEM_CREATED", entityType: "ActionItem", entityId: actionItem.id });
-  res.status(201).json({ actionItem });
+  await recordAudit(prisma, { consultantId, action: "ACTION_ITEM_CREATED", entityType: "ActionItem", entityId: actionItem.id });
+  return c.json({ actionItem }, 201);
 });
 
-router.put("/:id", async (req: AuthedRequest, res) => {
-  const existing = await prisma.actionItem.findFirst({ where: { id: req.params.id, client: { consultantId: req.consultantId } } });
-  if (!existing) return res.status(404).json({ error: "Action item not found." });
-  const parsed = actionItemInput.partial().safeParse(req.body);
-  if (!parsed.success) return res.status(400).json({ error: "Please check the highlighted fields." });
+app.put("/:id", async (c) => {
+  const prisma = c.get("prisma");
+  const consultantId = c.get("consultantId")!;
+  const existing = await prisma.actionItem.findFirst({ where: { id: c.req.param("id"), client: { consultantId } } });
+  if (!existing) return c.json({ error: "Action item not found." }, 404);
+  const parsed = actionItemInput.partial().safeParse(await c.req.json());
+  if (!parsed.success) return c.json({ error: "Please check the highlighted fields." }, 400);
   const d = parsed.data;
 
   const completedAt =
@@ -101,15 +107,17 @@ router.put("/:id", async (req: AuthedRequest, res) => {
       ...(d.notes !== undefined ? { notes: d.notes || null } : {}),
     },
   });
-  await recordAudit({ consultantId: req.consultantId!, action: "ACTION_ITEM_UPDATED", entityType: "ActionItem", entityId: actionItem.id });
-  res.json({ actionItem });
+  await recordAudit(prisma, { consultantId, action: "ACTION_ITEM_UPDATED", entityType: "ActionItem", entityId: actionItem.id });
+  return c.json({ actionItem });
 });
 
-router.delete("/:id", async (req: AuthedRequest, res) => {
-  const existing = await prisma.actionItem.findFirst({ where: { id: req.params.id, client: { consultantId: req.consultantId } } });
-  if (!existing) return res.status(404).json({ error: "Action item not found." });
+app.delete("/:id", async (c) => {
+  const prisma = c.get("prisma");
+  const consultantId = c.get("consultantId")!;
+  const existing = await prisma.actionItem.findFirst({ where: { id: c.req.param("id"), client: { consultantId } } });
+  if (!existing) return c.json({ error: "Action item not found." }, 404);
   await prisma.actionItem.delete({ where: { id: existing.id } });
-  res.json({ ok: true });
+  return c.json({ ok: true });
 });
 
-export default router;
+export default app;
