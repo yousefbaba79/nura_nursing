@@ -13,6 +13,7 @@ import dashboardRoutes from "./routes/dashboard";
 import settingsRoutes from "./routes/settings";
 import auditRoutes from "./routes/audit";
 import reportRoutes from "./routes/reports";
+import noteTemplateRoutes from "./routes/noteTemplates";
 
 const app = new Hono<AppEnv>();
 
@@ -41,6 +42,7 @@ app.route("/api/dashboard", dashboardRoutes);
 app.route("/api/settings", settingsRoutes);
 app.route("/api/audit-log", auditRoutes);
 app.route("/api/reports", reportRoutes);
+app.route("/api/note-templates", noteTemplateRoutes);
 
 // No sensitive information should reach logs.
 app.onError((err, c) => {

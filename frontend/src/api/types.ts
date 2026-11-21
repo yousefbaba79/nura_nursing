@@ -90,3 +90,9 @@ export interface FollowUp {
   client?: { id: string; fullName: string; phone: string };
   baby?: { id: string; fullName: string } | null;
 }
+
+export interface NoteTemplate {
+  id: string;
+  label: string;
+  text: string;
+}

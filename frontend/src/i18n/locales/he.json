@@ -255,6 +255,7 @@
     "relatedBaby": "תינוק קשור",
     "reason": "סיבה",
     "notes": "הערות",
+    "insertTemplate": "הוספת תבנית…",
     "errorDateRequired": "יש להזין תאריך ושעה למעקב.",
     "couldNotSave": "לא ניתן היה לשמור את המעקב.",
     "couldNotDelete": "לא ניתן היה למחוק את המעקב.",
@@ -286,6 +287,23 @@
     "periodTo": "עד תאריך",
     "periodFilterAriaLabel": "סינון מעקבים שהושלמו לפי תקופה"
   },
+  "noteTemplates": {
+    "backToSettings": "→ חזרה להגדרות",
+    "title": "תבניות הערות",
+    "subtitle": "קטעי טקסט לשימוש חוזר שניתן להוסיף להערות של מעקב.",
+    "add": "+ הוספת תבנית",
+    "noneYet": "עדיין אין תבניות",
+    "noneYetDescription": "הוסיפי את התבנית הראשונה שלך כדי להתחיל להשתמש בה בהערות המעקב.",
+    "editModalTitle": "עריכת תבנית",
+    "addModalTitle": "הוספת תבנית",
+    "labelField": "תווית",
+    "textField": "טקסט",
+    "addTemplate": "הוספת תבנית",
+    "errorFieldsRequired": "יש למלא תווית וטקסט.",
+    "couldNotSave": "לא ניתן היה לשמור את התבנית.",
+    "couldNotDelete": "לא ניתן היה למחוק את התבנית.",
+    "deleteConfirmTitle": "למחוק את התבנית הזו?"
+  },
   "settings": {
     "title": "הגדרות",
     "profileClinic": "פרופיל ומרפאה",
@@ -312,6 +330,7 @@
     "exportClientsCsv": "ייצוא לקוחות (CSV)",
     "viewReports": "צפייה בדוחות",
     "viewAuditLog": "צפייה ביומן הביקורת",
+    "manageNoteTemplates": "ניהול תבניות הערות",
     "dangerZone": "אזור מסוכן",
     "deactivateWarning": "השבתת החשבון תנתק אותך ותמנע התחברות. רשומות הלקוחות יישמרו.",
     "deactivateAccount": "השבתת חשבון",
@@ -357,7 +376,10 @@
       "BABY_CREATED": "רשומת תינוק נוצרה",
       "BABY_UPDATED": "רשומת תינוק עודכנה",
       "BABY_ARCHIVED": "רשומת תינוק הועברה לארכיון",
-      "BABY_RESTORED": "רשומת תינוק שוחזרה"
+      "BABY_RESTORED": "רשומת תינוק שוחזרה",
+      "NOTE_TEMPLATE_CREATED": "תבנית הערה נוצרה",
+      "NOTE_TEMPLATE_UPDATED": "תבנית הערה עודכנה",
+      "NOTE_TEMPLATE_DELETED": "תבנית הערה נמחקה"
     },
     "entities": {
       "Consultant": "יועצת",
@@ -365,7 +387,8 @@
       "Baby": "תינוק",
       "Visit": "ביקור",
       "ActionItem": "משימה",
-      "FollowUp": "מעקב"
+      "FollowUp": "מעקב",
+      "NoteTemplate": "תבנית הערה"
     }
   },
   "reports": {

@@ -12,6 +12,7 @@ import ClientDetail from "./pages/clients/ClientDetail";
 import FollowUps from "./pages/FollowUps";
 import Settings from "./pages/Settings";
 import AuditLog from "./pages/AuditLog";
+import NoteTemplates from "./pages/NoteTemplates";
 import Reports from "./pages/Reports";
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
@@ -43,6 +44,7 @@ export default function App() {
         <Route path="/reports" element={<Reports />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/settings/audit-log" element={<AuditLog />} />
+        <Route path="/settings/note-templates" element={<NoteTemplates />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

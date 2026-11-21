@@ -41,6 +41,7 @@ model Consultant {
   clients        Client[]
   auditEntries   AuditEntry[]
   passwordResets PasswordReset[]
+  noteTemplates  NoteTemplate[]
 }
 
 model PasswordReset {
@@ -210,6 +211,26 @@ model FollowUp {
   @@index([clientId])
   @@index([status])
   @@index([scheduledAt])
+}
+
+// ---------------------------------------------------------------------------
+// Note templates
+// ---------------------------------------------------------------------------
+// Reusable snippets of text a consultant can insert into a follow-up's notes
+// instead of retyping them. Managed entirely by the consultant.
+
+model NoteTemplate {
+  id           String     @id @default(cuid())
+  consultantId String
+  consultant   Consultant @relation(fields: [consultantId], references: [id])
+
+  label        String
+  text         String
+
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([consultantId])
 }
 
 // ---------------------------------------------------------------------------
