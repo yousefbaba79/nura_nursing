@@ -7,7 +7,6 @@ import type { FollowUp, Baby } from "../api/types";
 
 interface Props {
   clientId: string;
-  visitId?: string;
   babies?: Baby[];
   followUp?: FollowUp | null;
   onSaved: (followUp: FollowUp) => void;
@@ -22,7 +21,7 @@ function toLocalInput(value?: string | null) {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
-export default function FollowUpForm({ clientId, visitId, babies, followUp, onSaved, onCancel, onDeleted }: Props) {
+export default function FollowUpForm({ clientId, babies, followUp, onSaved, onCancel, onDeleted }: Props) {
   const { t } = useTranslation();
   const [scheduledAt, setScheduledAt] = useState(toLocalInput(followUp?.scheduledAt));
   const [type, setType] = useState(followUp?.type || "CLINIC_VISIT");
@@ -61,7 +60,6 @@ export default function FollowUpForm({ clientId, visitId, babies, followUp, onSa
     try {
       const payload = {
         clientId,
-        visitId: visitId || undefined,
         scheduledAt: new Date(scheduledAt).toISOString(),
         type,
         reason: reason || null,

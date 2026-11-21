@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { api, apiErrorMessage } from "../../api/client";
@@ -56,7 +56,7 @@ export default function ClientDetail() {
     );
   }
 
-  const upcomingFollowUps = (client.followUps || []).filter((f) => f.status === "SCHEDULED");
+  const followUps = [...(client.followUps || [])].sort((a, b) => new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime());
 
   return (
     <div className="space-y-6">
@@ -129,58 +129,6 @@ export default function ClientDetail() {
             )}
           </Section>
 
-          <Section
-            title={t("clients.detail.visitHistory")}
-            action={
-              <Link to={`/clients/${client.id}/visits/new`} className="text-sm font-medium text-brand-700 hover:underline">
-                {t("clients.detail.newVisitLink")}
-              </Link>
-            }
-          >
-            {!client.visits || client.visits.length === 0 ? (
-              <EmptyState title={t("clients.detail.noVisitsYet")} description={t("clients.detail.noVisitsYetDescription")} />
-            ) : (
-              <ul className="divide-y divide-gray-100">
-                {client.visits.map((v) => (
-                  <li key={v.id}>
-                    <Link to={`/visits/${v.id}`} className="block py-3 hover:bg-gray-50">
-                      <div className="flex flex-wrap items-center justify-between gap-2">
-                        <div>
-                          <p className="font-medium text-gray-900">
-                            {formatDate(v.visitDate)} · {t(`enums.visitType.${v.visitType}`)}
-                          </p>
-                          {v.problems && v.problems.length > 0 && (
-                            <p className="text-sm text-gray-500">{t("clients.detail.problemsLabel", { list: v.problems.map((p) => p.title).join(", ") })}</p>
-                          )}
-                          {v.recommendations && v.recommendations.length > 0 && (
-                            <p className="text-sm text-gray-500">
-                              {t("clients.detail.recommendationsLabel", { list: v.recommendations.map((r) => r.title).join(", ") })}
-                            </p>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-2 text-sm">
-                          {v.actionItems && v.actionItems.filter((a) => a.status !== "COMPLETED" && a.status !== "CANCELLED").length > 0 && (
-                            <Badge className="bg-amber-100 text-amber-800">
-                              {t("clients.detail.openBadge", { count: v.actionItems.filter((a) => a.status !== "COMPLETED" && a.status !== "CANCELLED").length })}
-                            </Badge>
-                          )}
-                          <Badge
-                            className={
-                              v.status === "COMPLETED" ? "bg-green-100 text-green-800" : v.status === "CANCELLED" ? "bg-gray-100 text-gray-500" : "bg-blue-100 text-blue-800"
-                            }
-                          >
-                            {t(`enums.visitStatus.${v.status}`)}
-                          </Badge>
-                        </div>
-                      </div>
-                      {v.followUpDate && <p className="mt-1 text-xs text-gray-500">{t("clients.detail.followUpLabel", { date: formatDate(v.followUpDate) })}</p>}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </Section>
-
           {client.generalNotes && (
             <Section title={t("clients.detail.generalNotes")}>
               <p className="whitespace-pre-wrap text-sm text-gray-700">{client.generalNotes}</p>
@@ -197,11 +145,11 @@ export default function ClientDetail() {
               </button>
             }
           >
-            {upcomingFollowUps.length === 0 ? (
+            {followUps.length === 0 ? (
               <EmptyState title={t("clients.detail.noFollowUpsScheduled")} />
             ) : (
               <ul className="space-y-2">
-                {upcomingFollowUps.map((f) => (
+                {followUps.map((f) => (
                   <li key={f.id}>
                     <button className="w-full rounded-md border border-gray-200 p-2 text-start hover:bg-gray-50" onClick={() => setFollowUpModal({ open: true, item: f })}>
                       <p className="text-sm font-medium text-gray-900">{t(`enums.followUpType.${f.type}`)}</p>

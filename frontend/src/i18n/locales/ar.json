@@ -74,8 +74,7 @@
     "stats": {
       "activeClients": "العميلات النشطات",
       "overdueFollowUps": "متابعات متأخرة",
-      "overdueActionItems": "مهام متأخرة",
-      "draftVisits": "زيارات في المسودة"
+      "overdueActionItems": "مهام متأخرة"
     },
     "sections": {
       "todayUpcomingFollowUps": "متابعات اليوم والقادمة",
@@ -85,8 +84,8 @@
       "nothingOverdueDescription": "عمل رائع في متابعة كل شيء في وقته.",
       "incompleteActionItems": "مهام غير مكتملة",
       "noOpenActionItems": "لا توجد مهام مفتوحة",
-      "recentVisits": "الزيارات الأخيرة",
-      "noVisitsYet": "لم تُسجَّل أي زيارات بعد",
+      "recentFollowUps": "المتابعات الأخيرة",
+      "noFollowUpsYet": "لم تُسجَّل أي متابعات بعد",
       "recentlyViewedClients": "العميلات اللاتي تمت زيارتهنّ مؤخرًا",
       "noClientsViewedYet": "لم تتم زيارة أي عميلة بعد",
       "recentlyAddedClients": "العميلات المُضافات مؤخرًا",
@@ -122,7 +121,6 @@
     "lastVisit": "آخر زيارة: {{date}}",
     "detail": {
       "edit": "تعديل",
-      "newVisit": "+ زيارة جديدة",
       "archive": "أرشفة",
       "restore": "استعادة",
       "babies": "الرضّع",
@@ -132,19 +130,6 @@
       "dobPrefix": "تاريخ الميلاد {{date}}",
       "currentWeight": "الوزن الحالي: {{weight}} جم",
       "archived": "في الأرشيف",
-      "visitHistory": "سجلّ الزيارات",
-      "newVisitLink": "+ زيارة جديدة",
-      "noVisitsYet": "لم تُسجَّل أي زيارات بعد",
-      "noVisitsYetDescription": "وثّقي الاستشارة الأولى لبدء سجلّ هذه العميلة.",
-      "problemsLabel": "المشكلات: {{list}}",
-      "recommendationsLabel": "التوصيات: {{list}}",
-      "openBadge_zero": "لا مفتوحة",
-      "openBadge_one": "مفتوحة واحدة",
-      "openBadge_two": "مفتوحتان",
-      "openBadge_few": "{{count}} مفتوحة",
-      "openBadge_many": "{{count}} مفتوحة",
-      "openBadge_other": "{{count}} مفتوحة",
-      "followUpLabel": "المتابعة: {{date}}",
       "generalNotes": "ملاحظات عامة",
       "consent": "الموافقة",
       "consentReceived": "تم استلام الموافقة",
@@ -279,157 +264,6 @@
     "deleteConfirmTitle": "حذف هذه المتابعة؟",
     "deleteConfirmDescription": "لا يمكن التراجع عن هذا الإجراء."
   },
-  "visits": {
-    "form": {
-      "newDraftTitle": "زيارة جديدة / مسودة",
-      "editTitle": "تعديل الزيارة",
-      "client": "العميلة: {{name}}",
-      "draftSaving": "جارٍ الحفظ…",
-      "draftSavedAt": "تم حفظ المسودة الساعة {{time}}",
-      "notEditableNotice": "حالة هذه الزيارة {{status}}. سيتم حفظ التغييرات أدناه عند الضغط على \"حفظ التغييرات\".",
-      "generalInformation": "معلومات عامة",
-      "visitDate": "تاريخ الزيارة",
-      "startTime": "وقت البدء",
-      "endTime": "وقت الانتهاء",
-      "visitType": "نوع الزيارة",
-      "location": "المكان / الوسيلة",
-      "followUpDate": "تاريخ المتابعة",
-      "babiesInvolved": "الرضّع المعنيون بهذه الزيارة",
-      "groupReasonGoals": "السبب والأهداف",
-      "groupAssessment": "التقييم",
-      "groupPlan": "الخطة",
-      "groupPrivate": "خاص",
-      "field": {
-        "reasonForConsultation": "سبب طلب الاستشارة",
-        "clientGoals": "أهداف العميلة",
-        "clientQuestions": "أسئلة العميلة",
-        "currentFeedingRoutine": "روتين الإطعام الحالي",
-        "problemsReported": "المشكلات التي أبلغت عنها العميلة",
-        "consultantObservations": "ملاحظات الاستشارية",
-        "feedingAssessment": "تقييم الإطعام",
-        "breastAssessment": "تقييم الثدي",
-        "babyAssessment": "تقييم الرضيع",
-        "latchAssessment": "تقييم التعلّق بالثدي",
-        "milkTransferAssessment": "تقييم انتقال الحليب",
-        "weightInformation": "معلومات الوزن",
-        "relevantMedicalInfo": "معلومات طبية ذات صلة",
-        "solutionsDiscussed": "الحلول التي نوقشت",
-        "clientActionPlan": "خطة عمل العميلة",
-        "warningSignsDiscussed": "علامات التحذير التي نوقشت",
-        "referrals": "الإحالات إلى مختصين آخرين",
-        "followUpPlan": "خطة المتابعة",
-        "privateNotes": "ملاحظات مهنية خاصة (لا تُشارك مع العميلة)"
-      },
-      "backToClient": "العودة إلى العميلة",
-      "saveAsDraft": "حفظ كمسودة",
-      "completeVisit": "إنهاء الزيارة",
-      "couldNotStart": "تعذّر بدء زيارة جديدة.",
-      "couldNotLoad": "تعذّر تحميل هذه الزيارة.",
-      "couldNotSave": "تعذّر حفظ الزيارة.",
-      "couldNotComplete": "تعذّر إنهاء الزيارة."
-    },
-    "detail": {
-      "title": "زيارة بتاريخ {{date}}",
-      "editVisit": "تعديل الزيارة",
-      "generateSummary": "إنشاء ملخص",
-      "start": "البداية",
-      "end": "النهاية",
-      "location": "المكان",
-      "followUpDate": "تاريخ المتابعة",
-      "created": "أُنشئت في",
-      "createdBy": "أنشأها",
-      "lastUpdated": "آخر تحديث",
-      "updatedBy": "حدّثها",
-      "noClinicalDetail": "لم تُسجَّل أي تفاصيل سريرية بعد",
-      "noClinicalDetailDescription": "أضيفي مشكلات أو توصيات أو مهام من الأقسام أعلاه.",
-      "privateNotesGroupTitle": "ملاحظات مهنية خاصة"
-    },
-    "summary": {
-      "backToVisit": "→ العودة إلى الزيارة",
-      "title": "ملخص زيارة للعميلة",
-      "subtitle": "اختاري بدقة ما تريدين مشاركته. لا تُدرَج الملاحظات المهنية الخاصة والتقييمات الداخلية أبدًا.",
-      "whatToInclude": "ما الذي سيتم تضمينه",
-      "questionsDiscussed": "الأسئلة التي نوقشت",
-      "noneRecorded": "(لم يُسجَّل شيء)",
-      "recommendationsNarrative": "التوصيات التي نوقشت (وصف حر)",
-      "recommendationsLabel": "التوصيات",
-      "actionItemsLabel": "المهام",
-      "warningSignsLabel": "علامات التحذير التي يجب مراقبتها",
-      "followUpPlanLabel": "خطة المتابعة",
-      "preview": "معاينة",
-      "copyToClipboard": "نسخ إلى الحافظة",
-      "copied": "تم النسخ!",
-      "downloadPdf": "تنزيل PDF",
-      "preparingPdf": "جارٍ تجهيز ملف PDF…",
-      "couldNotLoad": "تعذّر تحميل ملخص هذه الزيارة.",
-      "couldNotGeneratePdf": "تعذّر إنشاء ملخص PDF.",
-      "text": {
-        "heading": "ملخص الزيارة — {{clientName}}",
-        "babies": "الرضيع/الرضّع: {{names}}",
-        "visitDate": "تاريخ الزيارة: {{date}}",
-        "questionsDiscussed": "الأسئلة التي نوقشت:",
-        "recommendationsDiscussed": "التوصيات التي نوقشت:",
-        "recommendations": "التوصيات:",
-        "actionItems": "المهام:",
-        "actionItemDue": "بحلول {{date}}",
-        "warningSigns": "علامات التحذير التي يجب مراقبتها:",
-        "followUpPlan": "خطة المتابعة:",
-        "nextFollowUp": "المتابعة القادمة: {{date}}",
-        "preparedBy": "أُعِدّ بواسطة:"
-      }
-    }
-  },
-  "problems": {
-    "title": "المشكلات المحدَّدة",
-    "add": "+ إضافة مشكلة",
-    "noneRecorded": "لم تُسجَّل أي مشكلات لهذه الزيارة.",
-    "editModalTitle": "تعديل المشكلة",
-    "addModalTitle": "إضافة مشكلة",
-    "deleteConfirmTitle": "هل تريدين حذف هذه المشكلة؟",
-    "deleteConfirmDescription": "سيؤدي هذا أيضًا إلى إزالة ارتباطها بأي توصيات أو مهام ذات صلة.",
-    "relatedBaby": "الرضيع: {{name}}",
-    "form": {
-      "title": "عنوان المشكلة",
-      "description": "وصف تفصيلي",
-      "severity": "الشدة",
-      "status": "الحالة",
-      "relatedBaby": "الرضيع المرتبط",
-      "notes": "ملاحظات",
-      "errorTitleRequired": "يجب إدخال عنوان للمشكلة.",
-      "couldNotSave": "تعذّر حفظ المشكلة.",
-      "addProblem": "إضافة مشكلة"
-    }
-  },
-  "recommendations": {
-    "title": "التوصيات",
-    "add": "+ إضافة توصية",
-    "noneRecorded": "لم تُسجَّل أي توصيات لهذه الزيارة.",
-    "notSharedBadge": "غير مشاركة مع العميلة",
-    "relatedProblem": "المشكلة المرتبطة: {{title}}",
-    "editModalTitle": "تعديل التوصية",
-    "addModalTitle": "إضافة توصية",
-    "deleteConfirmTitle": "هل تريدين حذف هذه التوصية؟",
-    "form": {
-      "title": "عنوان التوصية",
-      "instructions": "تعليمات تفصيلية",
-      "priority": "الأولوية",
-      "relatedProblem": "المشكلة المرتبطة",
-      "relatedBaby": "الرضيع المرتبط",
-      "includeInSummary": "يمكن تضمينها في ملخص العميلة",
-      "errorTitleRequired": "يجب إدخال عنوان للتوصية.",
-      "couldNotSave": "تعذّر حفظ التوصية.",
-      "addRecommendation": "إضافة توصية"
-    }
-  },
-  "actionItemsSection": {
-    "title": "مهام العميلة",
-    "add": "+ إضافة مهمة",
-    "noneRecorded": "لا توجد مهام لهذه الزيارة بعد.",
-    "due": "الاستحقاق: {{date}}",
-    "editModalTitle": "تعديل المهمة",
-    "addModalTitle": "إضافة مهمة",
-    "deleteConfirmTitle": "هل تريدين حذف هذه المهمة؟"
-  },
   "followUps": {
     "title": "المتابعات",
     "scopes": {
@@ -541,7 +375,7 @@
     "title": "التقارير",
     "stats": {
       "activeClients": "العميلات النشطات",
-      "totalVisits": "إجمالي الزيارات",
+      "totalFollowUps": "إجمالي المتابعات",
       "needFollowUp": "بحاجة إلى متابعة",
       "openActionItems": "مهام مفتوحة",
       "overdueActionItems": "مهام متأخرة"
@@ -567,36 +401,10 @@
       "TUBE_FEEDING": "تغذية بأنبوب",
       "OTHER": "أخرى"
     },
-    "visitType": {
-      "INITIAL_CONSULTATION": "استشارة أولى",
-      "FOLLOW_UP_CONSULTATION": "استشارة متابعة",
-      "PHONE_CONSULTATION": "استشارة هاتفية",
-      "VIDEO_CONSULTATION": "استشارة عبر الفيديو",
-      "HOME_VISIT": "زيارة منزلية",
-      "CLINIC_VISIT": "زيارة عيادة",
-      "MESSAGE_CONSULTATION": "استشارة عبر الرسائل",
-      "OTHER": "أخرى"
-    },
-    "visitStatus": {
-      "DRAFT": "مسودة",
-      "COMPLETED": "مكتملة",
-      "CANCELLED": "ملغاة"
-    },
-    "severity": {
-      "LOW": "منخفضة",
-      "MEDIUM": "متوسطة",
-      "HIGH": "عالية"
-    },
     "priority": {
       "LOW": "منخفضة",
       "MEDIUM": "متوسطة",
       "HIGH": "عالية"
-    },
-    "problemStatus": {
-      "NEW": "جديدة",
-      "IN_PROGRESS": "قيد المعالجة",
-      "IMPROVED": "تحسّنت",
-      "RESOLVED": "تم حلّها"
     },
     "actionItemStatus": {
       "TODO": "قيد الانتظار",

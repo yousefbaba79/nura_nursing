@@ -11,7 +11,6 @@ app.use(authenticate);
 const followUpInput = z.object({
   clientId: z.string().min(1),
   babyId: z.string().optional().nullable(),
-  visitId: z.string().optional().nullable(),
   scheduledAt: z.string().min(1),
   type: z.enum(FOLLOW_UP_TYPES).optional(),
   reason: z.string().optional().nullable(),
@@ -94,7 +93,6 @@ app.post("/", async (c) => {
     data: {
       clientId: client.id,
       babyId: d.babyId || null,
-      visitId: d.visitId || null,
       scheduledAt: new Date(d.scheduledAt),
       type: d.type || "CLINIC_VISIT",
       reason: d.reason || null,
@@ -119,7 +117,6 @@ app.put("/:id", async (c) => {
     where: { id: existing.id },
     data: {
       ...(d.babyId !== undefined ? { babyId: d.babyId || null } : {}),
-      ...(d.visitId !== undefined ? { visitId: d.visitId || null } : {}),
       ...(d.scheduledAt !== undefined ? { scheduledAt: new Date(d.scheduledAt) } : {}),
       ...(d.type !== undefined ? { type: d.type } : {}),
       ...(d.reason !== undefined ? { reason: d.reason || null } : {}),

@@ -106,7 +106,6 @@ app.get("/babies/:id", async (c) => {
     where: { id, client: { consultantId } },
     include: {
       weightLogs: { orderBy: { date: "asc" } },
-      visits: { include: { visit: { select: { id: true, visitDate: true, visitType: true, status: true } } } },
     },
   });
   if (!baby) return c.json({ error: "Baby not found." }, 404);

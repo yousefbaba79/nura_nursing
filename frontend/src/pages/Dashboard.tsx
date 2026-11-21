@@ -38,7 +38,7 @@ export default function Dashboard() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             <StatCard label={t("dashboard.stats.activeClients")} value={data.stats.activeClientCount} to="/clients" />
             <StatCard
               label={t("dashboard.stats.overdueFollowUps")}
@@ -47,7 +47,6 @@ export default function Dashboard() {
               alert={data.stats.overdueFollowUpCount > 0}
             />
             <StatCard label={t("dashboard.stats.overdueActionItems")} value={data.stats.overdueActionItemCount} alert={data.stats.overdueActionItemCount > 0} />
-            <StatCard label={t("dashboard.stats.draftVisits")} value={data.stats.incompleteDraftCount} alert={data.stats.incompleteDraftCount > 0} />
           </div>
 
           <div className="grid gap-6 lg:grid-cols-2">
@@ -108,16 +107,16 @@ export default function Dashboard() {
               )}
             </Section>
 
-            <Section title={t("dashboard.sections.recentVisits")}>
-              {data.recentVisits.length === 0 ? (
-                <EmptyState title={t("dashboard.sections.noVisitsYet")} />
+            <Section title={t("dashboard.sections.recentFollowUps")}>
+              {data.recentCompletedFollowUps.length === 0 ? (
+                <EmptyState title={t("dashboard.sections.noFollowUpsYet")} />
               ) : (
                 <ul className="divide-y divide-gray-100">
-                  {data.recentVisits.map((v: any) => (
-                    <li key={v.id}>
-                      <Link to={`/visits/${v.id}`} className="flex items-center justify-between py-2 text-sm hover:text-brand-700">
-                        <span className="font-medium text-gray-900">{v.client.fullName}</span>
-                        <span className="text-gray-500">{formatDate(v.visitDate)}</span>
+                  {data.recentCompletedFollowUps.map((f: any) => (
+                    <li key={f.id}>
+                      <Link to={`/clients/${f.client.id}`} className="flex items-center justify-between py-2 text-sm hover:text-brand-700">
+                        <span className="font-medium text-gray-900">{f.client.fullName}</span>
+                        <span className="text-gray-500">{formatDate(f.scheduledAt)}</span>
                       </Link>
                     </li>
                   ))}

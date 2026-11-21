@@ -74,8 +74,7 @@
     "stats": {
       "activeClients": "לקוחות פעילות",
       "overdueFollowUps": "מעקבים באיחור",
-      "overdueActionItems": "משימות באיחור",
-      "draftVisits": "ביקורים בטיוטה"
+      "overdueActionItems": "משימות באיחור"
     },
     "sections": {
       "todayUpcomingFollowUps": "מעקבים להיום ולקראת",
@@ -85,8 +84,8 @@
       "nothingOverdueDescription": "עבודה מצוינת בשמירה על לוח הזמנים למעקבים.",
       "incompleteActionItems": "משימות לא גמורות",
       "noOpenActionItems": "אין משימות פתוחות",
-      "recentVisits": "ביקורים אחרונים",
-      "noVisitsYet": "עדיין לא נרשמו ביקורים",
+      "recentFollowUps": "מעקבים אחרונים",
+      "noFollowUpsYet": "עדיין לא נרשמו מעקבים",
       "recentlyViewedClients": "לקוחות שנצפו לאחרונה",
       "noClientsViewedYet": "עדיין לא נצפו לקוחות",
       "recentlyAddedClients": "לקוחות שנוספו לאחרונה",
@@ -120,7 +119,6 @@
     "lastVisit": "ביקור אחרון: {{date}}",
     "detail": {
       "edit": "עריכה",
-      "newVisit": "+ ביקור חדש",
       "archive": "העברה לארכיון",
       "restore": "שחזור",
       "babies": "תינוקות",
@@ -130,17 +128,6 @@
       "dobPrefix": "תאריך לידה {{date}}",
       "currentWeight": "משקל נוכחי: {{weight}} גרם",
       "archived": "בארכיון",
-      "visitHistory": "היסטוריית ביקורים",
-      "newVisitLink": "+ ביקור חדש",
-      "noVisitsYet": "עדיין לא נרשמו ביקורים",
-      "noVisitsYetDescription": "תעדי את הייעוץ הראשון כדי להתחיל את ההיסטוריה של הלקוחה הזו.",
-      "problemsLabel": "בעיות: {{list}}",
-      "recommendationsLabel": "המלצות: {{list}}",
-      "openBadge_one": "פתוחה אחת",
-      "openBadge_two": "{{count}} פתוחות",
-      "openBadge_many": "{{count}} פתוחות",
-      "openBadge_other": "{{count}} פתוחות",
-      "followUpLabel": "מעקב: {{date}}",
       "generalNotes": "הערות כלליות",
       "consent": "הסכמה",
       "consentReceived": "התקבלה הסכמה",
@@ -275,157 +262,6 @@
     "deleteConfirmTitle": "למחוק את המעקב הזה?",
     "deleteConfirmDescription": "לא ניתן לבטל פעולה זו."
   },
-  "visits": {
-    "form": {
-      "newDraftTitle": "ביקור חדש / טיוטה",
-      "editTitle": "עריכת ביקור",
-      "client": "לקוחה: {{name}}",
-      "draftSaving": "שומר…",
-      "draftSavedAt": "הטיוטה נשמרה בשעה {{time}}",
-      "notEditableNotice": "הביקור הזה במצב {{status}}. השינויים למטה יישמרו כשתלחצי על \"שמירת שינויים\".",
-      "generalInformation": "מידע כללי",
-      "visitDate": "תאריך הביקור",
-      "startTime": "שעת התחלה",
-      "endTime": "שעת סיום",
-      "visitType": "סוג הביקור",
-      "location": "מיקום / אמצעי",
-      "followUpDate": "תאריך מעקב",
-      "babiesInvolved": "תינוקות המעורבים בביקור זה",
-      "groupReasonGoals": "סיבה ומטרות",
-      "groupAssessment": "הערכה",
-      "groupPlan": "תוכנית",
-      "groupPrivate": "פרטי",
-      "field": {
-        "reasonForConsultation": "סיבת הפנייה לייעוץ",
-        "clientGoals": "מטרות הלקוחה",
-        "clientQuestions": "שאלות הלקוחה",
-        "currentFeedingRoutine": "שגרת ההאכלה הנוכחית",
-        "problemsReported": "בעיות שדווחו על ידי הלקוחה",
-        "consultantObservations": "התרשמות היועצת",
-        "feedingAssessment": "הערכת האכלה",
-        "breastAssessment": "הערכת שד",
-        "babyAssessment": "הערכת תינוק",
-        "latchAssessment": "הערכת אחיזה",
-        "milkTransferAssessment": "הערכת העברת חלב",
-        "weightInformation": "מידע על משקל",
-        "relevantMedicalInfo": "מידע רפואי רלוונטי",
-        "solutionsDiscussed": "פתרונות שנדונו",
-        "clientActionPlan": "תוכנית פעולה ללקוחה",
-        "warningSignsDiscussed": "סימני אזהרה שנדונו",
-        "referrals": "הפניות לגורמים מקצועיים נוספים",
-        "followUpPlan": "תוכנית מעקב",
-        "privateNotes": "הערות מקצועיות פרטיות (לא משותפות עם הלקוחה)"
-      },
-      "backToClient": "חזרה ללקוחה",
-      "saveAsDraft": "שמירה כטיוטה",
-      "completeVisit": "השלמת הביקור",
-      "couldNotStart": "לא ניתן היה להתחיל ביקור חדש.",
-      "couldNotLoad": "לא ניתן היה לטעון את הביקור הזה.",
-      "couldNotSave": "לא ניתן היה לשמור את הביקור.",
-      "couldNotComplete": "לא ניתן היה להשלים את הביקור."
-    },
-    "detail": {
-      "title": "ביקור מתאריך {{date}}",
-      "editVisit": "עריכת ביקור",
-      "generateSummary": "יצירת סיכום",
-      "start": "התחלה",
-      "end": "סיום",
-      "location": "מיקום",
-      "followUpDate": "תאריך מעקב",
-      "created": "נוצר",
-      "createdBy": "נוצר על ידי",
-      "lastUpdated": "עדכון אחרון",
-      "updatedBy": "עודכן על ידי",
-      "noClinicalDetail": "עדיין לא נרשם מידע קליני",
-      "noClinicalDetailDescription": "הוסיפי בעיות, המלצות או משימות מהאזורים שלמעלה.",
-      "privateNotesGroupTitle": "הערות מקצועיות פרטיות"
-    },
-    "summary": {
-      "backToVisit": "→ חזרה לביקור",
-      "title": "סיכום ביקור ללקוחה",
-      "subtitle": "בחרי בדיוק מה לשתף. הערות מקצועיות פרטיות והערכות פנימיות לעולם אינן נכללות.",
-      "whatToInclude": "מה לכלול",
-      "questionsDiscussed": "שאלות שנדונו",
-      "noneRecorded": "(לא נרשם)",
-      "recommendationsNarrative": "המלצות שנדונו (תיאור חופשי)",
-      "recommendationsLabel": "המלצות",
-      "actionItemsLabel": "משימות",
-      "warningSignsLabel": "סימני אזהרה למעקב",
-      "followUpPlanLabel": "תוכנית מעקב",
-      "preview": "תצוגה מקדימה",
-      "copyToClipboard": "העתקה ללוח",
-      "copied": "הועתק!",
-      "downloadPdf": "הורדת PDF",
-      "preparingPdf": "מכין PDF…",
-      "couldNotLoad": "לא ניתן היה לטעון את סיכום הביקור הזה.",
-      "couldNotGeneratePdf": "לא ניתן היה ליצור את קובץ ה-PDF.",
-      "text": {
-        "heading": "סיכום ביקור — {{clientName}}",
-        "babies": "תינוק/ות: {{names}}",
-        "visitDate": "תאריך הביקור: {{date}}",
-        "questionsDiscussed": "שאלות שנדונו:",
-        "recommendationsDiscussed": "המלצות שנדונו:",
-        "recommendations": "המלצות:",
-        "actionItems": "משימות:",
-        "actionItemDue": "עד {{date}}",
-        "warningSigns": "סימני אזהרה למעקב:",
-        "followUpPlan": "תוכנית מעקב:",
-        "nextFollowUp": "המעקב הבא: {{date}}",
-        "preparedBy": "הוכן על ידי:"
-      }
-    }
-  },
-  "problems": {
-    "title": "בעיות שזוהו",
-    "add": "+ הוספת בעיה",
-    "noneRecorded": "לא נרשמו בעיות עבור ביקור זה.",
-    "editModalTitle": "עריכת בעיה",
-    "addModalTitle": "הוספת בעיה",
-    "deleteConfirmTitle": "למחוק את הבעיה הזו?",
-    "deleteConfirmDescription": "פעולה זו תסיר גם את הקישור להמלצות או למשימות קשורות.",
-    "relatedBaby": "תינוק: {{name}}",
-    "form": {
-      "title": "כותרת הבעיה",
-      "description": "תיאור מפורט",
-      "severity": "חומרה",
-      "status": "סטטוס",
-      "relatedBaby": "תינוק קשור",
-      "notes": "הערות",
-      "errorTitleRequired": "יש להזין כותרת לבעיה.",
-      "couldNotSave": "לא ניתן היה לשמור את הבעיה.",
-      "addProblem": "הוספת בעיה"
-    }
-  },
-  "recommendations": {
-    "title": "המלצות",
-    "add": "+ הוספת המלצה",
-    "noneRecorded": "לא נרשמו המלצות עבור ביקור זה.",
-    "notSharedBadge": "לא משותפת עם הלקוחה",
-    "relatedProblem": "בעיה קשורה: {{title}}",
-    "editModalTitle": "עריכת המלצה",
-    "addModalTitle": "הוספת המלצה",
-    "deleteConfirmTitle": "למחוק את ההמלצה הזו?",
-    "form": {
-      "title": "כותרת ההמלצה",
-      "instructions": "הנחיות מפורטות",
-      "priority": "עדיפות",
-      "relatedProblem": "בעיה קשורה",
-      "relatedBaby": "תינוק קשור",
-      "includeInSummary": "ניתן לכלול בסיכום ללקוחה",
-      "errorTitleRequired": "יש להזין כותרת להמלצה.",
-      "couldNotSave": "לא ניתן היה לשמור את ההמלצה.",
-      "addRecommendation": "הוספת המלצה"
-    }
-  },
-  "actionItemsSection": {
-    "title": "משימות ללקוחה",
-    "add": "+ הוספת משימה",
-    "noneRecorded": "עדיין אין משימות עבור ביקור זה.",
-    "due": "יעד: {{date}}",
-    "editModalTitle": "עריכת משימה",
-    "addModalTitle": "הוספת משימה",
-    "deleteConfirmTitle": "למחוק את המשימה הזו?"
-  },
   "followUps": {
     "title": "מעקבים",
     "scopes": {
@@ -537,7 +373,7 @@
     "title": "דוחות",
     "stats": {
       "activeClients": "לקוחות פעילות",
-      "totalVisits": "סך הביקורים",
+      "totalFollowUps": "סך המעקבים",
       "needFollowUp": "דורשות מעקב",
       "openActionItems": "משימות פתוחות",
       "overdueActionItems": "משימות באיחור"
@@ -563,36 +399,10 @@
       "TUBE_FEEDING": "האכלה בזונדה",
       "OTHER": "אחר"
     },
-    "visitType": {
-      "INITIAL_CONSULTATION": "ייעוץ ראשוני",
-      "FOLLOW_UP_CONSULTATION": "ייעוץ מעקב",
-      "PHONE_CONSULTATION": "ייעוץ טלפוני",
-      "VIDEO_CONSULTATION": "ייעוץ בווידאו",
-      "HOME_VISIT": "ביקור בית",
-      "CLINIC_VISIT": "ביקור מרפאה",
-      "MESSAGE_CONSULTATION": "ייעוץ בהודעות",
-      "OTHER": "אחר"
-    },
-    "visitStatus": {
-      "DRAFT": "טיוטה",
-      "COMPLETED": "הושלם",
-      "CANCELLED": "בוטל"
-    },
-    "severity": {
-      "LOW": "נמוכה",
-      "MEDIUM": "בינונית",
-      "HIGH": "גבוהה"
-    },
     "priority": {
       "LOW": "נמוכה",
       "MEDIUM": "בינונית",
       "HIGH": "גבוהה"
-    },
-    "problemStatus": {
-      "NEW": "חדשה",
-      "IN_PROGRESS": "בטיפול",
-      "IMPROVED": "השתפרה",
-      "RESOLVED": "נפתרה"
     },
     "actionItemStatus": {
       "TODO": "לביצוע",

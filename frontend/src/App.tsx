@@ -9,9 +9,6 @@ import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
 import ClientList from "./pages/clients/ClientList";
 import ClientDetail from "./pages/clients/ClientDetail";
-import VisitDetail from "./pages/visits/VisitDetail";
-import VisitForm from "./pages/visits/VisitForm";
-import VisitSummary from "./pages/visits/VisitSummary";
 import FollowUps from "./pages/FollowUps";
 import Settings from "./pages/Settings";
 import AuditLog from "./pages/AuditLog";
@@ -42,10 +39,6 @@ export default function App() {
         <Route path="/" element={<Dashboard />} />
         <Route path="/clients" element={<ClientList />} />
         <Route path="/clients/:clientId" element={<ClientDetail />} />
-        <Route path="/clients/:clientId/visits/new" element={<VisitForm />} />
-        <Route path="/visits/:visitId" element={<VisitDetail />} />
-        <Route path="/visits/:visitId/edit" element={<VisitForm />} />
-        <Route path="/visits/:visitId/summary" element={<VisitSummary />} />
         <Route path="/follow-ups" element={<FollowUps />} />
         <Route path="/reports" element={<Reports />} />
         <Route path="/settings" element={<Settings />} />
