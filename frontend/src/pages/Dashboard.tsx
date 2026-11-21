@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { api } from "../api/client";
 import { Spinner, EmptyState } from "../components/ui";
-import { formatDate, formatDateTime } from "../lib/format";
+import { formatDateTime } from "../lib/format";
 import { useAuth } from "../context/AuthContext";
 
 export default function Dashboard() {
@@ -84,66 +84,10 @@ export default function Dashboard() {
                 </ul>
               )}
             </Section>
-
-            <Section title={t("dashboard.sections.recentFollowUps")}>
-              {data.recentCompletedFollowUps.length === 0 ? (
-                <EmptyState title={t("dashboard.sections.noFollowUpsYet")} />
-              ) : (
-                <ul className="divide-y divide-gray-100">
-                  {data.recentCompletedFollowUps.map((f: any) => (
-                    <li key={f.id}>
-                      <Link to={`/clients/${f.client.id}`} className="flex items-center justify-between py-2 text-sm hover:text-brand-700">
-                        <span className="font-medium text-gray-900">{f.client.fullName}</span>
-                        <span className="text-gray-500">{formatDate(f.scheduledAt)}</span>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </Section>
-          </div>
-
-          <div className="grid gap-6 lg:grid-cols-2">
-            <Section title={t("dashboard.sections.recentlyViewedClients")}>
-              {data.recentlyViewedClients.length === 0 ? (
-                <EmptyState title={t("dashboard.sections.noClientsViewedYet")} />
-              ) : (
-                <ClientMiniList clients={data.recentlyViewedClients} />
-              )}
-            </Section>
-            <Section title={t("dashboard.sections.recentlyAddedClients")}>
-              {data.recentlyAddedClients.length === 0 ? (
-                <EmptyState
-                  title={t("dashboard.sections.noClientsYet")}
-                  action={
-                    <Link className="btn-primary" to="/clients?new=1">
-                      {t("dashboard.sections.addFirstClient")}
-                    </Link>
-                  }
-                />
-              ) : (
-                <ClientMiniList clients={data.recentlyAddedClients} />
-              )}
-            </Section>
           </div>
         </>
       )}
     </div>
-  );
-}
-
-function ClientMiniList({ clients }: { clients: any[] }) {
-  return (
-    <ul className="divide-y divide-gray-100">
-      {clients.map((c) => (
-        <li key={c.id}>
-          <Link to={`/clients/${c.id}`} className="flex items-center justify-between py-2 text-sm hover:text-brand-700">
-            <span className="font-medium text-gray-900">{c.fullName}</span>
-            <span className="text-gray-500">{c.phone}</span>
-          </Link>
-        </li>
-      ))}
-    </ul>
   );
 }
 
