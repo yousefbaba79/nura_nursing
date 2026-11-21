@@ -80,14 +80,7 @@
       "noUpcomingFollowUps": "لا توجد متابعات قادمة",
       "overdueFollowUps": "متابعات متأخرة",
       "nothingOverdue": "لا شيء متأخر",
-      "nothingOverdueDescription": "عمل رائع في متابعة كل شيء في وقته.",
-      "recentFollowUps": "المتابعات الأخيرة",
-      "noFollowUpsYet": "لم تُسجَّل أي متابعات بعد",
-      "recentlyViewedClients": "العميلات اللاتي تمت زيارتهنّ مؤخرًا",
-      "noClientsViewedYet": "لم تتم زيارة أي عميلة بعد",
-      "recentlyAddedClients": "العميلات المُضافات مؤخرًا",
-      "noClientsYet": "لا توجد عميلات بعد",
-      "addFirstClient": "أضيفي أول عميلة لك"
+      "nothingOverdueDescription": "عمل رائع في متابعة كل شيء في وقته."
     }
   },
   "clients": {

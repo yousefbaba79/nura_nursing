@@ -80,14 +80,7 @@
       "noUpcomingFollowUps": "אין מעקבים קרובים",
       "overdueFollowUps": "מעקבים באיחור",
       "nothingOverdue": "אין באיחור",
-      "nothingOverdueDescription": "עבודה מצוינת בשמירה על לוח הזמנים למעקבים.",
-      "recentFollowUps": "מעקבים אחרונים",
-      "noFollowUpsYet": "עדיין לא נרשמו מעקבים",
-      "recentlyViewedClients": "לקוחות שנצפו לאחרונה",
-      "noClientsViewedYet": "עדיין לא נצפו לקוחות",
-      "recentlyAddedClients": "לקוחות שנוספו לאחרונה",
-      "noClientsYet": "עדיין אין לקוחות",
-      "addFirstClient": "הוספת הלקוחה הראשונה שלך"
+      "nothingOverdueDescription": "עבודה מצוינת בשמירה על לוח הזמנים למעקבים."
     }
   },
   "clients": {

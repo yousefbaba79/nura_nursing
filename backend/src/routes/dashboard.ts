@@ -12,28 +12,8 @@ app.get("/", async (c) => {
   const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const endOfToday = new Date(startOfToday.getTime() + 24 * 60 * 60 * 1000);
 
-  const [
-    activeClientCount,
-    recentlyViewedClients,
-    recentlyAddedClients,
-    upcomingFollowUps,
-    overdueFollowUps,
-    todayFollowUps,
-    recentCompletedFollowUps,
-  ] = await Promise.all([
+  const [activeClientCount, upcomingFollowUps, overdueFollowUps, todayFollowUps] = await Promise.all([
     prisma.client.count({ where: { consultantId, status: { not: "ARCHIVED" } } }),
-    prisma.client.findMany({
-      where: { consultantId, lastViewedAt: { not: null } },
-      orderBy: { lastViewedAt: "desc" },
-      take: 5,
-      select: { id: true, fullName: true, phone: true, status: true, lastViewedAt: true },
-    }),
-    prisma.client.findMany({
-      where: { consultantId },
-      orderBy: { createdAt: "desc" },
-      take: 5,
-      select: { id: true, fullName: true, phone: true, status: true, createdAt: true },
-    }),
     prisma.followUp.findMany({
       where: { client: { consultantId }, status: "SCHEDULED", scheduledAt: { gte: endOfToday } },
       orderBy: { scheduledAt: "asc" },
@@ -51,12 +31,6 @@ app.get("/", async (c) => {
       orderBy: { scheduledAt: "asc" },
       include: { client: { select: { id: true, fullName: true } } },
     }),
-    prisma.followUp.findMany({
-      where: { client: { consultantId }, status: "COMPLETED" },
-      orderBy: { scheduledAt: "desc" },
-      take: 5,
-      include: { client: { select: { id: true, fullName: true } } },
-    }),
   ]);
 
   return c.json({
@@ -64,12 +38,9 @@ app.get("/", async (c) => {
       activeClientCount,
       overdueFollowUpCount: overdueFollowUps.length,
     },
-    recentlyViewedClients,
-    recentlyAddedClients,
     todayFollowUps,
     upcomingFollowUps,
     overdueFollowUps,
-    recentCompletedFollowUps,
   });
 });
 

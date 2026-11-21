@@ -80,14 +80,7 @@
       "noUpcomingFollowUps": "No upcoming follow-ups",
       "overdueFollowUps": "Overdue follow-ups",
       "nothingOverdue": "Nothing overdue",
-      "nothingOverdueDescription": "Great work staying on top of follow-ups.",
-      "recentFollowUps": "Recent follow-ups",
-      "noFollowUpsYet": "No follow-ups recorded yet",
-      "recentlyViewedClients": "Recently viewed clients",
-      "noClientsViewedYet": "No clients viewed yet",
-      "recentlyAddedClients": "Recently added clients",
-      "noClientsYet": "No clients yet",
-      "addFirstClient": "Add your first client"
+      "nothingOverdueDescription": "Great work staying on top of follow-ups."
     }
   },
   "clients": {
