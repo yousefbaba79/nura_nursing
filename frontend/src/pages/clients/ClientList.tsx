@@ -111,9 +111,6 @@ export default function ClientList() {
                     </p>
                   </div>
                   <div className="flex items-center gap-3 text-sm">
-                    {c.openActionItemCount ? (
-                      <Badge className="bg-amber-100 text-amber-800">{t("clients.openTaskCount", { count: c.openActionItemCount })}</Badge>
-                    ) : null}
                     <span className="text-gray-500">{t("clients.lastVisit", { date: formatDate(c.lastVisitDate) })}</span>
                     <Badge className={CLIENT_STATUS_COLORS[c.status]}>{t(`enums.clientStatus.${c.status}`)}</Badge>
                   </div>

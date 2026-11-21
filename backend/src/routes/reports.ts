@@ -14,12 +14,10 @@ app.get("/", async (c) => {
   if (from) dateFilter.gte = new Date(from);
   if (to) dateFilter.lte = new Date(to);
 
-  const [activeClientCount, followUpsInRange, clientsNeedingFollowUp, openActionItems, overdueActionItems, recentFollowUps] = await Promise.all([
+  const [activeClientCount, followUpsInRange, clientsNeedingFollowUp, recentFollowUps] = await Promise.all([
     prisma.client.count({ where: { consultantId, status: { not: "ARCHIVED" } } }),
     prisma.followUp.count({ where: { client: { consultantId }, ...(from || to ? { scheduledAt: dateFilter } : {}) } }),
     prisma.client.count({ where: { consultantId, status: "FOLLOW_UP_REQUIRED" } }),
-    prisma.actionItem.count({ where: { client: { consultantId }, status: { in: ["TODO", "IN_PROGRESS"] } } }),
-    prisma.actionItem.count({ where: { client: { consultantId }, status: { in: ["TODO", "IN_PROGRESS"] }, dueDate: { lt: new Date() } } }),
     prisma.followUp.findMany({
       where: { client: { consultantId } },
       orderBy: { scheduledAt: "desc" },
@@ -32,8 +30,6 @@ app.get("/", async (c) => {
     activeClientCount,
     followUpsInRange,
     clientsNeedingFollowUp,
-    openActionItems,
-    overdueActionItems,
     recentFollowUps,
   });
 });

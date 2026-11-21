@@ -11,12 +11,6 @@ export const FEEDING_METHODS = [
 ] as const;
 export type FeedingMethod = (typeof FEEDING_METHODS)[number];
 
-export const PRIORITIES = ["LOW", "MEDIUM", "HIGH"] as const;
-export type Priority = (typeof PRIORITIES)[number];
-
-export const ACTION_ITEM_STATUSES = ["TODO", "IN_PROGRESS", "COMPLETED", "CANCELLED"] as const;
-export type ActionItemStatus = (typeof ACTION_ITEM_STATUSES)[number];
-
 export const FOLLOW_UP_TYPES = ["CLINIC_VISIT", "VIDEO_MEETING"] as const;
 export type FollowUpType = (typeof FOLLOW_UP_TYPES)[number];
 
@@ -28,19 +22,6 @@ export const CLIENT_STATUS_COLORS: Record<string, string> = {
   FOLLOW_UP_REQUIRED: "bg-amber-100 text-amber-800",
   TREATMENT_COMPLETED: "bg-blue-100 text-blue-800",
   ARCHIVED: "bg-gray-100 text-gray-600",
-};
-
-export const PRIORITY_COLORS: Record<string, string> = {
-  LOW: "bg-gray-100 text-gray-700",
-  MEDIUM: "bg-amber-100 text-amber-800",
-  HIGH: "bg-red-100 text-red-800",
-};
-
-export const ACTION_ITEM_STATUS_COLORS: Record<string, string> = {
-  TODO: "bg-gray-100 text-gray-700",
-  IN_PROGRESS: "bg-blue-100 text-blue-800",
-  COMPLETED: "bg-green-100 text-green-800",
-  CANCELLED: "bg-gray-100 text-gray-400 line-through",
 };
 
 export const FOLLOW_UP_STATUS_COLORS: Record<string, string> = {

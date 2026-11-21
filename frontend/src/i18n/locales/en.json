@@ -73,8 +73,7 @@
     "addClient": "+ Add client",
     "stats": {
       "activeClients": "Active clients",
-      "overdueFollowUps": "Overdue follow-ups",
-      "overdueActionItems": "Overdue action items"
+      "overdueFollowUps": "Overdue follow-ups"
     },
     "sections": {
       "todayUpcomingFollowUps": "Today & upcoming follow-ups",
@@ -82,8 +81,6 @@
       "overdueFollowUps": "Overdue follow-ups",
       "nothingOverdue": "Nothing overdue",
       "nothingOverdueDescription": "Great work staying on top of follow-ups.",
-      "incompleteActionItems": "Incomplete action items",
-      "noOpenActionItems": "No open action items",
       "recentFollowUps": "Recent follow-ups",
       "noFollowUpsYet": "No follow-ups recorded yet",
       "recentlyViewedClients": "Recently viewed clients",
@@ -112,8 +109,6 @@
     },
     "noClientsFound": "No clients found",
     "noClientsFoundDescription": "Try adjusting your search or filters, or add a new client.",
-    "openTaskCount_one": "{{count}} open task",
-    "openTaskCount_other": "{{count}} open tasks",
     "lastVisit": "Last visit: {{date}}",
     "detail": {
       "edit": "Edit",
@@ -132,10 +127,6 @@
       "consentDate": "Consent date",
       "consentMethod": "Method",
       "consentFormVersion": "Form version",
-      "openActionItems": "Open action items",
-      "addAction": "+ Add",
-      "noOpenActionItems": "No open action items",
-      "markComplete": "Mark {{title}} complete",
       "followUps": "Follow-ups",
       "schedule": "+ Schedule",
       "noFollowUpsScheduled": "No follow-ups scheduled",
@@ -145,8 +136,6 @@
       "editModalTitle": "Edit client",
       "addBabyModalTitle": "Add baby",
       "editBabyModalTitle": "Edit baby",
-      "editActionItemModalTitle": "Edit action item",
-      "addActionItemModalTitle": "Add action item",
       "editFollowUpModalTitle": "Edit follow-up",
       "scheduleFollowUpModalTitle": "Schedule follow-up",
       "archiveConfirmTitleArchive": "Archive this client?",
@@ -233,18 +222,6 @@
       "couldNotSave": "Could not save baby record.",
       "addBaby": "Add baby"
     }
-  },
-  "actionItemForm": {
-    "taskTitle": "Task title",
-    "instructions": "Instructions",
-    "dueDate": "Due date",
-    "priority": "Priority",
-    "status": "Status",
-    "relatedBaby": "Related baby",
-    "notes": "Notes",
-    "errorTitleRequired": "Task title is required.",
-    "couldNotSave": "Could not save action item.",
-    "addTask": "Add task"
   },
   "followUpForm": {
     "dateTime": "Date & time",
@@ -395,9 +372,7 @@
     "stats": {
       "activeClients": "Active clients",
       "totalFollowUps": "Total follow-ups",
-      "needFollowUp": "Need follow-up",
-      "openActionItems": "Open action items",
-      "overdueActionItems": "Overdue action items"
+      "needFollowUp": "Need follow-up"
     },
     "recentConsultations": "Recent consultations"
   },
@@ -419,17 +394,6 @@
       "MIXED_FEEDING": "Mixed Feeding",
       "TUBE_FEEDING": "Tube Feeding",
       "OTHER": "Other"
-    },
-    "priority": {
-      "LOW": "Low",
-      "MEDIUM": "Medium",
-      "HIGH": "High"
-    },
-    "actionItemStatus": {
-      "TODO": "To Do",
-      "IN_PROGRESS": "In Progress",
-      "COMPLETED": "Completed",
-      "CANCELLED": "Cancelled"
     },
     "followUpType": {
       "CALL": "Call",

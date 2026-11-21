@@ -19,8 +19,6 @@ app.get("/", async (c) => {
     upcomingFollowUps,
     overdueFollowUps,
     todayFollowUps,
-    incompleteActionItems,
-    overdueActionItems,
     recentCompletedFollowUps,
   ] = await Promise.all([
     prisma.client.count({ where: { consultantId, status: { not: "ARCHIVED" } } }),
@@ -53,15 +51,6 @@ app.get("/", async (c) => {
       orderBy: { scheduledAt: "asc" },
       include: { client: { select: { id: true, fullName: true } } },
     }),
-    prisma.actionItem.findMany({
-      where: { client: { consultantId }, status: { in: ["TODO", "IN_PROGRESS"] } },
-      orderBy: { dueDate: "asc" },
-      take: 10,
-      include: { client: { select: { id: true, fullName: true } } },
-    }),
-    prisma.actionItem.count({
-      where: { client: { consultantId }, status: { in: ["TODO", "IN_PROGRESS"] }, dueDate: { lt: now } },
-    }),
     prisma.followUp.findMany({
       where: { client: { consultantId }, status: "COMPLETED" },
       orderBy: { scheduledAt: "desc" },
@@ -74,14 +63,12 @@ app.get("/", async (c) => {
     stats: {
       activeClientCount,
       overdueFollowUpCount: overdueFollowUps.length,
-      overdueActionItemCount: overdueActionItems,
     },
     recentlyViewedClients,
     recentlyAddedClients,
     todayFollowUps,
     upcomingFollowUps,
     overdueFollowUps,
-    incompleteActionItems,
     recentCompletedFollowUps,
   });
 });
