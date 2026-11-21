@@ -253,6 +253,7 @@
     "relatedBaby": "Related baby",
     "reason": "Reason",
     "notes": "Notes",
+    "insertTemplate": "Insert template…",
     "errorDateRequired": "Follow-up date and time are required.",
     "couldNotSave": "Could not save follow-up.",
     "couldNotDelete": "Could not delete follow-up.",
@@ -284,6 +285,23 @@
     "periodTo": "To",
     "periodFilterAriaLabel": "Filter completed follow-ups by period"
   },
+  "noteTemplates": {
+    "backToSettings": "← Back to settings",
+    "title": "Note templates",
+    "subtitle": "Reusable snippets you can insert into a follow-up's notes.",
+    "add": "+ Add template",
+    "noneYet": "No templates yet",
+    "noneYetDescription": "Add your first template to start reusing it in follow-up notes.",
+    "editModalTitle": "Edit template",
+    "addModalTitle": "Add template",
+    "labelField": "Label",
+    "textField": "Text",
+    "addTemplate": "Add template",
+    "errorFieldsRequired": "Label and text are both required.",
+    "couldNotSave": "Could not save template.",
+    "couldNotDelete": "Could not delete template.",
+    "deleteConfirmTitle": "Delete this template?"
+  },
   "settings": {
     "title": "Settings",
     "profileClinic": "Profile & clinic",
@@ -310,6 +328,7 @@
     "exportClientsCsv": "Export clients (CSV)",
     "viewReports": "View reports",
     "viewAuditLog": "View audit log",
+    "manageNoteTemplates": "Manage note templates",
     "dangerZone": "Danger zone",
     "deactivateWarning": "Deactivating your account will sign you out and disable sign-in. Client records are preserved.",
     "deactivateAccount": "Deactivate account",
@@ -355,7 +374,10 @@
       "BABY_CREATED": "Baby record created",
       "BABY_UPDATED": "Baby record updated",
       "BABY_ARCHIVED": "Baby record archived",
-      "BABY_RESTORED": "Baby record restored"
+      "BABY_RESTORED": "Baby record restored",
+      "NOTE_TEMPLATE_CREATED": "Note template created",
+      "NOTE_TEMPLATE_UPDATED": "Note template updated",
+      "NOTE_TEMPLATE_DELETED": "Note template deleted"
     },
     "entities": {
       "Consultant": "Consultant",
@@ -363,7 +385,8 @@
       "Baby": "Baby",
       "Visit": "Visit",
       "ActionItem": "Action item",
-      "FollowUp": "Follow-up"
+      "FollowUp": "Follow-up",
+      "NoteTemplate": "Note template"
     }
   },
   "reports": {

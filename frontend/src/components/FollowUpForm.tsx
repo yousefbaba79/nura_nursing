@@ -1,9 +1,10 @@
 import { type FormEvent, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { api, apiErrorMessage } from "../api/client";
 import { FOLLOW_UP_TYPES, FOLLOW_UP_STATUSES } from "../api/enums";
 import { ConfirmDialog, ErrorBanner } from "./ui";
-import type { FollowUp, Baby } from "../api/types";
+import type { FollowUp, Baby, NoteTemplate } from "../api/types";
 
 interface Props {
   clientId: string;
@@ -33,6 +34,17 @@ export default function FollowUpForm({ clientId, babies, followUp, onSaved, onCa
   const [saving, setSaving] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
+
+  const { data: noteTemplates } = useQuery({
+    queryKey: ["note-templates"],
+    queryFn: async () => (await api.get("/note-templates")).data.noteTemplates as NoteTemplate[],
+  });
+
+  function handleInsertTemplate(templateId: string) {
+    const template = noteTemplates?.find((nt) => nt.id === templateId);
+    if (!template) return;
+    setNotes((cur) => (cur.trim() ? `${cur}\n${template.text}` : template.text));
+  }
 
   async function handleDelete() {
     if (!followUp) return;
@@ -123,7 +135,26 @@ export default function FollowUpForm({ clientId, babies, followUp, onSaved, onCa
         <input id="fu-reason" className="input" value={reason} onChange={(e) => setReason(e.target.value)} />
       </div>
       <div>
-        <label className="label" htmlFor="fu-notes">{t("followUpForm.notes")}</label>
+        <div className="flex items-center justify-between gap-2">
+          <label className="label" htmlFor="fu-notes">{t("followUpForm.notes")}</label>
+          {noteTemplates && noteTemplates.length > 0 && (
+            <select
+              className="input !w-auto text-sm"
+              value=""
+              onChange={(e) => {
+                if (e.target.value) handleInsertTemplate(e.target.value);
+                e.target.value = "";
+              }}
+            >
+              <option value="">{t("followUpForm.insertTemplate")}</option>
+              {noteTemplates.map((nt) => (
+                <option key={nt.id} value={nt.id}>
+                  {nt.label}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
         <textarea id="fu-notes" className="input" rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} />
       </div>
       <div className="flex items-center justify-between gap-2 border-t border-gray-200 pt-3">

@@ -213,6 +213,9 @@ export default function Settings() {
           <Link className="btn-secondary" to="/settings/audit-log">
             {t("settings.viewAuditLog")}
           </Link>
+          <Link className="btn-secondary" to="/settings/note-templates">
+            {t("settings.manageNoteTemplates")}
+          </Link>
         </div>
       </div>
 

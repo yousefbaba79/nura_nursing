@@ -257,6 +257,7 @@
     "relatedBaby": "الرضيع المرتبط",
     "reason": "السبب",
     "notes": "ملاحظات",
+    "insertTemplate": "إدراج قالب…",
     "errorDateRequired": "يجب إدخال تاريخ ووقت للمتابعة.",
     "couldNotSave": "تعذّر حفظ المتابعة.",
     "couldNotDelete": "تعذّر حذف المتابعة.",
@@ -288,6 +289,23 @@
     "periodTo": "إلى تاريخ",
     "periodFilterAriaLabel": "تصفية المتابعات المكتملة حسب الفترة"
   },
+  "noteTemplates": {
+    "backToSettings": "→ العودة إلى الإعدادات",
+    "title": "قوالب الملاحظات",
+    "subtitle": "مقاطع نصية قابلة لإعادة الاستخدام يمكن إدراجها في ملاحظات المتابعة.",
+    "add": "+ إضافة قالب",
+    "noneYet": "لا توجد قوالب بعد",
+    "noneYetDescription": "أضيفي أول قالب لكِ لتبدئي باستخدامه في ملاحظات المتابعة.",
+    "editModalTitle": "تعديل القالب",
+    "addModalTitle": "إضافة قالب",
+    "labelField": "التسمية",
+    "textField": "النص",
+    "addTemplate": "إضافة قالب",
+    "errorFieldsRequired": "التسمية والنص مطلوبان.",
+    "couldNotSave": "تعذّر حفظ القالب.",
+    "couldNotDelete": "تعذّر حذف القالب.",
+    "deleteConfirmTitle": "هل تريدين حذف هذا القالب؟"
+  },
   "settings": {
     "title": "الإعدادات",
     "profileClinic": "الملف الشخصي والعيادة",
@@ -314,6 +332,7 @@
     "exportClientsCsv": "تصدير العميلات (CSV)",
     "viewReports": "عرض التقارير",
     "viewAuditLog": "عرض سجل التدقيق",
+    "manageNoteTemplates": "إدارة قوالب الملاحظات",
     "dangerZone": "منطقة الخطر",
     "deactivateWarning": "سيؤدي إيقاف تفعيل حسابك إلى تسجيل خروجك وتعطيل تسجيل الدخول. سيتم الاحتفاظ بسجلات العميلات.",
     "deactivateAccount": "إيقاف تفعيل الحساب",
@@ -359,7 +378,10 @@
       "BABY_CREATED": "تم إنشاء سجل رضيع",
       "BABY_UPDATED": "تم تحديث سجل رضيع",
       "BABY_ARCHIVED": "تم أرشفة سجل رضيع",
-      "BABY_RESTORED": "تم استعادة سجل رضيع"
+      "BABY_RESTORED": "تم استعادة سجل رضيع",
+      "NOTE_TEMPLATE_CREATED": "تم إنشاء قالب ملاحظة",
+      "NOTE_TEMPLATE_UPDATED": "تم تحديث قالب ملاحظة",
+      "NOTE_TEMPLATE_DELETED": "تم حذف قالب ملاحظة"
     },
     "entities": {
       "Consultant": "استشارية",
@@ -367,7 +389,8 @@
       "Baby": "رضيع",
       "Visit": "زيارة",
       "ActionItem": "مهمة",
-      "FollowUp": "متابعة"
+      "FollowUp": "متابعة",
+      "NoteTemplate": "قالب ملاحظة"
     }
   },
   "reports": {
