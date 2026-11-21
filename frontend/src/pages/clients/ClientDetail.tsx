@@ -132,9 +132,9 @@ export default function ClientDetail() {
           <Section
             title={t("clients.detail.visitHistory")}
             action={
-              <button className="text-sm font-medium text-brand-700 hover:underline" onClick={() => setFollowUpModal({ open: true })}>
-                {t("clients.detail.schedule")}
-              </button>
+              <Link to={`/clients/${client.id}/visits/new`} className="text-sm font-medium text-brand-700 hover:underline">
+                {t("clients.detail.newVisitLink")}
+              </Link>
             }
           >
             {!client.visits || client.visits.length === 0 ? (
