@@ -74,8 +74,7 @@
     "stats": {
       "activeClients": "Active clients",
       "overdueFollowUps": "Overdue follow-ups",
-      "overdueActionItems": "Overdue action items",
-      "draftVisits": "Draft visits"
+      "overdueActionItems": "Overdue action items"
     },
     "sections": {
       "todayUpcomingFollowUps": "Today & upcoming follow-ups",
@@ -85,8 +84,8 @@
       "nothingOverdueDescription": "Great work staying on top of follow-ups.",
       "incompleteActionItems": "Incomplete action items",
       "noOpenActionItems": "No open action items",
-      "recentVisits": "Recent visits",
-      "noVisitsYet": "No visits recorded yet",
+      "recentFollowUps": "Recent follow-ups",
+      "noFollowUpsYet": "No follow-ups recorded yet",
       "recentlyViewedClients": "Recently viewed clients",
       "noClientsViewedYet": "No clients viewed yet",
       "recentlyAddedClients": "Recently added clients",
@@ -118,7 +117,6 @@
     "lastVisit": "Last visit: {{date}}",
     "detail": {
       "edit": "Edit",
-      "newVisit": "+ New visit",
       "archive": "Archive",
       "restore": "Restore",
       "babies": "Babies",
@@ -128,15 +126,6 @@
       "dobPrefix": "DOB {{date}}",
       "currentWeight": "Current weight: {{weight}}g",
       "archived": "Archived",
-      "visitHistory": "Visit history",
-      "newVisitLink": "+ New visit",
-      "noVisitsYet": "No visits recorded yet",
-      "noVisitsYetDescription": "Document the first consultation to start this client's history.",
-      "problemsLabel": "Problems: {{list}}",
-      "recommendationsLabel": "Recommendations: {{list}}",
-      "openBadge_one": "{{count}} open",
-      "openBadge_other": "{{count}} open",
-      "followUpLabel": "Follow-up: {{date}}",
       "generalNotes": "General notes",
       "consent": "Consent",
       "consentReceived": "Consent received",
@@ -271,157 +260,6 @@
     "deleteConfirmTitle": "Delete this follow-up?",
     "deleteConfirmDescription": "This cannot be undone."
   },
-  "visits": {
-    "form": {
-      "newDraftTitle": "New / draft visit",
-      "editTitle": "Edit visit",
-      "client": "Client: {{name}}",
-      "draftSaving": "Saving…",
-      "draftSavedAt": "Draft saved {{time}}",
-      "notEditableNotice": "This visit is {{status}}. Changes below are saved when you click \"Save changes\".",
-      "generalInformation": "General information",
-      "visitDate": "Visit date",
-      "startTime": "Start time",
-      "endTime": "End time",
-      "visitType": "Visit type",
-      "location": "Location / method",
-      "followUpDate": "Follow-up date",
-      "babiesInvolved": "Babies involved in this visit",
-      "groupReasonGoals": "Reason & goals",
-      "groupAssessment": "Assessment",
-      "groupPlan": "Plan",
-      "groupPrivate": "Private",
-      "field": {
-        "reasonForConsultation": "Reason for consultation",
-        "clientGoals": "Client's goals",
-        "clientQuestions": "Client's questions",
-        "currentFeedingRoutine": "Current feeding routine",
-        "problemsReported": "Problems reported by the client",
-        "consultantObservations": "Consultant's observations",
-        "feedingAssessment": "Feeding assessment",
-        "breastAssessment": "Breast assessment",
-        "babyAssessment": "Baby assessment",
-        "latchAssessment": "Latch assessment",
-        "milkTransferAssessment": "Milk transfer assessment",
-        "weightInformation": "Weight information",
-        "relevantMedicalInfo": "Relevant medical information",
-        "solutionsDiscussed": "Solutions discussed",
-        "clientActionPlan": "Client action plan",
-        "warningSignsDiscussed": "Warning signs discussed",
-        "referrals": "Referrals to other professionals",
-        "followUpPlan": "Follow-up plan",
-        "privateNotes": "Private professional notes (never shared with client)"
-      },
-      "backToClient": "Back to client",
-      "saveAsDraft": "Save as draft",
-      "completeVisit": "Complete visit",
-      "couldNotStart": "Could not start a new visit.",
-      "couldNotLoad": "Could not load this visit.",
-      "couldNotSave": "Could not save visit.",
-      "couldNotComplete": "Could not complete visit."
-    },
-    "detail": {
-      "title": "{{date}} visit",
-      "editVisit": "Edit visit",
-      "generateSummary": "Generate summary",
-      "start": "Start",
-      "end": "End",
-      "location": "Location",
-      "followUpDate": "Follow-up date",
-      "created": "Created",
-      "createdBy": "Created by",
-      "lastUpdated": "Last updated",
-      "updatedBy": "Updated by",
-      "noClinicalDetail": "No clinical detail recorded yet",
-      "noClinicalDetailDescription": "Add problems, recommendations, or action items from the sections above.",
-      "privateNotesGroupTitle": "Private professional notes"
-    },
-    "summary": {
-      "backToVisit": "← Back to visit",
-      "title": "Client visit summary",
-      "subtitle": "Choose exactly what to share. Private professional notes and internal assessments are never included.",
-      "whatToInclude": "What to include",
-      "questionsDiscussed": "Questions discussed",
-      "noneRecorded": "(none recorded)",
-      "recommendationsNarrative": "Recommendations discussed (narrative)",
-      "recommendationsLabel": "Recommendations",
-      "actionItemsLabel": "Action items",
-      "warningSignsLabel": "Warning signs to watch for",
-      "followUpPlanLabel": "Follow-up plan",
-      "preview": "Preview",
-      "copyToClipboard": "Copy to clipboard",
-      "copied": "Copied!",
-      "downloadPdf": "Download PDF",
-      "preparingPdf": "Preparing PDF…",
-      "couldNotLoad": "Could not load this visit's summary.",
-      "couldNotGeneratePdf": "Could not generate the PDF summary.",
-      "text": {
-        "heading": "Visit Summary — {{clientName}}",
-        "babies": "Baby/Babies: {{names}}",
-        "visitDate": "Visit date: {{date}}",
-        "questionsDiscussed": "Questions Discussed:",
-        "recommendationsDiscussed": "Recommendations Discussed:",
-        "recommendations": "Recommendations:",
-        "actionItems": "Action Items:",
-        "actionItemDue": "due {{date}}",
-        "warningSigns": "Warning Signs to Watch For:",
-        "followUpPlan": "Follow-Up Plan:",
-        "nextFollowUp": "Next follow-up: {{date}}",
-        "preparedBy": "Prepared by:"
-      }
-    }
-  },
-  "problems": {
-    "title": "Identified problems",
-    "add": "+ Add problem",
-    "noneRecorded": "No problems recorded for this visit.",
-    "editModalTitle": "Edit problem",
-    "addModalTitle": "Add problem",
-    "deleteConfirmTitle": "Delete this problem?",
-    "deleteConfirmDescription": "This will also remove its link to any related recommendations or action items.",
-    "relatedBaby": "Baby: {{name}}",
-    "form": {
-      "title": "Problem title",
-      "description": "Detailed description",
-      "severity": "Severity",
-      "status": "Status",
-      "relatedBaby": "Related baby",
-      "notes": "Notes",
-      "errorTitleRequired": "Problem title is required.",
-      "couldNotSave": "Could not save problem.",
-      "addProblem": "Add problem"
-    }
-  },
-  "recommendations": {
-    "title": "Recommendations",
-    "add": "+ Add recommendation",
-    "noneRecorded": "No recommendations recorded for this visit.",
-    "notSharedBadge": "Not shared with client",
-    "relatedProblem": "Related problem: {{title}}",
-    "editModalTitle": "Edit recommendation",
-    "addModalTitle": "Add recommendation",
-    "deleteConfirmTitle": "Delete this recommendation?",
-    "form": {
-      "title": "Recommendation title",
-      "instructions": "Detailed instructions",
-      "priority": "Priority",
-      "relatedProblem": "Related problem",
-      "relatedBaby": "Related baby",
-      "includeInSummary": "Can be included in the client summary",
-      "errorTitleRequired": "Recommendation title is required.",
-      "couldNotSave": "Could not save recommendation.",
-      "addRecommendation": "Add recommendation"
-    }
-  },
-  "actionItemsSection": {
-    "title": "Client action items",
-    "add": "+ Add task",
-    "noneRecorded": "No action items for this visit yet.",
-    "due": "Due {{date}}",
-    "editModalTitle": "Edit action item",
-    "addModalTitle": "Add action item",
-    "deleteConfirmTitle": "Delete this action item?"
-  },
   "followUps": {
     "title": "Follow-ups",
     "scopes": {
@@ -533,7 +371,7 @@
     "title": "Reports",
     "stats": {
       "activeClients": "Active clients",
-      "totalVisits": "Total visits",
+      "totalFollowUps": "Total follow-ups",
       "needFollowUp": "Need follow-up",
       "openActionItems": "Open action items",
       "overdueActionItems": "Overdue action items"
@@ -559,36 +397,10 @@
       "TUBE_FEEDING": "Tube Feeding",
       "OTHER": "Other"
     },
-    "visitType": {
-      "INITIAL_CONSULTATION": "Initial Consultation",
-      "FOLLOW_UP_CONSULTATION": "Follow Up Consultation",
-      "PHONE_CONSULTATION": "Phone Consultation",
-      "VIDEO_CONSULTATION": "Video Consultation",
-      "HOME_VISIT": "Home Visit",
-      "CLINIC_VISIT": "Clinic Visit",
-      "MESSAGE_CONSULTATION": "Message Consultation",
-      "OTHER": "Other"
-    },
-    "visitStatus": {
-      "DRAFT": "Draft",
-      "COMPLETED": "Completed",
-      "CANCELLED": "Cancelled"
-    },
-    "severity": {
-      "LOW": "Low",
-      "MEDIUM": "Medium",
-      "HIGH": "High"
-    },
     "priority": {
       "LOW": "Low",
       "MEDIUM": "Medium",
       "HIGH": "High"
-    },
-    "problemStatus": {
-      "NEW": "New",
-      "IN_PROGRESS": "In Progress",
-      "IMPROVED": "Improved",
-      "RESOLVED": "Resolved"
     },
     "actionItemStatus": {
       "TODO": "To Do",

@@ -29,7 +29,7 @@ export default function Reports() {
         <>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <Stat label={t("reports.stats.activeClients")} value={data.activeClientCount} />
-            <Stat label={t("reports.stats.totalVisits")} value={data.visitsInRange} />
+            <Stat label={t("reports.stats.totalFollowUps")} value={data.followUpsInRange} />
             <Stat label={t("reports.stats.needFollowUp")} value={data.clientsNeedingFollowUp} />
             <Stat label={t("reports.stats.openActionItems")} value={data.openActionItems} />
             <Stat label={t("reports.stats.overdueActionItems")} value={data.overdueActionItems} />
@@ -38,10 +38,10 @@ export default function Reports() {
           <div className="card">
             <h2 className="mb-2 text-sm font-semibold text-gray-900">{t("reports.recentConsultations")}</h2>
             <ul className="divide-y divide-gray-100">
-              {data.recentVisits.map((v: any) => (
-                <li key={v.id} className="flex items-center justify-between py-2 text-sm">
-                  <span className="font-medium text-gray-900">{v.client.fullName}</span>
-                  <span className="text-gray-500">{formatDate(v.visitDate)}</span>
+              {data.recentFollowUps.map((f: any) => (
+                <li key={f.id} className="flex items-center justify-between py-2 text-sm">
+                  <span className="font-medium text-gray-900">{f.client.fullName}</span>
+                  <span className="text-gray-500">{formatDate(f.scheduledAt)}</span>
                 </li>
               ))}
             </ul>

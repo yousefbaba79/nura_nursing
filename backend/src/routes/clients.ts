@@ -87,26 +87,23 @@ app.get("/", async (c) => {
     orderBy,
     include: {
       babies: { where: { archivedAt: null }, select: { id: true, fullName: true } },
-      visits: { orderBy: { visitDate: "desc" }, take: 1, select: { visitDate: true } },
-      followUps: {
-        where: { status: "SCHEDULED" },
-        orderBy: { scheduledAt: "asc" },
-        take: 1,
-        select: { scheduledAt: true },
-      },
+      followUps: { orderBy: { scheduledAt: "asc" }, select: { scheduledAt: true, status: true } },
       _count: { select: { actionItems: { where: { status: { in: ["TODO", "IN_PROGRESS"] } } } } },
     },
   });
 
-  let result = clients.map((cl) => ({
-    ...cl,
-    lastVisitDate: cl.visits[0]?.visitDate ?? null,
-    nextFollowUpDate: cl.followUps[0]?.scheduledAt ?? null,
-    openActionItemCount: cl._count.actionItems,
-    visits: undefined,
-    followUps: undefined,
-    _count: undefined,
-  }));
+  let result = clients.map((cl) => {
+    const scheduled = cl.followUps.filter((f) => f.status === "SCHEDULED");
+    const completed = cl.followUps.filter((f) => f.status === "COMPLETED");
+    return {
+      ...cl,
+      lastVisitDate: completed.length ? completed[completed.length - 1].scheduledAt : null,
+      nextFollowUpDate: scheduled.length ? scheduled[0].scheduledAt : null,
+      openActionItemCount: cl._count.actionItems,
+      followUps: undefined,
+      _count: undefined,
+    };
+  });
 
   if (sort === "last_visit") {
     result = result.sort((a, b) => {
@@ -157,15 +154,6 @@ app.get("/:id", async (c) => {
     where: { id, consultantId },
     include: {
       babies: { orderBy: { createdAt: "asc" } },
-      visits: {
-        orderBy: { visitDate: "desc" },
-        include: {
-          problems: true,
-          recommendations: true,
-          actionItems: true,
-          babies: { include: { baby: { select: { id: true, fullName: true } } } },
-        },
-      },
       actionItems: { orderBy: { dueDate: "asc" } },
       followUps: { orderBy: { scheduledAt: "asc" } },
     },
@@ -336,16 +324,11 @@ app.delete("/:id", async (c) => {
   await recordAudit(prisma, { consultantId, action: "CLIENT_DELETED", entityType: "Client", entityId: existing.id, details: `fullName=${existing.fullName}` });
 
   const babyIds = (await prisma.baby.findMany({ where: { clientId: existing.id }, select: { id: true } })).map((b) => b.id);
-  const visitIds = (await prisma.visit.findMany({ where: { clientId: existing.id }, select: { id: true } })).map((v) => v.id);
 
   await prisma.$transaction([
     prisma.weightLog.deleteMany({ where: { babyId: { in: babyIds } } }),
     prisma.actionItem.deleteMany({ where: { clientId: existing.id } }),
-    prisma.recommendation.deleteMany({ where: { visitId: { in: visitIds } } }),
-    prisma.problem.deleteMany({ where: { visitId: { in: visitIds } } }),
     prisma.followUp.deleteMany({ where: { clientId: existing.id } }),
-    prisma.visitBaby.deleteMany({ where: { visitId: { in: visitIds } } }),
-    prisma.visit.deleteMany({ where: { clientId: existing.id } }),
     prisma.baby.deleteMany({ where: { clientId: existing.id } }),
     prisma.client.delete({ where: { id: existing.id } }),
   ]);

@@ -14,15 +14,15 @@ app.get("/", async (c) => {
   if (from) dateFilter.gte = new Date(from);
   if (to) dateFilter.lte = new Date(to);
 
-  const [activeClientCount, visitsInRange, clientsNeedingFollowUp, openActionItems, overdueActionItems, recentVisits] = await Promise.all([
+  const [activeClientCount, followUpsInRange, clientsNeedingFollowUp, openActionItems, overdueActionItems, recentFollowUps] = await Promise.all([
     prisma.client.count({ where: { consultantId, status: { not: "ARCHIVED" } } }),
-    prisma.visit.count({ where: { client: { consultantId }, ...(from || to ? { visitDate: dateFilter } : {}) } }),
+    prisma.followUp.count({ where: { client: { consultantId }, ...(from || to ? { scheduledAt: dateFilter } : {}) } }),
     prisma.client.count({ where: { consultantId, status: "FOLLOW_UP_REQUIRED" } }),
     prisma.actionItem.count({ where: { client: { consultantId }, status: { in: ["TODO", "IN_PROGRESS"] } } }),
     prisma.actionItem.count({ where: { client: { consultantId }, status: { in: ["TODO", "IN_PROGRESS"] }, dueDate: { lt: new Date() } } }),
-    prisma.visit.findMany({
+    prisma.followUp.findMany({
       where: { client: { consultantId } },
-      orderBy: { visitDate: "desc" },
+      orderBy: { scheduledAt: "desc" },
       take: 10,
       include: { client: { select: { fullName: true } } },
     }),
@@ -30,11 +30,11 @@ app.get("/", async (c) => {
 
   return c.json({
     activeClientCount,
-    visitsInRange,
+    followUpsInRange,
     clientsNeedingFollowUp,
     openActionItems,
     overdueActionItems,
-    recentVisits,
+    recentFollowUps,
   });
 });
 

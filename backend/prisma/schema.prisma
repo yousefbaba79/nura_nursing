@@ -39,8 +39,6 @@ model Consultant {
   updatedAt         DateTime @updatedAt
 
   clients        Client[]
-  visitsCreated  Visit[]         @relation("VisitCreatedBy")
-  visitsUpdated  Visit[]         @relation("VisitUpdatedBy")
   auditEntries   AuditEntry[]
   passwordResets PasswordReset[]
 }
@@ -95,7 +93,6 @@ model Client {
   lastViewedAt       DateTime?
 
   babies       Baby[]
-  visits       Visit[]
   actionItems  ActionItem[]
   followUps    FollowUp[]
 
@@ -139,10 +136,7 @@ model Baby {
   createdAt           DateTime      @default(now())
   updatedAt           DateTime      @updatedAt
 
-  visits       VisitBaby[]
   weightLogs   WeightLog[]
-  problems     Problem[]
-  recommendations Recommendation[]
   actionItems  ActionItem[]
   followUps    FollowUp[]
 
@@ -153,8 +147,6 @@ model WeightLog {
   id          String   @id @default(cuid())
   babyId      String
   baby        Baby     @relation(fields: [babyId], references: [id])
-  visitId     String?
-  visit       Visit?   @relation(fields: [visitId], references: [id])
   date        DateTime @default(now())
   weightGrams Float
   createdAt   DateTime @default(now())
@@ -163,137 +155,15 @@ model WeightLog {
 }
 
 // ---------------------------------------------------------------------------
-// Visit
-// ---------------------------------------------------------------------------
-// visitType: INITIAL_CONSULTATION | FOLLOW_UP_CONSULTATION | PHONE_CONSULTATION |
-//            VIDEO_CONSULTATION | HOME_VISIT | CLINIC_VISIT | MESSAGE_CONSULTATION | OTHER
-// status: DRAFT | COMPLETED | CANCELLED
-
-model Visit {
-  id              String      @id @default(cuid())
-  clientId        String
-  client          Client      @relation(fields: [clientId], references: [id])
-
-  createdById     String
-  createdBy       Consultant  @relation("VisitCreatedBy", fields: [createdById], references: [id])
-  updatedById     String?
-  updatedBy       Consultant? @relation("VisitUpdatedBy", fields: [updatedById], references: [id])
-
-  visitDate       DateTime    @default(now())
-  startTime       String?
-  endTime         String?
-  visitType       String      @default("INITIAL_CONSULTATION")
-  location        String?
-  status          String      @default("DRAFT")
-  followUpDate    DateTime?
-
-  reasonForConsultation String?
-  clientGoals           String?
-  clientQuestions        String?
-  currentFeedingRoutine  String?
-  problemsReported       String?
-  consultantObservations String?
-  feedingAssessment      String?
-  breastAssessment       String?
-  babyAssessment         String?
-  latchAssessment        String?
-  milkTransferAssessment String?
-  weightInformation      String?
-  relevantMedicalInfo    String?
-  solutionsDiscussed     String?
-  clientActionPlan       String?
-  warningSignsDiscussed  String?
-  referrals              String?
-  followUpPlan           String?
-  privateNotes           String?
-
-  lastDraftSavedAt DateTime?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-
-  babies          VisitBaby[]
-  problems        Problem[]
-  recommendations Recommendation[]
-  actionItems     ActionItem[]
-  followUps       FollowUp[]
-  weightLogs      WeightLog[]
-
-  @@index([clientId])
-  @@index([status])
-}
-
-model VisitBaby {
-  id      String @id @default(cuid())
-  visitId String
-  visit   Visit  @relation(fields: [visitId], references: [id])
-  babyId  String
-  baby    Baby   @relation(fields: [babyId], references: [id])
-
-  @@unique([visitId, babyId])
-}
-
-// ---------------------------------------------------------------------------
-// Problems / Recommendations / Action items
+// Action items
 // ---------------------------------------------------------------------------
 // severity / priority: LOW | MEDIUM | HIGH
-// problem status: NEW | IN_PROGRESS | IMPROVED | RESOLVED
-
-model Problem {
-  id          String        @id @default(cuid())
-  visitId     String
-  visit       Visit         @relation(fields: [visitId], references: [id])
-  babyId      String?
-  baby        Baby?         @relation(fields: [babyId], references: [id])
-
-  title       String
-  description String?
-  severity    String        @default("MEDIUM")
-  status      String        @default("NEW")
-  notes       String?
-
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-
-  recommendations Recommendation[]
-  actionItems     ActionItem[]
-
-  @@index([visitId])
-}
-
-model Recommendation {
-  id           String   @id @default(cuid())
-  visitId      String
-  visit        Visit    @relation(fields: [visitId], references: [id])
-  problemId    String?
-  problem      Problem? @relation(fields: [problemId], references: [id])
-  babyId       String?
-  baby         Baby?    @relation(fields: [babyId], references: [id])
-
-  title             String
-  instructions      String?
-  priority          String   @default("MEDIUM")
-  includeInSummary  Boolean  @default(true)
-
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  actionItems  ActionItem[]
-
-  @@index([visitId])
-}
-
 // action item status: TODO | IN_PROGRESS | COMPLETED | CANCELLED
 
 model ActionItem {
   id               String            @id @default(cuid())
   clientId         String
   client           Client            @relation(fields: [clientId], references: [id])
-  visitId          String?
-  visit            Visit?            @relation(fields: [visitId], references: [id])
-  problemId        String?
-  problem          Problem?          @relation(fields: [problemId], references: [id])
-  recommendationId String?
-  recommendation   Recommendation?   @relation(fields: [recommendationId], references: [id])
   babyId           String?
   baby             Baby?             @relation(fields: [babyId], references: [id])
 
@@ -316,7 +186,9 @@ model ActionItem {
 // ---------------------------------------------------------------------------
 // Follow-ups
 // ---------------------------------------------------------------------------
-// type: CALL | MESSAGE | VIDEO_MEETING | CLINIC_VISIT | HOME_VISIT | OTHER
+// This is the sole record of a client encounter: either a clinic visit or a
+// video meeting, scheduled ahead of time and then documented afterward.
+// type: CLINIC_VISIT | VIDEO_MEETING
 // status: SCHEDULED | COMPLETED | RESCHEDULED | CANCELLED | MISSED
 
 model FollowUp {
@@ -325,8 +197,6 @@ model FollowUp {
   client      Client         @relation(fields: [clientId], references: [id])
   babyId      String?
   baby        Baby?          @relation(fields: [babyId], references: [id])
-  visitId     String?
-  visit       Visit?         @relation(fields: [visitId], references: [id])
 
   scheduledAt DateTime
   type        String         @default("CLINIC_VISIT")
