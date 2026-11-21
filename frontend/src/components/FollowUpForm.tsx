@@ -135,8 +135,8 @@ export default function FollowUpForm({ clientId, babies, followUp, onSaved, onCa
         <input id="fu-reason" className="input" value={reason} onChange={(e) => setReason(e.target.value)} />
       </div>
       <div>
-        <div className="flex items-center justify-between gap-2">
-          <label className="label" htmlFor="fu-notes">{t("followUpForm.notes")}</label>
+        <div dir="ltr" className="mb-1 flex items-center justify-between gap-2">
+          <label className="text-sm font-medium text-gray-700" htmlFor="fu-notes">{t("followUpForm.notes")}</label>
           {noteTemplates && noteTemplates.length > 0 && (
             <select
               className="input !w-auto text-sm"
