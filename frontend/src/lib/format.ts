@@ -42,8 +42,3 @@ export function formatRelativeDay(value?: string | null): string {
   if (diffDays === -1) return i18n.t("common.yesterday");
   return formatDate(value);
 }
-
-export function isOverdue(dueDate?: string | null): boolean {
-  if (!dueDate) return false;
-  return new Date(dueDate).getTime() < Date.now();
-}

@@ -14,15 +14,6 @@ export const FEEDING_METHODS = [
   "OTHER",
 ] as const;
 
-export const PRIORITIES = ["LOW", "MEDIUM", "HIGH"] as const;
-
-export const ACTION_ITEM_STATUSES = [
-  "TODO",
-  "IN_PROGRESS",
-  "COMPLETED",
-  "CANCELLED",
-] as const;
-
 export const FOLLOW_UP_TYPES = ["CLINIC_VISIT", "VIDEO_MEETING"] as const;
 
 export const FOLLOW_UP_STATUSES = [

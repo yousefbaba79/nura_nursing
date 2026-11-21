@@ -73,8 +73,7 @@
     "addClient": "+ הוספת לקוחה",
     "stats": {
       "activeClients": "לקוחות פעילות",
-      "overdueFollowUps": "מעקבים באיחור",
-      "overdueActionItems": "משימות באיחור"
+      "overdueFollowUps": "מעקבים באיחור"
     },
     "sections": {
       "todayUpcomingFollowUps": "מעקבים להיום ולקראת",
@@ -82,8 +81,6 @@
       "overdueFollowUps": "מעקבים באיחור",
       "nothingOverdue": "אין באיחור",
       "nothingOverdueDescription": "עבודה מצוינת בשמירה על לוח הזמנים למעקבים.",
-      "incompleteActionItems": "משימות לא גמורות",
-      "noOpenActionItems": "אין משימות פתוחות",
       "recentFollowUps": "מעקבים אחרונים",
       "noFollowUpsYet": "עדיין לא נרשמו מעקבים",
       "recentlyViewedClients": "לקוחות שנצפו לאחרונה",
@@ -112,10 +109,6 @@
     },
     "noClientsFound": "לא נמצאו לקוחות",
     "noClientsFoundDescription": "נסי להתאים את החיפוש או המסננים, או להוסיף לקוחה חדשה.",
-    "openTaskCount_one": "משימה פתוחה אחת",
-    "openTaskCount_two": "{{count}} משימות פתוחות",
-    "openTaskCount_many": "{{count}} משימות פתוחות",
-    "openTaskCount_other": "{{count}} משימות פתוחות",
     "lastVisit": "ביקור אחרון: {{date}}",
     "detail": {
       "edit": "עריכה",
@@ -134,10 +127,6 @@
       "consentDate": "תאריך הסכמה",
       "consentMethod": "שיטה",
       "consentFormVersion": "גרסת טופס",
-      "openActionItems": "משימות פתוחות",
-      "addAction": "+ הוספה",
-      "noOpenActionItems": "אין משימות פתוחות",
-      "markComplete": "סמני את {{title}} כהושלמה",
       "followUps": "מעקבים",
       "schedule": "+ קביעת מעקב",
       "noFollowUpsScheduled": "לא נקבעו מעקבים",
@@ -147,8 +136,6 @@
       "editModalTitle": "עריכת לקוחה",
       "addBabyModalTitle": "הוספת תינוק",
       "editBabyModalTitle": "עריכת תינוק",
-      "editActionItemModalTitle": "עריכת משימה",
-      "addActionItemModalTitle": "הוספת משימה",
       "editFollowUpModalTitle": "עריכת מעקב",
       "scheduleFollowUpModalTitle": "קביעת מעקב",
       "archiveConfirmTitleArchive": "להעביר את הלקוחה הזו לארכיון?",
@@ -235,18 +222,6 @@
       "couldNotSave": "לא ניתן היה לשמור את רשומת התינוק.",
       "addBaby": "הוספת תינוק"
     }
-  },
-  "actionItemForm": {
-    "taskTitle": "כותרת המשימה",
-    "instructions": "הנחיות",
-    "dueDate": "תאריך יעד",
-    "priority": "עדיפות",
-    "status": "סטטוס",
-    "relatedBaby": "תינוק קשור",
-    "notes": "הערות",
-    "errorTitleRequired": "יש להזין כותרת למשימה.",
-    "couldNotSave": "לא ניתן היה לשמור את המשימה.",
-    "addTask": "הוספת משימה"
   },
   "followUpForm": {
     "dateTime": "תאריך ושעה",
@@ -397,9 +372,7 @@
     "stats": {
       "activeClients": "לקוחות פעילות",
       "totalFollowUps": "סך המעקבים",
-      "needFollowUp": "דורשות מעקב",
-      "openActionItems": "משימות פתוחות",
-      "overdueActionItems": "משימות באיחור"
+      "needFollowUp": "דורשות מעקב"
     },
     "recentConsultations": "ייעוצים אחרונים"
   },
@@ -421,17 +394,6 @@
       "MIXED_FEEDING": "האכלה מעורבת",
       "TUBE_FEEDING": "האכלה בזונדה",
       "OTHER": "אחר"
-    },
-    "priority": {
-      "LOW": "נמוכה",
-      "MEDIUM": "בינונית",
-      "HIGH": "גבוהה"
-    },
-    "actionItemStatus": {
-      "TODO": "לביצוע",
-      "IN_PROGRESS": "בתהליך",
-      "COMPLETED": "הושלמה",
-      "CANCELLED": "בוטלה"
     },
     "followUpType": {
       "CALL": "שיחת טלפון",

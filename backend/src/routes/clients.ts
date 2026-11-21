@@ -88,7 +88,6 @@ app.get("/", async (c) => {
     include: {
       babies: { where: { archivedAt: null }, select: { id: true, fullName: true } },
       followUps: { orderBy: { scheduledAt: "asc" }, select: { scheduledAt: true, status: true } },
-      _count: { select: { actionItems: { where: { status: { in: ["TODO", "IN_PROGRESS"] } } } } },
     },
   });
 
@@ -99,9 +98,7 @@ app.get("/", async (c) => {
       ...cl,
       lastVisitDate: completed.length ? completed[completed.length - 1].scheduledAt : null,
       nextFollowUpDate: scheduled.length ? scheduled[0].scheduledAt : null,
-      openActionItemCount: cl._count.actionItems,
       followUps: undefined,
-      _count: undefined,
     };
   });
 
@@ -154,7 +151,6 @@ app.get("/:id", async (c) => {
     where: { id, consultantId },
     include: {
       babies: { orderBy: { createdAt: "asc" } },
-      actionItems: { orderBy: { dueDate: "asc" } },
       followUps: { orderBy: { scheduledAt: "asc" } },
     },
   });
@@ -327,7 +323,6 @@ app.delete("/:id", async (c) => {
 
   await prisma.$transaction([
     prisma.weightLog.deleteMany({ where: { babyId: { in: babyIds } } }),
-    prisma.actionItem.deleteMany({ where: { clientId: existing.id } }),
     prisma.followUp.deleteMany({ where: { clientId: existing.id } }),
     prisma.baby.deleteMany({ where: { clientId: existing.id } }),
     prisma.client.delete({ where: { id: existing.id } }),

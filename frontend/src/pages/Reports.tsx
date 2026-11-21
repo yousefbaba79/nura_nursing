@@ -27,12 +27,10 @@ export default function Reports() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             <Stat label={t("reports.stats.activeClients")} value={data.activeClientCount} />
             <Stat label={t("reports.stats.totalFollowUps")} value={data.followUpsInRange} />
             <Stat label={t("reports.stats.needFollowUp")} value={data.clientsNeedingFollowUp} />
-            <Stat label={t("reports.stats.openActionItems")} value={data.openActionItems} />
-            <Stat label={t("reports.stats.overdueActionItems")} value={data.overdueActionItems} />
           </div>
 
           <div className="card">

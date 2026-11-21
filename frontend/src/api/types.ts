@@ -56,26 +56,9 @@ export interface Client {
   updatedAt: string;
   lastViewedAt: string | null;
   babies?: Baby[];
-  actionItems?: ActionItem[];
   followUps?: FollowUp[];
   lastVisitDate?: string | null;
   nextFollowUpDate?: string | null;
-  openActionItemCount?: number;
-}
-
-export interface ActionItem {
-  id: string;
-  clientId: string;
-  babyId: string | null;
-  title: string;
-  instructions: string | null;
-  dueDate: string | null;
-  priority: string;
-  status: string;
-  completedAt: string | null;
-  notes: string | null;
-  client?: { id: string; fullName: string };
-  baby?: { id: string; fullName: string } | null;
 }
 
 export interface FollowUp {

@@ -94,7 +94,6 @@ model Client {
   lastViewedAt       DateTime?
 
   babies       Baby[]
-  actionItems  ActionItem[]
   followUps    FollowUp[]
 
   @@index([consultantId])
@@ -138,7 +137,6 @@ model Baby {
   updatedAt           DateTime      @updatedAt
 
   weightLogs   WeightLog[]
-  actionItems  ActionItem[]
   followUps    FollowUp[]
 
   @@index([clientId])
@@ -153,35 +151,6 @@ model WeightLog {
   createdAt   DateTime @default(now())
 
   @@index([babyId])
-}
-
-// ---------------------------------------------------------------------------
-// Action items
-// ---------------------------------------------------------------------------
-// severity / priority: LOW | MEDIUM | HIGH
-// action item status: TODO | IN_PROGRESS | COMPLETED | CANCELLED
-
-model ActionItem {
-  id               String            @id @default(cuid())
-  clientId         String
-  client           Client            @relation(fields: [clientId], references: [id])
-  babyId           String?
-  baby             Baby?             @relation(fields: [babyId], references: [id])
-
-  title         String
-  instructions  String?
-  dueDate       DateTime?
-  priority      String            @default("MEDIUM")
-  status        String            @default("TODO")
-  completedAt   DateTime?
-  notes         String?
-
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  @@index([clientId])
-  @@index([status])
-  @@index([dueDate])
 }
 
 // ---------------------------------------------------------------------------

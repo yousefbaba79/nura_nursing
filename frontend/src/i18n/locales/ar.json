@@ -73,8 +73,7 @@
     "addClient": "+ إضافة عميلة",
     "stats": {
       "activeClients": "العميلات النشطات",
-      "overdueFollowUps": "متابعات متأخرة",
-      "overdueActionItems": "مهام متأخرة"
+      "overdueFollowUps": "متابعات متأخرة"
     },
     "sections": {
       "todayUpcomingFollowUps": "متابعات اليوم والقادمة",
@@ -82,8 +81,6 @@
       "overdueFollowUps": "متابعات متأخرة",
       "nothingOverdue": "لا شيء متأخر",
       "nothingOverdueDescription": "عمل رائع في متابعة كل شيء في وقته.",
-      "incompleteActionItems": "مهام غير مكتملة",
-      "noOpenActionItems": "لا توجد مهام مفتوحة",
       "recentFollowUps": "المتابعات الأخيرة",
       "noFollowUpsYet": "لم تُسجَّل أي متابعات بعد",
       "recentlyViewedClients": "العميلات اللاتي تمت زيارتهنّ مؤخرًا",
@@ -112,12 +109,6 @@
     },
     "noClientsFound": "لم يتم العثور على عميلات",
     "noClientsFoundDescription": "جربي تعديل البحث أو المرشحات، أو أضيفي عميلة جديدة.",
-    "openTaskCount_zero": "لا مهام مفتوحة",
-    "openTaskCount_one": "مهمة مفتوحة واحدة",
-    "openTaskCount_two": "مهمتان مفتوحتان",
-    "openTaskCount_few": "{{count}} مهام مفتوحة",
-    "openTaskCount_many": "{{count}} مهمة مفتوحة",
-    "openTaskCount_other": "{{count}} مهمة مفتوحة",
     "lastVisit": "آخر زيارة: {{date}}",
     "detail": {
       "edit": "تعديل",
@@ -136,10 +127,6 @@
       "consentDate": "تاريخ الموافقة",
       "consentMethod": "الطريقة",
       "consentFormVersion": "إصدار النموذج",
-      "openActionItems": "مهام مفتوحة",
-      "addAction": "+ إضافة",
-      "noOpenActionItems": "لا توجد مهام مفتوحة",
-      "markComplete": "وضع علامة اكتمال على {{title}}",
       "followUps": "المتابعات",
       "schedule": "+ جدولة متابعة",
       "noFollowUpsScheduled": "لم تُجدوَل أي متابعات",
@@ -149,8 +136,6 @@
       "editModalTitle": "تعديل العميلة",
       "addBabyModalTitle": "إضافة رضيع",
       "editBabyModalTitle": "تعديل بيانات الرضيع",
-      "editActionItemModalTitle": "تعديل المهمة",
-      "addActionItemModalTitle": "إضافة مهمة",
       "editFollowUpModalTitle": "تعديل المتابعة",
       "scheduleFollowUpModalTitle": "جدولة متابعة",
       "archiveConfirmTitleArchive": "هل تريدين أرشفة هذه العميلة؟",
@@ -237,18 +222,6 @@
       "couldNotSave": "تعذّر حفظ سجل الرضيع.",
       "addBaby": "إضافة رضيع"
     }
-  },
-  "actionItemForm": {
-    "taskTitle": "عنوان المهمة",
-    "instructions": "التعليمات",
-    "dueDate": "تاريخ الاستحقاق",
-    "priority": "الأولوية",
-    "status": "الحالة",
-    "relatedBaby": "الرضيع المرتبط",
-    "notes": "ملاحظات",
-    "errorTitleRequired": "يجب إدخال عنوان للمهمة.",
-    "couldNotSave": "تعذّر حفظ المهمة.",
-    "addTask": "إضافة مهمة"
   },
   "followUpForm": {
     "dateTime": "التاريخ والوقت",
@@ -399,9 +372,7 @@
     "stats": {
       "activeClients": "العميلات النشطات",
       "totalFollowUps": "إجمالي المتابعات",
-      "needFollowUp": "بحاجة إلى متابعة",
-      "openActionItems": "مهام مفتوحة",
-      "overdueActionItems": "مهام متأخرة"
+      "needFollowUp": "بحاجة إلى متابعة"
     },
     "recentConsultations": "الاستشارات الأخيرة"
   },
@@ -423,17 +394,6 @@
       "MIXED_FEEDING": "تغذية مختلطة",
       "TUBE_FEEDING": "تغذية بأنبوب",
       "OTHER": "أخرى"
-    },
-    "priority": {
-      "LOW": "منخفضة",
-      "MEDIUM": "متوسطة",
-      "HIGH": "عالية"
-    },
-    "actionItemStatus": {
-      "TODO": "قيد الانتظار",
-      "IN_PROGRESS": "قيد التنفيذ",
-      "COMPLETED": "مكتملة",
-      "CANCELLED": "ملغاة"
     },
     "followUpType": {
       "CALL": "اتصال هاتفي",

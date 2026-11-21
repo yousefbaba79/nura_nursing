@@ -2,9 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { api } from "../api/client";
-import { Spinner, EmptyState, Badge } from "../components/ui";
-import { formatDate, formatDateTime, isOverdue } from "../lib/format";
-import { PRIORITY_COLORS } from "../api/enums";
+import { Spinner, EmptyState } from "../components/ui";
+import { formatDate, formatDateTime } from "../lib/format";
 import { useAuth } from "../context/AuthContext";
 
 export default function Dashboard() {
@@ -38,7 +37,7 @@ export default function Dashboard() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          <div className="grid grid-cols-2 gap-3">
             <StatCard label={t("dashboard.stats.activeClients")} value={data.stats.activeClientCount} to="/clients" />
             <StatCard
               label={t("dashboard.stats.overdueFollowUps")}
@@ -46,7 +45,6 @@ export default function Dashboard() {
               to="/follow-ups?scope=overdue"
               alert={data.stats.overdueFollowUpCount > 0}
             />
-            <StatCard label={t("dashboard.stats.overdueActionItems")} value={data.stats.overdueActionItemCount} alert={data.stats.overdueActionItemCount > 0} />
           </div>
 
           <div className="grid gap-6 lg:grid-cols-2">
@@ -80,26 +78,6 @@ export default function Dashboard() {
                       <Link to={`/clients/${f.client.id}`} className="flex items-center justify-between py-2 text-sm hover:text-brand-700">
                         <span className="font-medium text-gray-900">{f.client.fullName}</span>
                         <span className="text-red-600">{formatDateTime(f.scheduledAt)}</span>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </Section>
-
-            <Section title={t("dashboard.sections.incompleteActionItems")}>
-              {data.incompleteActionItems.length === 0 ? (
-                <EmptyState title={t("dashboard.sections.noOpenActionItems")} />
-              ) : (
-                <ul className="divide-y divide-gray-100">
-                  {data.incompleteActionItems.slice(0, 8).map((a: any) => (
-                    <li key={a.id}>
-                      <Link to={`/clients/${a.client.id}`} className="flex items-center justify-between py-2 text-sm hover:text-brand-700">
-                        <span className="flex items-center gap-2">
-                          <span className="font-medium text-gray-900">{a.title}</span>
-                          <Badge className={PRIORITY_COLORS[a.priority]}>{t(`enums.priority.${a.priority}`)}</Badge>
-                        </span>
-                        <span className={isOverdue(a.dueDate) ? "font-medium text-red-600" : "text-gray-500"}>{formatDate(a.dueDate)}</span>
                       </Link>
                     </li>
                   ))}

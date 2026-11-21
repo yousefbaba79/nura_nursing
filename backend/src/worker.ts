@@ -7,7 +7,6 @@ import { createPrismaClient } from "./lib/prisma";
 import authRoutes from "./routes/auth";
 import clientRoutes from "./routes/clients";
 import babyRoutes from "./routes/babies";
-import actionItemRoutes from "./routes/actionItems";
 import followUpRoutes from "./routes/followUps";
 import dashboardRoutes from "./routes/dashboard";
 import settingsRoutes from "./routes/settings";
@@ -36,7 +35,6 @@ app.get("/api/health", (c) => c.json({ ok: true }));
 app.route("/api/auth", authRoutes);
 app.route("/api/clients", clientRoutes);
 app.route("/api", babyRoutes); // /api/clients/:clientId/babies, /api/babies/:id
-app.route("/api/action-items", actionItemRoutes);
 app.route("/api/follow-ups", followUpRoutes);
 app.route("/api/dashboard", dashboardRoutes);
 app.route("/api/settings", settingsRoutes);
