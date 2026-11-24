@@ -2,7 +2,7 @@ import { type FormEvent, useState, cloneElement } from "react";
 import { useTranslation } from "react-i18next";
 import { api, apiErrorMessage } from "../api/client";
 import { FEEDING_METHODS } from "../api/enums";
-import { ErrorBanner } from "./ui";
+import { ErrorBanner, AutoTextarea } from "./ui";
 import type { Baby } from "../api/types";
 
 interface Props {
@@ -152,22 +152,22 @@ export default function BabyForm({ clientId, baby, onSaved, onCancel }: Props) {
           <input className="input" value={values.pediatricianPhone} onChange={(e) => update("pediatricianPhone", e.target.value)} />
         </F>
         <F id="baby-medical-conditions" label={t("babies.form.medicalConditions")} full>
-          <textarea className="input" rows={2} value={values.medicalConditions} onChange={(e) => update("medicalConditions", e.target.value)} />
+          <AutoTextarea className="input" rows={2} value={values.medicalConditions} onChange={(e) => update("medicalConditions", e.target.value)} />
         </F>
         <F id="baby-medications" label={t("babies.form.medications")} full>
-          <textarea className="input" rows={2} value={values.medications} onChange={(e) => update("medications", e.target.value)} />
+          <AutoTextarea className="input" rows={2} value={values.medications} onChange={(e) => update("medications", e.target.value)} />
         </F>
         <F id="baby-allergies" label={t("babies.form.allergies")} full>
           <input className="input" value={values.allergies} onChange={(e) => update("allergies", e.target.value)} />
         </F>
         <F id="baby-supplementation" label={t("babies.form.supplementationInfo")} full>
-          <textarea className="input" rows={2} value={values.supplementationInfo} onChange={(e) => update("supplementationInfo", e.target.value)} />
+          <AutoTextarea className="input" rows={2} value={values.supplementationInfo} onChange={(e) => update("supplementationInfo", e.target.value)} />
         </F>
         <F id="baby-hospital-info" label={t("babies.form.hospitalInfo")} full>
-          <textarea className="input" rows={2} value={values.hospitalInfo} onChange={(e) => update("hospitalInfo", e.target.value)} />
+          <AutoTextarea className="input" rows={2} value={values.hospitalInfo} onChange={(e) => update("hospitalInfo", e.target.value)} />
         </F>
         <F id="baby-notes" label={t("babies.form.notes")} full>
-          <textarea className="input" rows={2} value={values.notes} onChange={(e) => update("notes", e.target.value)} />
+          <AutoTextarea className="input" rows={2} value={values.notes} onChange={(e) => update("notes", e.target.value)} />
         </F>
       </div>
       <div className="flex justify-end gap-2 border-t border-gray-200 pt-3">

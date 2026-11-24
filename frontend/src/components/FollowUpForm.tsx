@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { api, apiErrorMessage } from "../api/client";
 import { FOLLOW_UP_TYPES, FOLLOW_UP_STATUSES } from "../api/enums";
-import { ConfirmDialog, ErrorBanner } from "./ui";
+import { ConfirmDialog, ErrorBanner, AutoTextarea } from "./ui";
 import type { FollowUp, Baby, NoteTemplate } from "../api/types";
 
 interface Props {
@@ -155,7 +155,7 @@ export default function FollowUpForm({ clientId, babies, followUp, onSaved, onCa
             </select>
           )}
         </div>
-        <textarea id="fu-notes" className="input" rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} />
+        <AutoTextarea id="fu-notes" className="input" rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} />
       </div>
       <div className="flex items-center justify-between gap-2 border-t border-gray-200 pt-3">
         {followUp ? (
