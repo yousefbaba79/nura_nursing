@@ -270,7 +270,9 @@
     "errorFieldsRequired": "التسمية والنص مطلوبان.",
     "couldNotSave": "تعذّر حفظ القالب.",
     "couldNotDelete": "تعذّر حذف القالب.",
-    "deleteConfirmTitle": "هل تريدين حذف هذا القالب؟"
+    "deleteConfirmTitle": "هل تريدين حذف هذا القالب؟",
+    "dragToReorder": "اسحبي لتغيير الترتيب",
+    "couldNotReorder": "تعذّر حفظ الترتيب الجديد."
   },
   "settings": {
     "title": "الإعدادات",
@@ -347,7 +349,8 @@
       "BABY_RESTORED": "تم استعادة سجل رضيع",
       "NOTE_TEMPLATE_CREATED": "تم إنشاء قالب ملاحظة",
       "NOTE_TEMPLATE_UPDATED": "تم تحديث قالب ملاحظة",
-      "NOTE_TEMPLATE_DELETED": "تم حذف قالب ملاحظة"
+      "NOTE_TEMPLATE_DELETED": "تم حذف قالب ملاحظة",
+      "NOTE_TEMPLATES_REORDERED": "تمت إعادة ترتيب قوالب الملاحظات"
     },
     "entities": {
       "Consultant": "استشارية",

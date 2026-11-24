@@ -18,7 +18,7 @@ app.get("/", async (c) => {
   const consultantId = c.get("consultantId")!;
   const noteTemplates = await prisma.noteTemplate.findMany({
     where: { consultantId },
-    orderBy: { createdAt: "asc" },
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
   });
   return c.json({ noteTemplates });
 });
@@ -29,11 +29,42 @@ app.post("/", async (c) => {
   const parsed = noteTemplateInput.safeParse(await c.req.json());
   if (!parsed.success) return c.json({ error: "Please check the highlighted fields.", details: parsed.error.flatten() }, 400);
 
+  const last = await prisma.noteTemplate.findFirst({
+    where: { consultantId },
+    orderBy: { sortOrder: "desc" },
+    select: { sortOrder: true },
+  });
   const noteTemplate = await prisma.noteTemplate.create({
-    data: { consultantId, label: parsed.data.label, text: parsed.data.text },
+    data: { consultantId, label: parsed.data.label, text: parsed.data.text, sortOrder: (last?.sortOrder ?? -1) + 1 },
   });
   await recordAudit(prisma, { consultantId, action: "NOTE_TEMPLATE_CREATED", entityType: "NoteTemplate", entityId: noteTemplate.id });
   return c.json({ noteTemplate }, 201);
+});
+
+// PUT /api/note-templates/reorder  { ids: string[] } — full ordered list of the consultant's template ids
+app.put("/reorder", async (c) => {
+  const prisma = c.get("prisma");
+  const consultantId = c.get("consultantId")!;
+  const parsed = z.object({ ids: z.array(z.string().min(1)).min(1) }).safeParse(await c.req.json());
+  if (!parsed.success) return c.json({ error: "Invalid order." }, 400);
+
+  const ids = parsed.data.ids;
+  const owned = await prisma.noteTemplate.findMany({ where: { consultantId }, select: { id: true } });
+  const ownedIds = new Set(owned.map((t) => t.id));
+  if (new Set(ids).size !== ids.length || ids.length !== ownedIds.size || !ids.every((id) => ownedIds.has(id))) {
+    return c.json({ error: "The template list has changed. Please refresh and try again." }, 409);
+  }
+
+  await prisma.$transaction(
+    ids.map((id, index) => prisma.noteTemplate.update({ where: { id }, data: { sortOrder: index } })),
+  );
+  await recordAudit(prisma, { consultantId, action: "NOTE_TEMPLATES_REORDERED", entityType: "NoteTemplate" });
+
+  const noteTemplates = await prisma.noteTemplate.findMany({
+    where: { consultantId },
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+  });
+  return c.json({ noteTemplates });
 });
 
 app.put("/:id", async (c) => {

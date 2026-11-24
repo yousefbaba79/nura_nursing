@@ -5,6 +5,25 @@ import { useTranslation } from "react-i18next";
 import { api, apiErrorMessage } from "../api/client";
 import { Modal, ConfirmDialog, Spinner, EmptyState, ErrorBanner } from "../components/ui";
 import type { NoteTemplate } from "../api/types";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { restrictToVerticalAxis } from "./noteTemplatesDnd";
+import { CSS } from "@dnd-kit/utilities";
 
 export default function NoteTemplates() {
   const { t } = useTranslation();
@@ -18,6 +37,33 @@ export default function NoteTemplates() {
     queryKey: ["note-templates"],
     queryFn: async () => (await api.get("/note-templates")).data.noteTemplates as NoteTemplate[],
   });
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
+  async function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!data || !over || active.id === over.id) return;
+    const oldIndex = data.findIndex((nt) => nt.id === active.id);
+    const newIndex = data.findIndex((nt) => nt.id === over.id);
+    if (oldIndex < 0 || newIndex < 0) return;
+
+    const reordered = arrayMove(data, oldIndex, newIndex);
+    const previous = data;
+    queryClient.setQueryData(["note-templates"], reordered);
+    setDeleteError("");
+    try {
+      const res = await api.put("/note-templates/reorder", { ids: reordered.map((nt) => nt.id) });
+      queryClient.setQueryData(["note-templates"], res.data.noteTemplates as NoteTemplate[]);
+    } catch (err) {
+      queryClient.setQueryData(["note-templates"], previous);
+      setDeleteError(apiErrorMessage(err, t("noteTemplates.couldNotReorder")));
+      invalidate();
+    }
+  }
 
   function invalidate() {
     queryClient.invalidateQueries({ queryKey: ["note-templates"] });
@@ -64,24 +110,20 @@ export default function NoteTemplates() {
       ) : !data || data.length === 0 ? (
         <EmptyState title={t("noteTemplates.noneYet")} description={t("noteTemplates.noneYetDescription")} />
       ) : (
-        <ul className="space-y-2">
-          {data.map((item) => (
-            <li key={item.id} className="card flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <p className="font-medium text-gray-900">{item.label}</p>
-                <p className="mt-0.5 whitespace-pre-wrap text-sm text-gray-600">{item.text}</p>
-              </div>
-              <div className="flex shrink-0 gap-2 text-xs">
-                <button type="button" className="font-medium text-brand-700 hover:underline" onClick={() => setModal({ open: true, item })}>
-                  {t("common.edit")}
-                </button>
-                <button type="button" className="font-medium text-red-600 hover:underline" onClick={() => setDeleteTarget(item)}>
-                  {t("common.delete")}
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
+        <DndContext sensors={sensors} collisionDetection={closestCenter} modifiers={[restrictToVerticalAxis]} onDragEnd={handleDragEnd}>
+          <SortableContext items={data.map((nt) => nt.id)} strategy={verticalListSortingStrategy}>
+            <ul className="space-y-2">
+              {data.map((item) => (
+                <SortableTemplateItem
+                  key={item.id}
+                  item={item}
+                  onEdit={() => setModal({ open: true, item })}
+                  onDelete={() => setDeleteTarget(item)}
+                />
+              ))}
+            </ul>
+          </SortableContext>
+        </DndContext>
       )}
 
       <Modal
@@ -109,6 +151,58 @@ export default function NoteTemplates() {
         onCancel={() => setDeleteTarget(null)}
       />
     </div>
+  );
+}
+
+function SortableTemplateItem({
+  item,
+  onEdit,
+  onDelete,
+}: {
+  item: NoteTemplate;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  const { t } = useTranslation();
+  const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({ id: item.id });
+
+  return (
+    <li
+      ref={setNodeRef}
+      style={{ transform: CSS.Translate.toString(transform), transition }}
+      className={`card flex items-start gap-3 ${isDragging ? "relative z-10 shadow-lg ring-2 ring-brand-300" : ""}`}
+    >
+      <button
+        type="button"
+        ref={setActivatorNodeRef}
+        {...attributes}
+        {...listeners}
+        title={t("noteTemplates.dragToReorder")}
+        aria-label={t("noteTemplates.dragToReorder")}
+        className="-my-1 shrink-0 cursor-grab touch-none rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 active:cursor-grabbing"
+      >
+        <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <circle cx="7" cy="5" r="1.5" />
+          <circle cx="13" cy="5" r="1.5" />
+          <circle cx="7" cy="10" r="1.5" />
+          <circle cx="13" cy="10" r="1.5" />
+          <circle cx="7" cy="15" r="1.5" />
+          <circle cx="13" cy="15" r="1.5" />
+        </svg>
+      </button>
+      <div className="min-w-0 flex-1">
+        <p className="font-medium text-gray-900">{item.label}</p>
+        <p className="mt-0.5 whitespace-pre-wrap text-sm text-gray-600">{item.text}</p>
+      </div>
+      <div className="flex shrink-0 gap-2 text-xs">
+        <button type="button" className="font-medium text-brand-700 hover:underline" onClick={onEdit}>
+          {t("common.edit")}
+        </button>
+        <button type="button" className="font-medium text-red-600 hover:underline" onClick={onDelete}>
+          {t("common.delete")}
+        </button>
+      </div>
+    </li>
   );
 }
 

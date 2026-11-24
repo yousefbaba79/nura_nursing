@@ -270,7 +270,9 @@
     "errorFieldsRequired": "יש למלא תווית וטקסט.",
     "couldNotSave": "לא ניתן היה לשמור את התבנית.",
     "couldNotDelete": "לא ניתן היה למחוק את התבנית.",
-    "deleteConfirmTitle": "למחוק את התבנית הזו?"
+    "deleteConfirmTitle": "למחוק את התבנית הזו?",
+    "dragToReorder": "גררי כדי לשנות את הסדר",
+    "couldNotReorder": "לא ניתן היה לשמור את הסדר החדש."
   },
   "settings": {
     "title": "הגדרות",
@@ -347,7 +349,8 @@
       "BABY_RESTORED": "רשומת תינוק שוחזרה",
       "NOTE_TEMPLATE_CREATED": "תבנית הערה נוצרה",
       "NOTE_TEMPLATE_UPDATED": "תבנית הערה עודכנה",
-      "NOTE_TEMPLATE_DELETED": "תבנית הערה נמחקה"
+      "NOTE_TEMPLATE_DELETED": "תבנית הערה נמחקה",
+      "NOTE_TEMPLATES_REORDERED": "סדר תבניות ההערות שונה"
     },
     "entities": {
       "Consultant": "יועצת",

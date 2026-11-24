@@ -270,7 +270,9 @@
     "errorFieldsRequired": "Label and text are both required.",
     "couldNotSave": "Could not save template.",
     "couldNotDelete": "Could not delete template.",
-    "deleteConfirmTitle": "Delete this template?"
+    "deleteConfirmTitle": "Delete this template?",
+    "dragToReorder": "Drag to reorder",
+    "couldNotReorder": "Could not save the new order."
   },
   "settings": {
     "title": "Settings",
@@ -347,7 +349,8 @@
       "BABY_RESTORED": "Baby record restored",
       "NOTE_TEMPLATE_CREATED": "Note template created",
       "NOTE_TEMPLATE_UPDATED": "Note template updated",
-      "NOTE_TEMPLATE_DELETED": "Note template deleted"
+      "NOTE_TEMPLATE_DELETED": "Note template deleted",
+      "NOTE_TEMPLATES_REORDERED": "Note templates reordered"
     },
     "entities": {
       "Consultant": "Consultant",
