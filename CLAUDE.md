@@ -9,7 +9,7 @@ Nura Lactation — an internal client-management tool for a lactation consultant
 - `backend/` — Hono API on Cloudflare Workers, Prisma (D1 driver adapter) over Cloudflare D1 (SQLite).
 - `frontend/` — React 19 + Vite + Tailwind SPA (TanStack Query, Axios, react-i18next), deployed to Cloudflare Pages.
 
-Note: `README.md` predates several removals — Visits, Problems, Recommendations, Action Items and visit drafts/summaries no longer exist. **Follow-up is now the sole encounter record.** Trust the code and `prisma/schema.prisma` over the README for the data model.
+**Follow-up is the sole encounter record** — Visits, Problems, Recommendations, Action Items and visit summaries were removed; don't reintroduce them from old migrations or git history.
 
 ## Commands
 
