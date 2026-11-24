@@ -12,7 +12,17 @@ database_name = "nura-nursing-db"
 database_id = "d067a91b-257a-4741-b359-0addd977e6d1"
 migrations_dir = "migrations"
 
+# Daily database backups (see src/lib/backup.ts). Create the bucket once with:
+#   npx wrangler r2 bucket create nura-nursing-backups
+[[r2_buckets]]
+binding = "BACKUPS"
+bucket_name = "nura-nursing-backups"
+
+[triggers]
+crons = ["17 2 * * *"] # every day at 02:17 UTC
+
 [vars]
 CORS_ORIGIN = "https://nura-nursing-app.pages.dev"
 JWT_EXPIRES_IN = "8h"
 ENVIRONMENT = "production"
+BACKUP_RETENTION_DAYS = "90"

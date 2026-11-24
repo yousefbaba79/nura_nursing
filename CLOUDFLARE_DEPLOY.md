@@ -57,7 +57,19 @@ When prompted, paste a long random string, e.g. generated with:
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
-### 4. Deploy the Worker
+### 4. Create the backup bucket
+
+The Worker backs up the whole database every night to a private R2 bucket (see
+[Backups](#backups) below). Create the bucket once, **before** the first deploy — the
+deploy fails if the bucket doesn't exist:
+
+```bash
+npx wrangler r2 bucket create nura-nursing-backups
+```
+
+(R2 must be enabled on the account first: Cloudflare dashboard → **R2 Object Storage**.)
+
+### 5. Deploy the Worker
 
 ```bash
 npm run deploy
@@ -67,7 +79,7 @@ This runs `prisma generate` then `wrangler deploy`. Wrangler prints the Worker's
 e.g. `https://nura-nursing-api.<your-subdomain>.workers.dev`. Keep this URL — the
 frontend needs it.
 
-### 5. Deploy the frontend to Cloudflare Pages
+### 6. Deploy the frontend to Cloudflare Pages
 
 In the Cloudflare dashboard: **Workers & Pages → Create → Pages → Connect to Git**, pick
 this repository, and set:
@@ -82,11 +94,11 @@ Add an environment variable on the Pages project:
 
 | Name | Value |
 |---|---|
-| `VITE_API_URL` | `https://nura-nursing-api.<your-subdomain>.workers.dev/api` (the Worker URL from step 4, plus `/api`) |
+| `VITE_API_URL` | `https://nura-nursing-api.<your-subdomain>.workers.dev/api` (the Worker URL from step 5, plus `/api`) |
 
 Deploy. Cloudflare prints the Pages URL, e.g. `https://nura-nursing-app.pages.dev`.
 
-### 6. Point the backend's CORS at the real frontend URL
+### 7. Point the backend's CORS at the real frontend URL
 
 Edit `backend/wrangler.toml`:
 
@@ -107,10 +119,57 @@ npm run deploy
 (`ENVIRONMENT = "production"` also turns off the `devResetToken` field the
 `/forgot-password` endpoint otherwise includes in its response for local testing.)
 
-### 7. Create the consultant account
+### 8. Create the consultant account
 
 Visit the Pages URL and go through the first-run `/setup` flow to create the one
 consultant account the app supports.
+
+## Backups
+
+All app data lives in the D1 database, and it is protected in two ways:
+
+1. **D1 Time Travel** (built in, nothing to set up) — restore to any minute in the last
+   30 days (Workers Paid) or 7 days (Free):
+   ```bash
+   npx wrangler d1 time-travel restore nura-nursing-db --timestamp=2026-11-20T10:00:00Z
+   ```
+2. **Daily backups to R2** — a cron trigger on the Worker (`[triggers]` in
+   `wrangler.toml`, 02:17 UTC daily) runs `src/lib/backup.ts`, which writes a gzipped SQL
+   dump of every table to `nura-nursing-backups/d1/nura-backup-<timestamp>.sql.gz`.
+   Backups older than `BACKUP_RETENTION_DAYS` (default 90) are deleted automatically.
+
+The bucket holds client health information: keep it private (never enable public
+access or an r2.dev URL on it).
+
+### Checking backups
+
+Cloudflare dashboard → **R2 → nura-nursing-backups → d1/** lists every backup. The
+Worker's **Logs** tab shows `Backup stored: …` (or `Backup failed: …`) for each nightly
+run. To trigger one immediately, use **Workers → nura-nursing-api → Settings → Trigger
+events → cron → Test**, or locally:
+
+```bash
+npx wrangler dev --test-scheduled
+curl "http://localhost:8787/__scheduled?cron=17+2+*+*+*"
+```
+
+### Downloading and restoring a backup
+
+```bash
+npx wrangler r2 object get nura-nursing-backups/d1/nura-backup-<timestamp>.sql.gz --remote --file=backup.sql.gz
+gunzip backup.sql.gz
+```
+
+The dump includes the schema, so restore it into an **empty** database — e.g. a new one,
+then point `database_id` in `wrangler.toml` at it and redeploy:
+
+```bash
+npx wrangler d1 create nura-nursing-db-restored
+npx wrangler d1 execute nura-nursing-db-restored --remote --file=backup.sql
+```
+
+Delete the downloaded `.sql` file when done — it contains client data and must never be
+committed to git.
 
 ## Local development
 

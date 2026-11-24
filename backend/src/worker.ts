@@ -3,6 +3,7 @@ import { cors } from "hono/cors";
 import { secureHeaders } from "hono/secure-headers";
 import type { AppEnv } from "./types";
 import { createPrismaClient } from "./lib/prisma";
+import { runBackup } from "./lib/backup";
 
 import authRoutes from "./routes/auth";
 import clientRoutes from "./routes/clients";
@@ -48,4 +49,15 @@ app.onError((err, c) => {
   return c.json({ error: "Something went wrong. Please try again." }, 500);
 });
 
-export default app;
+export default {
+  fetch: app.fetch,
+  // Daily database backup to R2 (cron schedule in wrangler.toml).
+  async scheduled(_controller: ScheduledController, env: AppEnv["Bindings"], ctx: ExecutionContext) {
+    ctx.waitUntil(
+      runBackup(env).catch((err) => {
+        console.error("Backup failed:", err?.message || err);
+        throw err;
+      }),
+    );
+  },
+} satisfies ExportedHandler<AppEnv["Bindings"]>;
