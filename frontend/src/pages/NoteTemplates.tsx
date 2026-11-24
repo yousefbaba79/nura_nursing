@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { api, apiErrorMessage } from "../api/client";
-import { Modal, ConfirmDialog, Spinner, EmptyState, ErrorBanner } from "../components/ui";
+import { Modal, ConfirmDialog, Spinner, EmptyState, ErrorBanner, AutoTextarea } from "../components/ui";
 import type { NoteTemplate } from "../api/types";
 
 export default function NoteTemplates() {
@@ -157,7 +157,7 @@ function NoteTemplateForm({
       </div>
       <div>
         <label className="label" htmlFor="nt-text">{t("noteTemplates.textField")}</label>
-        <textarea id="nt-text" className="input" rows={4} value={text} onChange={(e) => setText(e.target.value)} required />
+        <AutoTextarea id="nt-text" className="input" rows={4} value={text} onChange={(e) => setText(e.target.value)} required />
       </div>
       <div className="flex justify-end gap-2 border-t border-gray-200 pt-3">
         <button type="button" className="btn-secondary" onClick={onCancel} disabled={saving}>

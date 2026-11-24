@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { type ReactNode, type TextareaHTMLAttributes, useLayoutEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 
 export function Badge({ children, className = "" }: { children: ReactNode; className?: string }) {
@@ -97,5 +97,38 @@ export function Modal({ open, onClose, title, children, wide }: { open: boolean;
         {children}
       </div>
     </div>
+  );
+}
+
+/**
+ * Textarea that grows with its content. iOS browsers (including Chrome on iPhone,
+ * which uses WebKit) ignore the CSS `resize` property, so the drag handle is not
+ * available there; auto-growing keeps long notes readable on every device.
+ */
+export function AutoTextarea({ className = "", style, ...props }: TextareaHTMLAttributes<HTMLTextAreaElement>) {
+  const ref = useRef<HTMLTextAreaElement>(null);
+
+  const resize = () => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.height = "auto";
+    const cs = getComputedStyle(el);
+    const borders = parseFloat(cs.borderTopWidth) + parseFloat(cs.borderBottomWidth);
+    el.style.height = `${el.scrollHeight + borders}px`;
+  };
+
+  useLayoutEffect(resize, [props.value]);
+
+  return (
+    <textarea
+      ref={ref}
+      className={`${className} max-h-[60vh] overflow-y-auto`}
+      style={style}
+      {...props}
+      onInput={(e) => {
+        resize();
+        props.onInput?.(e);
+      }}
+    />
   );
 }
