@@ -1,7 +1,7 @@
 import { type FormEvent, useEffect, useState, cloneElement } from "react";
 import { useTranslation } from "react-i18next";
 import { api, apiErrorMessage } from "../api/client";
-import { ErrorBanner } from "./ui";
+import { ErrorBanner, AutoTextarea } from "./ui";
 import type { Client } from "../api/types";
 
 export interface ClientFormValues {
@@ -170,7 +170,7 @@ export default function ClientForm({ client, onSaved, onCancel }: Props) {
           <input className="input" value={values.tags} onChange={(e) => update("tags", e.target.value)} placeholder={t("clients.form.tagsPlaceholder")} />
         </Field>
         <Field id="client-notes" label={t("clients.form.generalNotes")} full>
-          <textarea className="input" rows={3} value={values.generalNotes} onChange={(e) => update("generalNotes", e.target.value)} />
+          <AutoTextarea className="input" rows={3} value={values.generalNotes} onChange={(e) => update("generalNotes", e.target.value)} />
         </Field>
       </fieldset>
 
